@@ -310,7 +310,7 @@ function kangStage1DealEncounterCardsToAllPlayers()
     -- TODO: Can this check for the encounter deck be moved to a more generic place?
     Wait.condition(
       function()
-        Global.call("dealEncounterCardsToAllPlayers", {numberOfCards = 1})
+        Global.call("dealEncounterCardsToAllPlayers", {cardsPerPlayer = 1})
       end,
       function()
         local deckOrCard = Global.call("getDeckOrCardAtPosition", {position = Vector(getEncounterDeckPosition())})
@@ -520,7 +520,7 @@ end
 function kangStage2DealEncounterCardsToAllPlayers()
   Wait.frames(
     function()
-      Global.call("dealEncounterCardsToAllPlayers", {numberOfCards = 1})
+      Global.call("dealEncounterCardsToAllPlayers", {cardsPerPlayer = 1})
     end,
     60
   )

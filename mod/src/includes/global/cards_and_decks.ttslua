@@ -15,19 +15,32 @@ end
 
 function dealEncounterCardsToAllPlayers(params)
     local numberOfCards = params.numberOfCards
+    local cardsPerPlayer = params.cardsPerPlayer or 1
     local heroManager = getObjectFromGUID(GUID_HERO_MANAGER)
-    local selectedHeroes = heroManager.call("getSelectedHeroes")
+    local allPlayers = heroManager.call("getPlayersInPlayerOrder")
+
+    if(numberOfCards == nil) then
+        numberOfCards = cardsPerPlayer * #allPlayers
+    end
 
     function dealCardsCoroutine()
-        for i = 1, numberOfCards do
-            for color, _ in pairs(selectedHeroes) do
-                dealEncounterCardToPlayer({
-                    playerColor = color
-                })
+        local playerIndex = 1
 
-                for i = 1, 5 do
-                    coroutine.yield(0)
-                end
+        for i = 1, numberOfCards do
+            local color = allPlayers[playerIndex].playerColor
+
+            dealEncounterCardToPlayer({
+                playerColor = color
+            })
+
+            playerIndex = playerIndex + 1
+
+            if(playerIndex > #allPlayers) then
+                playerIndex = 1
+            end
+
+            for i = 1, 10 do
+                coroutine.yield(0)
             end
         end
 
@@ -222,7 +235,7 @@ function shuffleDeck(params)
     local items = findInRadiusBy(params.deckPosition, 4, isDeck)
 
     if (not items) then
-        log("no deck found at position " .. params.deckPosition)
+        log("No deck found at position " .. params.deckPosition)
         return
     end
 

@@ -85,5 +85,5 @@ function setUpVillainStage_taskmaster(params)
 
   if(stageNumber == "1") then return end
 
-  Global.call("dealEncounterCardsToAllPlayers", {numberOfCards = 1})
+  Global.call("dealEncounterCardsToAllPlayers", {cardsPerPlayer = 1})
 end

@@ -123,7 +123,7 @@ function setUpVillainStage_absorbingMan(params)
 
   if(stageNumber == "2") then
     if(Global.call("cardIsInPlay", {cardId = "04092"})) then
-      Global.call("dealEncounterCardsToAllPlayers", {numberOfCards = 1})
+      Global.call("dealEncounterCardsToAllPlayers", {cardsPerPlayer = 1})
     else
       Global.call("moveCardFromEncounterDeckById", {cardId = "04092", searchInDiscard = true, zoneIndex = "sideScheme"})
     end
