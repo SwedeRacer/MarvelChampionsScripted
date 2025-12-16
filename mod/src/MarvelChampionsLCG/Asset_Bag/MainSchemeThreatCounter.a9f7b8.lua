@@ -6,12 +6,17 @@ local BUTTON_HEIGHT = "180"
 local BUTTON_WIDTH = "200"
 local BUTTON_FONT_SIZE = "160"
 
+local debounceTimer = nil
+local DEBOUNCE_DELAY = 0.3
+
 require('!/components/counter')
 
 function extendUI(params)
     local ui = params.ui
     local primaryButtonLabel = getDataValue("primaryButtonLabel", "ADVANCE")
     local showPrimaryButton = tostring(getDataValue("showPrimaryButton", false))
+    local targetValue = tostring(getDataValue("targetValue", ""))
+    local showTargetValue = targetValue ~= ""
 
     local primaryButton = 
     {
@@ -34,6 +39,26 @@ function extendUI(params)
 
     table.insert(ui[1].children, primaryButton)
 
+    local targetLabel = 
+    {
+        tag = "Button",
+        value = "TARGET: " .. targetValue,
+        attributes = {
+            id = "targetValueLabel",
+            rectAlignment = "MiddleCenter",
+            offsetXY = "0 -130",
+            color = "rgba(1,0,0,0)",
+            textColor = "rgb(1,1,1)",
+            height = "120",
+            width = "475",
+            fontSize = "50",
+            fontStyle = "Bold",
+            active = showTargetValue
+        }
+    }
+
+    table.insert(ui[1].children, targetLabel)
+
     return ui
 end
 
@@ -46,8 +71,19 @@ function setSchemeKey(params)
 end
 
 function setTargetValue(params)
-    setDataValue("targetValue", params.value)
+    local targetValue = params.value
+    local labelText = "TARGET: " .. tostring(targetValue)
+
+    setDataValue("targetValue", targetValue)
     valueUpdated()
+
+    if(targetValue ~= "") then
+        self.UI.setAttribute("targetValueLabel", "text", labelText)
+        self.UI.setAttribute("targetValueLabel", "textColor", "rgb(1,1,1)")
+        self.UI.show("targetValueLabel")
+    else
+        self.UI.hide("targetValueLabel")
+    end
 end
 
 function setPrimaryButtonOptions(params)
@@ -81,21 +117,48 @@ function hidePrimaryButton()
 end
 
 function valueUpdated()
-    local currentValue = getValue()
-    local targetValue = getDataValue("targetValue", 0)
-
-    if (targetValue == 0 or currentValue < (targetValue / 2)) then
-        self.highlightOff()
-        return
+    if debounceTimer then
+        Wait.stop(debounceTimer)
     end
-    
-    local percentage = (currentValue - (targetValue / 2)) / (targetValue / 2)
-    
-    percentage = math.max(0, math.min(1, percentage))
 
-    local red = 1
-    local green = 1 - percentage 
-    local blue = 0
-    
-    self.highlightOn({red, green, blue})
+    debounceTimer = Wait.time(function()
+        local currentValue = getValue()
+        local targetValue = getDataValue("targetValue", 0)
+
+        if (targetValue == 0 or currentValue < (targetValue / 2)) then
+            self.highlightOff()
+            self.UI.setAttribute("targetValueLabel", "textColor", "rgb(1,1,1)")
+            return
+        end
+        
+        local percentage = (currentValue - (targetValue / 2)) / (targetValue / 2)
+        
+        percentage = math.max(0, math.min(1, percentage))
+
+        local red = 1
+        local green = 1 - percentage 
+        local blue = 0
+        
+        local colorString = "rgb(" .. red .. "," .. green .. "," .. blue .. ")"
+        local shouldFlash = currentValue >= (targetValue * 0.75)
+        
+        if shouldFlash then
+            local flashInterval = 0.5
+            
+            for i = 1, 3 do
+                Wait.time(function()
+                    self.highlightOff()
+                    self.UI.setAttribute("targetValueLabel", "textColor", "rgba(0,0,0,0)")
+                end, (i - 1) * flashInterval * 2)
+                
+                Wait.time(function()
+                    self.highlightOn({red, green, blue})
+                    self.UI.setAttribute("targetValueLabel", "textColor", colorString)
+                end, ((i - 1) * flashInterval * 2) + flashInterval)
+            end
+        else
+            self.highlightOn({red, green, blue})
+            self.UI.setAttribute("targetValueLabel", "textColor", colorString)
+        end
+    end, DEBOUNCE_DELAY)
 end
