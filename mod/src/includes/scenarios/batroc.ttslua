@@ -119,7 +119,7 @@ function setUpSchemeStage_batroc_main(params)
             counter.call("setValue", {value = 0})
             alertLevelCard.flip()
         else
-            Global.call("dealEncounterCardsToAllPlayers", {numberOfCards = 1})            
+            Global.call("dealEncounterCardsToAllPlayers", {cardsPerPlayer = 1})            
         end
 
         if(mode == "expert") then

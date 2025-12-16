@@ -367,9 +367,7 @@ function lokiGodOfLiesShatterTheIllusion()
         lokiGodOfLiesFlipGodOfLies()
     end
 
-    Global.call("dealEncounterCardsToAllPlayers", {
-        numberOfCards = 1
-    })
+    Global.call("dealEncounterCardsToAllPlayers", {cardsPerPlayer = 1})
 
     Global.call("displayMessage", {
         message = "Dealing each hero a face-down encounter card.",

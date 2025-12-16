@@ -51,8 +51,7 @@ local currentScenario = nil
 
 function onload(saved_data)
     loadSavedData(saved_data)
-    createContextMenu()
-    -- layOutScenarios()
+
     self.setVar("loaded", true)
 end
 
@@ -432,10 +431,6 @@ function setUpScenario()
     finalizeSetUp(currentScenario)
 
     saveData()
-
-    -- Wait.frames(function()
-    --     showScenarioControlPanel()
-    -- end, 120)
 end
 
 function setInitialFirstPlayer()
@@ -1600,83 +1595,9 @@ function spawnNemesis(params)
     })
 end
 
-function createContextMenu()
-    self.addContextMenuItem("Lay Out Scenarios", layOutScenarios)
-    self.addContextMenuItem("Delete Scenarios", deleteScenarios)
-    self.addContextMenuItem("Delete Everything", deleteEverything)
-end
 
--- Layout functions - move to central layout manager
 
-local originPosition = {
-    x = 83.25,
-    y = 0.50,
-    z = 33.75
-}
 
-local rowGap = 2.5
-local columnGap = 5
-
-local rows = 12
-
-function layOutScenarios()
-    local layoutManager = getObjectFromGUID(Global.getVar("GUID_LAYOUT_MANAGER"))
-    layoutManager.call("layOutSelectorTiles", {
-        origin = originPosition,
-        direction = "vertical",
-        maxRowsOrColumns = rows,
-        columnGap = columnGap,
-        rowGap = rowGap,
-        items = scenarios,
-        itemType = "scenario",
-        behavior = "layOut"
-    })
-end
-
-function layOutScenarioSelectors(params)
-    local layoutManager = getObjectFromGUID(Global.getVar("GUID_LAYOUT_MANAGER"))
-    layoutManager.call("layOutSelectorTiles", {
-        origin = params.origin,
-        center = params.center or {0, 0.5, 0},
-        direction = params.direction or "horizontal",
-        maxRowsOrColumns = params.maxRowsOrColumns or 6,
-        columnGap = params.columnGap or 6.5,
-        rowGap = params.rowGap or 3.5,
-        selectorScale = params.selectorScale or {1.33, 1, 1.33},
-        items = scenarios,
-        itemType = "scenario",
-        behavior = params.behavior,
-        hidden = params.hidden
-    })
-end
-
-function deleteScenarios()
-    local layoutManager = getObjectFromGUID(Global.getVar("GUID_LAYOUT_MANAGER"))
-    layoutManager.call("clearSelectorTiles", {
-        itemType = "scenario"
-    })
-end
-
-function deleteEverything()
-    local layoutManager = getObjectFromGUID(Global.getVar("GUID_LAYOUT_MANAGER"))
-    layoutManager.call("clearSelectorTiles", {
-        itemType = "hero"
-    })
-    layoutManager.call("clearSelectorTiles", {
-        itemType = "scenario"
-    })
-    layoutManager.call("clearSelectorTiles", {
-        itemType = "modular-set"
-    })
-
-    clearData()
-
-    local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
-    heroManager.call("clearData")
-
-    local encounterSetManager = getObjectFromGUID(Global.getVar("GUID_MODULAR_SET_MANAGER"))
-    encounterSetManager.call("clearData")
-end
 
 function deepCopy(obj, seen)
     if type(obj) ~= 'table' then
@@ -1714,6 +1635,10 @@ function advanceVillainStage(villainKey, heroCount)
     setUpVillainStage(villain, nextStage, heroCount)
 
     saveData()
+    
+    -- Wait.frames(function()
+    --     showScenarioControlPanel()
+    -- end, 1)
 end
 
 function getNextVillainStage(villainKey)
@@ -1858,6 +1783,10 @@ function advanceSchemeStage(schemeKey, heroCount)
     setUpSchemeStage(scheme, nextStage, heroCount)
 
     saveData()
+
+    -- Wait.frames(function()
+    --     showScenarioControlPanel()
+    -- end, 1)
 end
 
 function getNextSchemeStage(scheme)

@@ -163,13 +163,13 @@ function setUpVillainStage_mutagenFormula(params)
   Wait.frames(
     function()
       if(stageNumber == "2") then
-        Global.call("dealEncounterCardsToAllPlayers", {numberOfCards = 2})
+        Global.call("dealEncounterCardsToAllPlayers", {cardsPerPlayer = 2})
       end
     end,
     delay
   )
 
   if(stageNumber == "3") then
-    Global.call("dealEncounterCardsToAllPlayers", {numberOfCards = 3})
+    Global.call("dealEncounterCardsToAllPlayers", {cardsPerPlayer = 3})
   end
 end
