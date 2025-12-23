@@ -165,6 +165,7 @@ ZONE_ATTACHMENT = {
    rescaleOnExit = true,
    repositionCards = true,
    addCountersAndTokens = true,
+   overflowPosition = {-12.75, 0.97, 15.25},
    group = "scenario"
 }
 

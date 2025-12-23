@@ -80,10 +80,15 @@ function setUpSchemeStage_taskmaster_main(params)
 end
 
 function setUpVillainStage_taskmaster(params)
-  local stage = params.stage
-  local stageNumber = string.sub(stage.key, -1)
+    local stage = params.stage
+    local stageNumber = string.sub(stage.key, -1)
 
-  if(stageNumber == "1") then return end
+    if(stageNumber == "1") then return end
 
-  Global.call("dealEncounterCardsToAllPlayers", {cardsPerPlayer = 1})
+    Global.call("dealEncounterCardsToAllPlayers", {cardsPerPlayer = 1})
+
+    Global.call("displayMessage", {
+        message = "Encounter cards for everyone!",
+        messageType = Global.getVar("MESSAGE_TYPE_INFO")
+    })
 end

@@ -1136,6 +1136,10 @@ function placeDeck(deck)
         name = deck.name
     })
 
+    Wait.frames(function()
+        spawnedDeck.shuffle()
+    end, 10)
+
     local linkedCards = spawnedDeck.getGMNotes()
 
     if (linkedCards and string.len(linkedCards) > 0) then

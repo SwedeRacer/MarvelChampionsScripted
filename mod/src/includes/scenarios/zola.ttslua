@@ -1,6 +1,7 @@
 scenarios["zola"] =
 {
     name="Zola",
+    fullyScripted = true,
     tileImageUrl="https://steamusercontent-a.akamaihd.net/ugc/1849305905150149561/7BDA5483418FB33A377C93A60F7D06F1E3774351/",
     villains={
         zola={
@@ -40,14 +41,6 @@ scenarios["zola"] =
             }
         }
     },
-    cards={
-        hydraPrison={
-            cardId="04122",
-            position={7.25, 0.97, 16.75},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER")),
-            landscape=true
-        }
-    },
     decks={
         encounterDeck={
             name="Zola's Encounter Deck",
@@ -60,6 +53,7 @@ scenarios["zola"] =
                 ["04119"]=2,
                 ["04120"]=3,
                 ["04121"]=2,
+                ["04122"]=1,
                 ["04123"]=2,
                 ["04124"]=1,
             }
@@ -69,3 +63,72 @@ scenarios["zola"] =
         underAttack="recommended"
     }
 }
+
+function setUpSchemeStage_zola_main(params)
+    local stage = params.stage
+    local stageNumber = string.sub(stage.key, -1)
+
+    if(stageNumber == "1") then
+        local hydraPrisonCardId = "04122"
+        Global.call(
+            "moveCardFromEncounterDeckById", 
+            {
+                cardId = hydraPrisonCardId, 
+                searchInDiscard = true,
+                zoneIndex = "sideScheme"
+            })
+
+        local ultimateBioServantCardId = "04114"
+        Global.call("dealMinionToAllPlayers", {cardId = ultimateBioServantCardId})
+
+        Global.call("displayMessage", {
+            message="Zola's Ultimate Bio-Servants attack the heroes!"
+        })
+
+        Global.call("displayMessage", {
+            message="Each player searches their deck, discard pile and hand for a hero-specific ally and places it facedown beneath Hydra Prison. Place X threat on Hydra Prison, where X is the total cost of all allies beneath it. Each player shuffles their deck.",
+            messageType=Global.getVar("MESSAGE_TYPE_INSTRUCTION")
+        })
+    end
+
+    if(stageNumber == "2") then
+        Global.call("displayMessage", {
+            message="Each player searches the encounter deck and discard pile for a minion and reveals it. Shuffle the encounter deck.",
+            messageType=Global.getVar("MESSAGE_TYPE_INSTRUCTION")
+        })
+    end
+end
+
+function setUpVillainStage_zola(params)
+    local stage = params.stage
+    local stageNumber = string.sub(stage.key, -1)
+
+    if(stageNumber == "2") then
+        local mode = currentScenario.mode
+        local delay = (mode == "expert") and 120 or 0
+        local testSubjectsCardId = "04123"
+
+        Wait.frames(function()
+            local testSubjectsCard = Global.call(
+                "moveCardFromEncounterDeckById", 
+                {
+                    cardId = testSubjectsCardId, 
+                    searchInDiscard = true,
+                    zoneIndex = "sideScheme"
+                })
+
+            if(testSubjectsCard) then
+                Global.call("displayMessage", {
+                    message = "Zola begins experimenting on a new batch of test subjects!"
+                })
+            end
+        end, delay)
+    end
+
+    if(stageNumber == "3") then
+        Global.call("displayMessage", {
+            message="Each player searches the encounter deck and discard pile for a minion and reveals it. Shuffle the encounter deck.",
+            messageType=Global.getVar("MESSAGE_TYPE_INSTRUCTION")
+        })
+    end
+end
