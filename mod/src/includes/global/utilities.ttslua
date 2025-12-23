@@ -61,7 +61,7 @@ end
 
 function displayMessage(params)
     local message = params.message
-    local messageType = params.messageType
+    local messageType = params.messageType or MESSAGE_TYPE_INFO
     local playerColor = params.playerColor
  
     if messageType == MESSAGE_TYPE_PLAYER then

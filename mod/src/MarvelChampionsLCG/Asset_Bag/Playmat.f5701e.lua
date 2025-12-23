@@ -439,7 +439,7 @@ function drawEncounter(player, value, id)
 end
 
 function discardEncounter()
-   Global.call("discardEncounterCard", {playerColor = getValue("playerColor")})
+   Global.call("discardPlayerEncounterCard", {playerColor = getValue("playerColor")})
 end
 
 function discardRandom(object, player)

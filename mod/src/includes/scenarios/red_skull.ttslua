@@ -1,6 +1,7 @@
 scenarios["redSkull"] =
 {
     name="Red Skull",
+    fullyScripted = true,
     tileImageUrl="https://steamusercontent-a.akamaihd.net/ugc/1849305905150138001/6A9EC283F45343AF8C06D9001FF6DA4DC11E99E3/",
     villains={
         redSkull={
@@ -40,23 +41,11 @@ scenarios["redSkull"] =
             }
         }
     },
-    cards={
-        sleeper={
-            cardId="04130",
-            position={-13.75, 0.97, 30.25},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER"))
-        },
-        redHouse={
-            cardId="04139",
-            position={7.25, 0.97, 16.75},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER")),
-            landscape=true
-        }
-    },
     decks={
         encounterDeck={
             name="Red Skull's Encounter Deck",
             cards={
+                ["04130"]=1,
                 ["04131"]=3,
                 ["04132"]=1,
                 ["04133"]=2,
@@ -64,14 +53,8 @@ scenarios["redSkull"] =
                 ["04135"]=2,
                 ["04136"]=2,
                 ["04137"]=2,
-                ["04138"]=2
-            }
-        },
-        sideSchemes={
-            name="Side Scheme Deck",
-            position={-19.25, 1.01, 30.75},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER")),
-            cards={
+                ["04138"]=2,
+                ["04139"]=1,
                 ["04140"]=1,
                 ["04141"]=1,
                 ["04142"]=1,
@@ -85,3 +68,123 @@ scenarios["redSkull"] =
         hydraPatrol="recommended"
     }
 }
+
+function setUpSchemeStage_redSkull_main(params)
+    local stage = params.stage
+    local stageNumber = string.sub(stage.key, -1)
+
+    if(stageNumber == "1") then
+        redSkullSetUpSchemeStage1()
+    end
+
+    if(stageNumber == "2") then
+        Global.call("displayMessage", {
+            message = "Reveal the top card of the Side Scheme deck and put it into play.",
+            messageType = Global.getVar("MESSAGE_TYPE_INSTRUCTION")
+        })
+    end
+end
+
+function redSkullSetUpSchemeStage1()
+    --Put The Red House side scheme (04139) into play
+    local redHouseCardId = "04139"
+    Global.call(
+        "moveCardFromEncounterDeckById", 
+        {
+            cardId = redHouseCardId, 
+            searchInDiscard = true,
+            zoneIndex = "sideScheme"
+        })
+
+    --Set The Sleeper minion (04130) aside
+    local sleeperCardId = "04130"
+    Global.call(
+        "moveCardFromEncounterDeckById", 
+        {
+            cardId = sleeperCardId, 
+            searchInDiscard = true,
+            destinationPosition = {-13.75, 1, 30.25}
+        })
+    
+    --Move all side schemes into a side scheme deck
+    local encounterDeck = Global.call("getEncounterDeck")
+    local cards = encounterDeck.getObjects()
+    local sideSchemeCardIds = {}
+    local sideSchemeDeckPosition = {-19.25, 1.10, 30.75}
+    local labelPosition = Vector(sideSchemeDeckPosition) + Vector({0, 0, 5.25})
+    
+    function createSideSchemeDeckCoroutine()
+        for i= 1, 30 do
+            coroutine.yield(0)
+        end
+
+        for _, card in pairs(cards) do
+            local cardData = Global.call("getCardData", {card = card})
+            if(cardData.type == "side_scheme") then
+                table.insert(sideSchemeCardIds, cardData.code)
+            end
+        end
+
+        for _, cardId in pairs(sideSchemeCardIds) do
+            Global.call(
+                "moveCardFromEncounterDeckById", 
+                {
+                    cardId = cardId, 
+                    searchInDiscard = false,
+                    destinationPosition = {-19.25, 1.10, 30.75},
+                    flipCard = true
+                })
+
+            for i= 1, 10 do
+                coroutine.yield(0)
+            end
+        end
+
+        for i= 1, 120 do
+            coroutine.yield(0)
+        end
+
+        Global.call("nameDeck", {
+            deckPosition = sideSchemeDeckPosition,
+            name = "Side Schemes"
+        })
+
+        spawnObject({
+            type = "3DText",
+            position = labelPosition,
+            rotation = {90, 0, 0},
+            callback_function = function(spawned_object)
+                spawned_object.TextTool.setValue("Side\nSchemes")
+                spawned_object.TextTool.setFontSize(60)
+                spawned_object.TextTool.setFontColor({1, 1, 1})
+                spawned_object.interactable = false
+                spawned_object.addTag("delete-with-scenario")
+            end
+        })
+
+        local sideSchemeDeck = Global.call("getDeckOrCardAtPosition", {position = sideSchemeDeckPosition})
+        sideSchemeDeck.shuffle()
+
+        return 1
+    end
+
+    startLuaCoroutine(self, "createSideSchemeDeckCoroutine")
+end
+
+function setUpVillainStage_redSkull(params)
+    local stage = params.stage
+    local stageNumber = string.sub(stage.key, -1)
+    local mode = currentScenario.mode
+    local delay = (mode == "expert" and stageNumber == "2") and 150 or 0
+
+    if(stageNumber == "1") then return end
+
+    Wait.frames(function()
+        Global.call("dealEncounterCardsToAllPlayers", {cardsPerPlayer = 1})
+
+        Global.call("displayMessage", {
+            message = "Encounter cards for everyone!",
+            messageType = Global.getVar("MESSAGE_TYPE_INFO")
+        })
+    end, delay)
+end

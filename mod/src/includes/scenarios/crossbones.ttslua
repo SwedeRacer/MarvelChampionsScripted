@@ -1,6 +1,7 @@
 scenarios["crossbones"] =
 {
     name="Crossbones",
+    fullyScripted=true,
     tileImageUrl="https://steamusercontent-a.akamaihd.net/ugc/1833526625011331024/2436BF66FF5980186D51FFDBA4D6E4DA16CBA24C/",
     villains={
         crossbones={
@@ -58,17 +59,6 @@ scenarios["crossbones"] =
                 ["04070"]=2,
                 ["04071"]=1
             }
-        },
-        experimentalWeapons={
-            name="Experimental Weapons",
-            position={-17.25, 1.25, 32.25},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER")),
-            cards={
-                ["04072"]=1,
-                ["04073"]=1,
-                ["04074"]=1,
-                ["04075"]=1
-            }
         }
     },
     modularSets={
@@ -77,3 +67,64 @@ scenarios["crossbones"] =
         legionsOfHydra="recommended"
     }
 }
+
+function prepareScenario_crossbones()
+    local experimentalWeapons = {
+        {cardId="04072", name="Laser Rifle"},
+        {cardId="04073", name="Energy Shield"},
+        {cardId="04074", name="Power Gauntlets"},
+        {cardId="04075", name="Exo-Suit"}
+    }
+
+  currentScenario.experimentalWeapons = Global.call("shuffleTable", {table=experimentalWeapons})
+  currentScenario.experimentalWeaponsIndex = 1
+end
+
+function setUpVillainStage_crossbones(params)
+    local stage = params.stage
+    local stageNumber = string.sub(stage.key, -1)
+    
+    if(stageNumber == "2") then
+        local crossbonesMachineGunCardId = "04064"
+        local delay = currentScenario.mode == "standard" and 0 or 10
+
+        Wait.frames(function()
+            Global.call("moveCardFromEncounterDeckById", {
+                cardId = crossbonesMachineGunCardId,
+                searchInDiscard = true,
+                zoneIndex = "attachment"
+            })
+
+            Global.call("displayMessage", {
+                message = "Crossbones equips his machine gun!",
+                messageType = Global.getVar("MESSAGE_TYPE_INFO")
+            })
+        end, delay)
+    end
+
+    if(stageNumber == "3") then
+        crossbonesPlaceExperimentalWeapon()
+    end
+end
+
+function setUpSchemeStage_crossbones_main(params)
+    crossbonesPlaceExperimentalWeapon()
+end
+
+function crossbonesPlaceExperimentalWeapon()
+    local experimentalWeaponCard = currentScenario.experimentalWeapons[currentScenario.experimentalWeaponsIndex]
+    
+    Global.call("spawnCardAndMoveFromEncounterDeckById", {
+        cardId = experimentalWeaponCard.cardId,
+        zoneIndex = "attachment"
+    })
+
+    Global.call("displayMessage", {
+        message = "Crossbones equips the " .. experimentalWeaponCard.name .. "!",
+        messageType = Global.getVar("MESSAGE_TYPE_INFO")
+    })
+
+    currentScenario.experimentalWeaponsIndex = currentScenario.experimentalWeaponsIndex + 1
+
+    saveData()
+end

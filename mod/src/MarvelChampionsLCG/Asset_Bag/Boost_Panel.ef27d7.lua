@@ -33,5 +33,5 @@ function drawBoost(object, player, isRightClick)
 end
 
 function discardBoost(object, player, isRightClick)
-    Global.call("discardBoostcard", {self.getRotation()})
+    Global.call("discardBoostcard")
 end
