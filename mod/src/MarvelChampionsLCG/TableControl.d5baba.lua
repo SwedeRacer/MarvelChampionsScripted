@@ -237,7 +237,7 @@ function changeTableButtonClicked(player, value, id)
 end
 
 function setTableImage(player, value, id)
-	Global.UI.setXml("")
+	Global.call("showScenarioControlPanel")
 	local currentCover = Global.call("findObjectByTag", {tag="table-cover"})
 	local tableUrl = baseImageUrl .. id .. ".png"
 

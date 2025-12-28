@@ -1,3 +1,5 @@
+require('!/lib/json')
+
 preventDeletion = true
 
 local defaults = {
@@ -48,11 +50,20 @@ local defaults = {
 
 local scenarios = {}
 local currentScenario = nil
+local allEncounterSets = {}
 
 function onload(saved_data)
     loadSavedData(saved_data)
 
-    self.setVar("loaded", true)
+    local encounterSetManager = getObjectFromGUID(Global.getVar("GUID_MODULAR_SET_MANAGER"))
+    allEncounterSets = encounterSetManager.call("getEncounterSets", {})
+
+    if(currentScenario ~= nil) then
+        showScenarioControlPanel()
+    else
+        local scenarioButton = getObjectFromGUID(Global.getVar("GUID_SCENARIO_BUTTON"))
+        scenarioButton.call("showUI")
+    end
 end
 
 function clearData()
@@ -62,13 +73,13 @@ end
 
 function loadSavedData(saved_data)
     if saved_data ~= "" then
-        local loaded_data = JSON.decode(saved_data)
+        local loaded_data = json.decode(saved_data)
         currentScenario = loaded_data
     end
 end
 
 function saveData()
-    local saved_data = JSON.encode(currentScenario)
+    local saved_data = json.encode(currentScenario)
     self.script_state = saved_data
 end
 
@@ -377,11 +388,11 @@ function setUpScenario()
     currentScenario.inProgress = true
 
     local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
-    local layoutManager = getObjectFromGUID(Global.getVar("GUID_LAYOUT_MANAGER"))
-
     heroManager.call("hideHeroSelection")
 
-    layoutManager.call("hideSetupUI")
+    local scenarioButton = getObjectFromGUID(Global.getVar("GUID_SCENARIO_BUTTON"))
+    scenarioButton.call("hideUI")
+
     prepareScenario()
 
     setUpZones()
@@ -501,7 +512,7 @@ end
 function createVictoryDisplayText()
     spawnObject({
         type = "3DText",
-        position = {78.25, 0.55, 26.25},
+        position = {78.25, 0.55, 37.25},
         rotation = {90, 0, 0},
         callback_function = function(spawned_object)
             spawned_object.TextTool.setValue("Victory Display")
@@ -515,7 +526,7 @@ function createVictoryDisplayText()
 
     spawnObject({
         type = "3DText",
-        position = {69.25, 0.51, -2.25},
+        position = {69.25, 0.51, 9.25},
         rotation = {90, 0, 0},
         callback_function = function(spawned_object)
             spawned_object.TextTool.setValue("Victory Points: 0")
@@ -529,7 +540,7 @@ function createVictoryDisplayText()
 
     spawnObject({
         type = "3DText",
-        position = {87.25, 0.51, -2.25},
+        position = {87.25, 0.51, 9.25},
         rotation = {90, 0, 0},
         callback_function = function(spawned_object)
             spawned_object.TextTool.setValue("Items: 0")
@@ -1475,7 +1486,8 @@ function finalizeSetUp(scenario)
 end
 
 function clearScenario()
-    Global.UI.setXml("")
+    hideScenarioControlPanel()
+
     Global.call("deleteZoneGroup", {group = "scenario"})
 
     local allObjects = getAllObjects()
@@ -1512,15 +1524,19 @@ function clearScenario()
         end
     end
 
-    local turnCounter = getObjectFromGUID("turncounter")
-    turnCounter.call('setValue', {
-        value = 0
-    })
-
     clearData()
+
+    local firstPlayerToken = getObjectFromGUID(Global.getVar("FIRST_PLAYER_TOKEN_GUID"))
+    local firstPlayerTokenPosition = Global.getTable("FIRST_PLAYER_TOKEN_POSITION")
+    if(firstPlayerToken) then
+        firstPlayerToken.setPositionSmooth(firstPlayerTokenPosition)
+    end
 
     local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
     heroManager.call("showHeroSelection")
+
+    local scenarioButton = getObjectFromGUID(Global.getVar("GUID_SCENARIO_BUTTON"))
+    scenarioButton.call("showUI")
 end
 
 -- TODO: These functions should be moved to global
@@ -1640,9 +1656,9 @@ function advanceVillainStage(villainKey, heroCount)
 
     saveData()
     
-    -- Wait.frames(function()
-    --     showScenarioControlPanel()
-    -- end, 1)
+    Wait.frames(function()
+        showScenarioControlPanel()
+    end, 1)
 end
 
 function getNextVillainStage(villainKey)
@@ -1788,9 +1804,9 @@ function advanceSchemeStage(schemeKey, heroCount)
 
     saveData()
 
-    -- Wait.frames(function()
-    --     showScenarioControlPanel()
-    -- end, 1)
+    Wait.frames(function()
+        showScenarioControlPanel()
+    end, 1)
 end
 
 function getNextSchemeStage(scheme)
@@ -2066,6 +2082,7 @@ function getSelectedSetCount()
     return count
 end
 
+require('!/scenario_manager/scenario_selection_ui')
 require('!/scenario_manager/scenario_control_panel')
 
 

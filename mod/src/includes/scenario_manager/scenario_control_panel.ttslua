@@ -1,41 +1,130 @@
+local cdnUrl = Global.getVar("CDN_URL")
+
 function showScenarioControlPanel()
+	if(not currentScenario) then 
+		Global.UI.setXml("")
+		return 
+	end
+
+	local turnCount = currentScenario.turnCount or 1
+
     local scenarioControlPanelUI = {{
         tag = "Panel",
         attributes = {
-            height = "100",
+            height = "50",
             width = "300",
-            color = "rgba(0,0,1,1)",
+            color = "rgba(0,0,0,0)",
             rectAlignment = "UpperRight",
-            offsetXY = "-200 -10",
+            offsetXY = "-500 0",
         },
         children = {
 			{
 				tag = "HorizontalLayout",
 				attributes = {
-					childAlignment = "MiddleCenter",
+					childAlignment = "UpperLeft",
+					childForceExpandWidth = false,
 					spacing = "10"
 				},
 				children = {
 					{
-						tag = "Button",
-						value = "Threat",
+						tag = "Panel",
 						attributes = {
-							height = "80",
-							preferredWidth = "130",
+							preferredWidth = "50",
 							flexibleWidth = "0",
-							fontSize = "30",
+							tooltip = "Add threat to the main scheme",
+							tooltipPosition = "Below",
 							onClick = self.getGUID() .. "/threatButtonClicked"
+						},
+						children = {
+							{
+								tag = "Image",
+								attributes = {
+									image = cdnUrl .. "/assets/control-panel-threat.png",
+									preserveAspect = true
+								}
+							}
 						}
 					},
 					{
-						tag = "Button",
-						value = "Encounter\nCards",
+						tag = "Panel",
 						attributes = {
-							height = "80",
-							preferredWidth = "130",
+							preferredWidth = "33",
+							contentSizeFitter = "horizontal",
 							flexibleWidth = "0",
-							fontSize = "30",
+							tooltip = "Deal encounter cards to all players",
+							tooltipPosition = "Below",
 							onClick = self.getGUID() .. "/encounterCardsButtonClicked"
+						},
+						children = {
+							{
+								tag = "Image",
+								attributes = {
+									image = cdnUrl .. "/card-backs/encounter.jpg",
+									preserveAspect = true
+								}
+							}
+						}
+					},
+					{
+						tag = "Panel",
+						attributes = {
+							preferredWidth = "86",
+							flexibleWidth = "0",
+							tooltip = "Turn counter",
+							tooltipPosition = "Below"
+						},
+						children = {
+							{
+								tag = "Image",
+								attributes = {
+									image = cdnUrl .. "/counters/turn.png",
+									preserveAspect = true
+								}
+							},
+							{
+								tag = "Button",
+								value = tostring(turnCount),
+								attributes = {
+									id = "turnCountButton",
+									rectAlignment = "MiddleLeft",
+									onClick = self.getGUID() .. "/turnCounterClicked",
+									color = "rgba(0,0,0,0)",
+									textColor = "rgb(0,0,0)",
+									height = "40",
+									width = "45",
+									fontSize = "30",
+									fontStyle = "Bold"
+								}
+							}
+						}
+					},
+					{
+						tag = "Panel",
+						attributes = {
+							preferredWidth = "107",
+							flexibleWidth = "0",
+							tooltip = "Clear the Scenario",
+							tooltipPosition = "Below"
+						},
+						children = {
+							{
+								tag = "Image",
+								attributes = {
+									image = "https://steamusercontent-a.akamaihd.net/ugc/2476508329238019024/F96C056CE02B90986413B56023F34DFA544164B2/",
+									preserveAspect = true
+								}
+							},
+							{
+								tag = "Button",
+								value = "CLEAR",
+								attributes = {
+									alignment = "MiddleCenter",
+									fontSize = "20",
+									color = "rgba(0,0,0,0)",
+									textColor = "rgb(1,1,1)",
+									onClick = self.getGUID() .. "/clearButtonClicked"
+								}
+							}
 						}
 					}
 				}
@@ -65,7 +154,7 @@ function threatButtonClicked(player, value, id)
 
 	local totalAcceleration = accelerationFromSchemeStage + accelerationFromCards + accelerationFromCounters
 
-	threatCounter.call("adjustValue", {adjustment=totalAcceleration})
+	threatCounter.call("adjustValue", {adjustment = totalAcceleration})
 end
 
 function encounterCardsButtonClicked(player, value, id)
@@ -73,4 +162,28 @@ function encounterCardsButtonClicked(player, value, id)
 	local hazardFromCards = Global.call("countCardIconsInPlay", {iconType="hazard"})
 	local cardsToDeal = heroCount + hazardFromCards
 	Global.call("dealEncounterCardsToAllPlayers", {numberOfCards = cardsToDeal})
+end
+
+function turnCounterClicked(player, value, id)
+    local rightClick = value == "-2"
+	local adjustment = rightClick and -1 or 1
+
+	adjustTurnCount({adjustment = adjustment})
+end
+
+function clearButtonClicked(player, value, id)
+	clearScenario()
+end
+
+function adjustTurnCount(params)
+    local turnCount = currentScenario.turnCount or 0
+
+    turnCount = turnCount + params.adjustment
+    if turnCount < 1 then turnCount = 1 end
+
+	currentScenario.turnCount = turnCount
+
+	saveData()
+
+	Global.UI.setAttribute("turnCountButton", "text", tostring(turnCount))
 end
