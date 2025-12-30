@@ -15,7 +15,7 @@ function showScenarioControlPanel()
             width = "300",
             color = "rgba(0,0,0,0)",
             rectAlignment = "UpperRight",
-            offsetXY = "-500 0",
+            offsetXY = "-500 -5",
         },
         children = {
 			{
@@ -39,7 +39,9 @@ function showScenarioControlPanel()
 							{
 								tag = "Image",
 								attributes = {
-									image = cdnUrl .. "/assets/control-panel-threat.png",
+									image = "https://steamusercontent-a.akamaihd.net/ugc/12782670079207614076/57F10F28BD2F62536BA04D0D2869B0A30E533251/", -- cdnUrl .. "/assets/control-panel-threat.png",
+									rectAlignment = "MiddleCenter",
+									height = "40",
 									preserveAspect = true
 								}
 							}
@@ -59,7 +61,7 @@ function showScenarioControlPanel()
 							{
 								tag = "Image",
 								attributes = {
-									image = cdnUrl .. "/card-backs/encounter.jpg",
+									image = "https://steamusercontent-a.akamaihd.net/ugc/16634110925634444748/3BA78927F4723EDBDFF8A567B72FC1B3CA44B7F8/", -- cdnUrl .. "/card-backs/encounter.jpg",
 									preserveAspect = true
 								}
 							}
@@ -77,7 +79,7 @@ function showScenarioControlPanel()
 							{
 								tag = "Image",
 								attributes = {
-									image = cdnUrl .. "/counters/turn.png",
+									image = "https://steamusercontent-a.akamaihd.net/ugc/11948548561271011510/2690C35F818CBA5374500BD49C9836753DAF09F7/", -- cdnUrl .. "/counters/turn.png",
 									preserveAspect = true
 								}
 							},
@@ -140,6 +142,8 @@ function hideScenarioControlPanel()
 end
 
 function threatButtonClicked(player, value, id)
+	if(not currentScenario) then return end
+
 	local scheme = currentScenario.schemes["main"]
 	local threatCounterGuid = scheme.threatCounter.guid
 	local threatCounter = getObjectFromGUID(threatCounterGuid)
@@ -158,6 +162,8 @@ function threatButtonClicked(player, value, id)
 end
 
 function encounterCardsButtonClicked(player, value, id)
+	if(not currentScenario) then return end
+	
 	local heroCount = getHeroCount()
 	local hazardFromCards = Global.call("countCardIconsInPlay", {iconType="hazard"})
 	local cardsToDeal = heroCount + hazardFromCards

@@ -39,8 +39,11 @@ function dealEncounterCardsToAllPlayers(params)
                 playerIndex = 1
             end
 
-            for i = 1, 10 do
+            local i = 1
+
+            while (Global.getVar("shuffling-encounter") or i < 30) do
                 coroutine.yield(0)
+                i = i + 1
             end
         end
 
@@ -188,7 +191,7 @@ function refreshEncounterDeck()
     local encounterDeckPosition = Vector(scenarioManager.call('getEncounterDeckPosition')) + Vector(0,1.5,0)
     local encounterDiscardPosition = Vector(scenarioManager.call('getEncounterDiscardPosition'))
 
-    refreshDeck({deckPosition = encounterDeckPosition, discardPosition = encounterDiscardPosition})
+    refreshDeck({deckPosition = encounterDeckPosition, discardPosition = encounterDiscardPosition, deckType = "encounter"})
 
     displayMessage({
         message = "Reshuffled the encounter deck.",
@@ -557,7 +560,7 @@ function getCardAtPosition(params)
     position = Vector(params.position)
     position["y"] = 0
 
-    local objects = findInRadiusBy(position, 3, isCard, false)
+    local objects = findInRadiusBy(position, 1, isCard, false)
     
     if(#objects == 0) then
         return nil
@@ -570,7 +573,7 @@ function getDeckAtPosition(params)
     position = Vector(params.position)
     position["y"] = 0
 
-    local objects = findInRadiusBy(position, 3, isDeck, false)
+    local objects = findInRadiusBy(position, 1, isDeck, false)
 
     if(#objects == 0) then
         return nil
@@ -874,7 +877,8 @@ function refreshPlayerDeck(params)
 
     refreshDeck({
         deckPosition = deckPosition,
-        discardPosition = discardPosition
+        discardPosition = discardPosition,
+        deckType = playerColor
     })
     displayMessage({
         message = "You cycled your deck. Time for an encounter card!",
@@ -902,6 +906,7 @@ end
 function refreshDeck(params)
     local deckPosition = params.deckPosition
     local discardPosition = params.discardPosition
+    
     local deck = getDeckOrCardAtPosition({
         position = discardPosition
     })
@@ -910,11 +915,18 @@ function refreshDeck(params)
         return
     end
 
+    local shuffleFlag = "shuffling-" .. params.deckType
+    Global.setVar(shuffleFlag, true)
+
     deck.setPositionSmooth(deckPosition, false, false)
     deck.setRotationSmooth({0, 180, 180}, false, false)
 
     Wait.condition(function()
         deck.shuffle()
+
+        Wait.frames(function()
+            Global.setVar(shuffleFlag, false)
+        end, 90)
     end, function()
         return deck.resting
     end, 2)
@@ -1002,6 +1014,7 @@ function countCardIconsInPlay(params)
 
             if(not cardData) then goto continueIconCount end
             if(not isFaceUp({object = object})) then goto continueIconCount end
+            if(cardIsInZone({card = object, zoneIndex = "victoryDisplay"})) then goto continueIconCount end
 
             for _, deckPosition in pairs(deckPositions) do
                 if objectIsAtPosition({
