@@ -184,7 +184,7 @@ end
 function placeCampaign(campaignId)
     local campaignManager = getCampaignManager()
     campaignManager.call("placeCampaign", {campaignId = campaignId})
-    Global.UI.setXml("")
+    Global.call("showScenarioControlPanel")
     self.reload()
 end
 
@@ -195,5 +195,5 @@ function clearCampaign()
 end
 
 function cancel()
-    Global.UI.setXml("")
+    Global.call("showScenarioControlPanel")
 end

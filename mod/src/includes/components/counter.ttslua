@@ -78,8 +78,8 @@ function setUpUI()
     self.UI.setXmlTable(ui) 
 end
 
-function valueButtonClicked(player, value, id)
-    local rightClick = value == "-2"
+function valueButtonClicked(player, clickValue, id)
+    local rightClick = clickValue == "-2"
     local value = getDataValue("value", 0)
 
     value = rightClick and value - 1 or value + 1

@@ -570,7 +570,7 @@ function drawCards(params)
          local deckPosition = getPlayerDeckPosition()
          local discardPosition = getPlayerDiscardPosition()
 
-         Global.call("refreshDeck", {deckPosition = deckPosition, discardPosition = discardPosition})
+         Global.call("refreshDeck", {deckPosition = deckPosition, discardPosition = discardPosition, deckType = positionColor})
          Global.call("displayMessage", {message = "You cycled your deck. Time for an encounter card!", messageType = Global.getVar("MESSAGE_TYPE_INFO"), playerColor = positionColor})
          Global.call("dealEncounterCardToPlayer", {playerColor = positionColor})
 

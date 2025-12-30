@@ -81,6 +81,7 @@ GUID_LARGE_GENERAL_COUNTER_BAG = "65c1cc"
 GUID_ACCELERATION_COUNTER_BAG  = "2604fd"
 GUID_THREAT_COUNTER_BAG        = "eb5d6d"
 GUID_HEALTH_COUNTER_BAG        = "029e3b"
+GUID_SCENARIO_BUTTON           = "40c742"
 
 FIRST_PLAYER_TOKEN_GUID        = "d93792"
 FIRST_PLAYER_TOKEN_POSITION = {-49.50, 1.07, 33.25}
@@ -182,9 +183,9 @@ ZONE_ENCOUNTER_DECK = {
 
 ZONE_VICTORY_DISPLAY = {
    zoneIndex = "victoryDisplay",
-   position = {78.00, 0.50, 10.75},
+   position = {78.00, 0.50, 22.75},
    scale = {33.00, 1.00, 23.50},
-   firstCardPosition = {66.75, 0.51, 18.25},
+   firstCardPosition = {66.75, 0.51, 29.25},
    horizontalGap = 7.5,
    verticalGap = 7.5,
    layoutDirection = "horizontal",

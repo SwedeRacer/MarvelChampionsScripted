@@ -193,7 +193,7 @@ function breakLabel(params)
         length = length
     }
 end
- 
+
 function getWords (text, breakCharacter)
     local t={}
  
@@ -215,4 +215,9 @@ end
  
 function trim(s)
     return (string.gsub(s, "^%s*(.-)%s*$", "%1"))
+end
+
+function showScenarioControlPanel()
+   local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
+   scenarioManager.call("showScenarioControlPanel")
 end
