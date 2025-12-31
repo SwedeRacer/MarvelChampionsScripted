@@ -705,7 +705,10 @@ function discardFromEncounterDeck(params)
                 position = deckPosition
             })
             if (not deck) then
-                refreshEncounterDeck()
+                Wait.frames(function()
+                    broadcastToAll("refreshing encounter deck.", {1,1,1})
+                    refreshEncounterDeck()
+                end, 45)
             end
         end, 30)
 
@@ -807,14 +810,18 @@ end
 
 function discardPlayerCard(params)
     local card = params.card
-    local playerColor = getCardValue({
-        cardGuid = card.getGUID(),
-        property = "playerColor"
-    })
+    local playerColor = params.playerColor or
+        getCardValue({
+            cardGuid = card.getGUID(),
+            property = "playerColor"
+        })
+
     local heroManager = getObjectFromGUID(GUID_HERO_MANAGER)
     local playmat = heroManager.call("getPlaymat", {
         playerColor = playerColor
     })
+    if(not playmat) then return end
+
     local discardPosition = Vector(playmat.call("getPlayerDiscardPosition"))
 
     card.setPositionSmooth(discardPosition, false, false)
@@ -863,6 +870,21 @@ function discardFromPlayerDeck(params)
                 coroutine.yield(0)
             end
         end
+
+        Wait.frames(function()
+            local deck = getDeckOrCardAtPosition({
+                position = deckPosition
+            })
+            if (not deck) then
+                Wait.frames(function()
+                    refreshPlayerDeck({
+                        deckPosition = deckPosition,
+                        discardPosition = discardPosition,
+                        playerColor = playerColor
+                    })
+                end, 20)
+            end
+        end, 30)
 
         return 1
     end
@@ -1073,6 +1095,127 @@ function dealMinionToAllPlayers(params)
     end
 
     startLuaCoroutine(self, "dealMinionsCoroutine")
+end
+
+function getPlayerColorFromDeck(params)
+    local deck = params.deck
+    local heroManager = getObjectFromGUID(GUID_HERO_MANAGER)
+    local players = heroManager.call("getPlayersInPlayerOrder")
+
+    for _, player in ipairs(players) do
+        local playmat = heroManager.call("getPlaymat", {
+            playerColor = player.playerColor
+        })
+        local playerDeckPosition = Vector(playmat.call("getPlayerDeckPosition"))
+
+        if objectIsAtPosition({
+            object = deck,
+            position = playerDeckPosition
+        }) then
+            return player.playerColor
+        end
+    end
+
+    return nil
+end
+
+function discardCardOrDeck(params)
+    local cardOrDeck = params.object
+    if(not cardOrDeck) then return end
+
+    --If the object is a player deck, discard from that deck (refresh if needed))
+    local playerDeckColor = getPlayerColorFromDeck({deck = cardOrDeck})
+
+    if playerDeckColor then
+        discardFromPlayerDeck({
+            playerColor = playerDeckColor,
+            numberOfCards = 1
+        })
+        return
+    end
+
+    --If the object is the encounter deck, discard from that deck (refresh if needed))
+    local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
+    local encounterDeckPosition = scenarioManager.call("getEncounterDeckPosition")
+
+    if objectIsAtPosition({
+        object = cardOrDeck,
+        position = Vector(encounterDeckPosition)
+    }) then
+        discardFromEncounterDeck({
+            cardsToDiscard = 1
+        })
+        return
+    end
+
+    --Ignore all other decks
+    if cardOrDeck.tag == "Deck" then return end
+
+    --Don't discard locked cards
+    if cardOrDeck.getLock() then return end
+
+    --If the card is in a player zone, discard to that player's discard pile
+    local zones = cardOrDeck.getZones()
+
+    for _, zone in pairs(zones) do
+        if(zone.tag == "Hand") then
+            local playerColor = zone.getValue()
+
+            cardOrDeck.use_hands = false
+
+            supressZones()
+            discardPlayerCard({
+                card = cardOrDeck,
+                playerColor = playerColor
+            })
+
+            Wait.frames(function()
+                if(not cardOrDeck.isDestroyed()) then
+                    cardOrDeck.use_hands = true
+                end
+            end, 10)
+
+            return
+        end
+
+        local zoneDef = getZoneDefinition({zoneGuid = zone.getGUID()})
+
+        if(zoneDef and (zoneDef.zoneType == "player" or zoneDef.zoneType == "heroCounters" or zoneDef.zoneType == "heroExit")) then
+            removeCountersFromCard({card = cardOrDeck})
+            supressZones()
+            discardPlayerCard({
+                card = cardOrDeck,
+                playerColor = zoneDef.playerColor
+            })
+            return
+        end
+    end
+
+    --If the card is an encounter card, discard to the encounter discard pile
+    local cardData = getCardData({card = cardOrDeck})
+    if(cardData.aspect == "encounter") then
+        removeCountersFromCard({card = cardOrDeck})
+        supressZones()
+        discardEncounterCard({
+            discardFromPosition = cardOrDeck.getPosition()
+        })
+        return
+    end
+
+    --If the player is seated, discard to their discard pile
+    local playerColor = params.playerColor
+    if(playerColor == "Red" or playerColor == "Blue" or playerColor == "Green" or playerColor == "Yellow") then
+        removeCountersFromCard({card = cardOrDeck})
+        supressZones()
+        discardPlayerCard({
+            card = cardOrDeck,
+            playerColor = playerColor
+        })
+        return
+    end
+
+    --Otherwise, notify that a discard deck could not be identified
+    broadcastToAll("Could not determine which discard pile to discard to.", {1,0,0})
 end
 
 --Zone Manager pass-throughs

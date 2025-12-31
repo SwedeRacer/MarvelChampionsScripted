@@ -220,7 +220,7 @@ ZONE_HERO_COUNTERS = {
 
 ZONE_HERO_EXIT = {
    zoneType = "heroExit",
-   scale = {29.25, 4.00, 18.00},
+   scale = {28, 4.00, 17.00},
    rescaleOnEnterTo = nil,
    rescaleOnExit = true,
    repositionCards = false,
