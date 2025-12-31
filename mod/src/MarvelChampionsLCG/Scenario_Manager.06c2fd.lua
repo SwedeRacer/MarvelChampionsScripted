@@ -64,18 +64,6 @@ function onload(saved_data)
         local scenarioButton = getObjectFromGUID(Global.getVar("GUID_SCENARIO_BUTTON"))
         scenarioButton.call("showUI")
     end
-
-    addHotkey("Begin villain phase (add threat)", function(playerColor, object, pointerPosition, isKeyUp)
-        threatButtonClicked()
-    end, false)
-
-    addHotkey("Deal encounter cards", function(playerColor, object, pointerPosition, isKeyUp)
-        encounterCardsButtonClicked()
-    end, false)
-
-    addHotkey("Context-sensitive discard", function(playerColor, object, pointerPosition, isKeyUp)
-        Global.call("discardCardOrDeck", {object = object, playerColor = playerColor})
-    end, false)
 end
 
 function clearData()

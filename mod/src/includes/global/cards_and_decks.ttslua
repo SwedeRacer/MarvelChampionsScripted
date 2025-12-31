@@ -956,43 +956,51 @@ end
 
 function importDeck(params)
     local deckId = params.deckId
-    local isPrivateDeck = params.isPrivateDeck
     local callbackFunction = params.callbackFunction
     local callbackTarget = params.callbackTarget
 
-    local apiURL = isPrivateDeck and MARVEL_CDB_PRIVATE_DECK_URL or MARVEL_CDB_PUBLIC_DECK_URL
-
-    WebRequest.get(apiURL .. deckId, function(res)
+    -- Try private deck URL first
+    WebRequest.get(MARVEL_CDB_PRIVATE_DECK_URL .. deckId, function(res)
         local deckInfo = nil
 
         if res.is_done and not res.is_error then
-            if string.find(res.text, "<!DOCTYPE html>") then
-                broadcastToAll("Deck " .. deckId .. " is not shared", {0.5, 0.5, 0.5})
+            if not string.find(res.text, "<!DOCTYPE html>") then
+                deckInfo = JSON.decode(res.text)
+            end
+        end
 
-                callbackTarget.call(callbackFunction, { deckInfo = nil })
+        -- If private deck succeeded, use it
+        if deckInfo ~= nil then
+            print("Found decklist: " .. deckInfo.name)
+            callbackTarget.call(callbackFunction, {
+                deckInfo = deckInfo
+            })
+            return
+        end
+
+        -- Private deck failed, try public deck URL
+        WebRequest.get(MARVEL_CDB_PUBLIC_DECK_URL .. deckId, function(res2)
+            local deckInfo2 = nil
+
+            if res2.is_done and not res2.is_error then
+                if not string.find(res2.text, "<!DOCTYPE html>") then
+                    deckInfo2 = JSON.decode(res2.text)
+                end
+            end
+
+            -- If public deck succeeded, use it
+            if deckInfo2 ~= nil then
+                print("Found decklist: " .. deckInfo2.name)
+                callbackTarget.call(callbackFunction, {
+                    deckInfo = deckInfo2
+                })
                 return
             end
 
-            deckInfo = JSON.decode(res.text)
-        else
-            print(res.error)
-
+            -- Both failed, show error
+            broadcastToAll("Deck " .. deckId .. " not found.\nMake sure the \"Share your decks\" checkbox is checked in your MarvelCDB account page!", {1, 0.27, 0})
             callbackTarget.call(callbackFunction, { deckInfo = nil })
-            return
-        end
-
-        if (deckInfo == nil) then
-            broadcastToAll("Deck not found!", {0.5, 0.5, 0.5})
-
-            callbackTarget.call(callbackFunction, { deckInfo = nil })
-            return
-        end
-
-        print("Found decklist: " .. deckInfo.name)
-
-        callbackTarget.call(callbackFunction, {
-            deckInfo = deckInfo
-        })
+        end)
     end)
 end
 

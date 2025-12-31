@@ -1,6 +1,41 @@
 function onLoad()
     -- Create context Menus
     addContextMenuItem("Spawn Card", createUI)
+
+    spawnObject({
+        type = "Notecard",
+        position = {0,1,0},
+        callback_function = function(spawned_object)
+            spawned_object.setName("Release Notes")
+            spawned_object.setDescription(
+[[Lots of changes in the latest update!
+- New scenario toolbar
+- Custom hotkeys (including new context-sensitive discard)
+- Deck import will now look for both private and public decks
+- Updated rulebook to version 1.7
+- Various bug fixes and improvements
+
+Check out the mod's page for more info!]]
+            )
+        end})
+
+    addHotkey("Begin villain phase (add threat)", function(playerColor, object, pointerPosition, isKeyUp)
+        local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
+        if(not scenarioManager) then return end
+
+        scenarioManager.call("threatButtonClicked")
+    end, false)
+
+    addHotkey("Deal encounter cards", function(playerColor, object, pointerPosition, isKeyUp)
+        local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
+        if(not scenarioManager) then return end
+
+        scenarioManager.call("encounterCardsButtonClicked")
+    end, false)
+
+    addHotkey("Context-sensitive discard", function(playerColor, object, pointerPosition, isKeyUp)
+        discardCardOrDeck({object = object, playerColor = playerColor})
+    end, false)
 end
 
 function onObjectNumberTyped(object, playerColor, number)
