@@ -265,6 +265,9 @@ end
 
 function onObjectDestroy(object)
     if (not isCard(object)) then return end
+
+    object.use_hands = true
+    
     local cardGuid = object.getGUID()
 
     local keepInRegistry = getCardValue({

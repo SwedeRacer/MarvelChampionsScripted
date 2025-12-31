@@ -72,6 +72,10 @@ function onload(saved_data)
     addHotkey("Deal encounter cards", function(playerColor, object, pointerPosition, isKeyUp)
         encounterCardsButtonClicked()
     end, false)
+
+    addHotkey("Context-sensitive discard", function(playerColor, object, pointerPosition, isKeyUp)
+        Global.call("discardCardOrDeck", {object = object, playerColor = playerColor})
+    end, false)
 end
 
 function clearData()
@@ -920,14 +924,26 @@ function setUpDecks()
 end
 
 function getEncounterDeckPosition()
+    if (currentScenario == nil) then
+        return {}
+    end
+
     return currentScenario.encounterDeckPosition or defaults.encounterDeck.position
 end
 
 function getEncounterDiscardPosition()
+    if (currentScenario == nil) then
+        return {}
+    end
+
     return currentScenario.encounterDiscardPosition or defaults.encounterDeck.discardPosition
 end
 
 function getBoostDrawPosition()
+    if (currentScenario == nil) then
+        return {}
+    end
+
     return currentScenario.boostDrawPosition or defaults.boostDrawPosition
 end
 
