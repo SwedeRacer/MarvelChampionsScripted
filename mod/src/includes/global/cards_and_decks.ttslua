@@ -1044,7 +1044,7 @@ function countCardIconsInPlay(params)
 
             if(not cardData) then goto continueIconCount end
             if(not isFaceUp({object = object})) then goto continueIconCount end
-            if(cardIsInZone({card = object, zoneIndex = "victoryDisplay"})) then goto continueIconCount end
+            if(not objectIsOnTable({object = object})) then goto continueIconCount end
 
             for _, deckPosition in pairs(deckPositions) do
                 if objectIsAtPosition({

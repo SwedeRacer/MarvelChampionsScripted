@@ -47,6 +47,15 @@ function objectIsAtPosition(params)
             math.abs(objectPosition.z - position.z) <= tolerance)
 end
 
+function objectIsOnTable(params)
+    local object = params.object
+    local objectPosition = object.getPosition()
+  
+    return (
+      math.abs(objectPosition.x) < 56.25 and
+      objectPosition.z < 39.75)
+end
+
 function shuffleTable(params)
     local tbl = params.table
     math.randomseed(os.time())
