@@ -85,7 +85,6 @@ function getEncounterSetButtons(guid)
             textColor = textColorRecommended
         end
 
-        local functionName = "selectEncounterSet-" .. encounterKey
         local label = encounterSet.label or encounterSet.name
         local fontSize = 15
 
@@ -964,6 +963,10 @@ end
 
 function hideScenarioUI()
     Global.UI.setXml("")
+end
+
+function modularEncounterSetToggleChanged(player, value, id)
+    selectEncounterSet(id, value)
 end
 
 function modeToggleClicked(player, value, id)

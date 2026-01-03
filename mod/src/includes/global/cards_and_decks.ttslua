@@ -1181,7 +1181,7 @@ function discardCardOrDeck(params)
                 if(not cardOrDeck.isDestroyed()) then
                     cardOrDeck.use_hands = true
                 end
-            end, 10)
+            end, 60)
 
             return
         end
