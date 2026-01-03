@@ -240,11 +240,11 @@ function displayHeroUI(obj, playerColor)
                                     tag="Button",
                                     value="IMPORT",
                                     attributes={
-                                        onClick="importDeck",
                                         fontSize="70",
                                         height="125",
                                         width="330",
-                                        offsetXY="-400 -50"
+                                        offsetXY="-400 -50",
+                                        onClick="importDeck"
                                     }
                                 }
                             }

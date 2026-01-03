@@ -11,11 +11,14 @@ function showScenarioControlPanel()
     local scenarioControlPanelUI = {{
         tag = "Panel",
         attributes = {
+            id = "scenarioControlPanel",
             height = "50",
-            width = "300",
+            width = "325",
             color = "rgba(0,0,0,0)",
             rectAlignment = "UpperRight",
-            offsetXY = "-500 -5",
+            offsetXY = "-205 -5",
+            allowDragging = "true",
+            returnToOriginalPositionWhenReleased = "false"
         },
         children = {
 			{
@@ -26,6 +29,26 @@ function showScenarioControlPanel()
 					spacing = "10"
 				},
 				children = {
+					{
+						tag = "Panel",
+						attributes = {
+							id = "dragHandle",
+							preferredWidth = "13",
+							flexibleWidth = "0",
+							color = "rgba(0,0,0,0)",
+							tooltip = "Drag toolbar to move",
+							tooltipPosition = "Below",
+						},
+						children = {
+							{
+								tag = "Image",
+								attributes = {
+									image = "https://steamusercontent-a.akamaihd.net/ugc/17306829250394526252/74C15A7C0D4E30910965BB49FED5D2C946E5C6B5/",
+									preserveAspect = true
+								}
+							}
+						}
+					},
 					{
 						tag = "Panel",
 						attributes = {
@@ -103,6 +126,7 @@ function showScenarioControlPanel()
 					{
 						tag = "Panel",
 						attributes = {
+							id = "clearButtonPanel",
 							preferredWidth = "107",
 							flexibleWidth = "0",
 							tooltip = "Clear the Scenario",
@@ -125,6 +149,31 @@ function showScenarioControlPanel()
 									color = "rgba(0,0,0,0)",
 									textColor = "rgb(1,1,1)",
 									onClick = self.getGUID() .. "/clearButtonClicked"
+								}
+							}
+						}
+					},
+					{
+						tag = "Panel",
+						attributes = {
+							id = "clearConfirmPanel",
+							preferredWidth = "107",
+							flexibleWidth = "0",
+							color = "rgb(0,0,0)",
+							tooltip = "Are you sure?",
+							tooltipPosition = "Below",
+							active = "false"
+						},
+						children = {
+							{
+								tag = "Button",
+								value = "CONFIRM",
+								attributes = {
+									alignment = "MiddleCenter",
+									fontSize = "20",
+									color = "rgba(0,0,0,0)",
+									textColor = "rgb(1,0,0)",
+									onClick = self.getGUID() .. "/clearConfirmButtonClicked"
 								}
 							}
 						}
@@ -178,6 +227,16 @@ function turnCounterClicked(player, value, id)
 end
 
 function clearButtonClicked(player, value, id)
+	Global.UI.show("clearConfirmPanel")
+	Global.UI.hide("clearButtonPanel")
+
+	Wait.time(function()
+		Global.UI.hide("clearConfirmPanel")
+		Global.UI.show("clearButtonPanel")
+	end, 3)
+end
+
+function clearConfirmButtonClicked(player, value, id)
 	clearScenario()
 end
 
