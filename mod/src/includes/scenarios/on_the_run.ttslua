@@ -23,7 +23,8 @@ scenarios["onTheRun"] =
                 stage2={
                     cardId="40104",
                     startingThreatPerPlayer=1,
-                    targetThreatPerPlayer=9
+                    targetThreatPerPlayer=9,
+                    accelerationPerPlayer=2
                 }
             }
         }

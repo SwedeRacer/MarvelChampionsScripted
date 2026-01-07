@@ -30,12 +30,14 @@ scenarios["badoon"] =
                 stage1={
                     cardId="16061",
                     startingThreatPerPlayer=2,
-                    targetThreatPerPlayer=8
+                    targetThreatPerPlayer=8,
+                    accelerationPerPlayer=2
                 },
                 stage2={
                     cardId="16062",
                     startingThreatPerPlayer=4,
-                    targetThreatPerPlayer=8
+                    targetThreatPerPlayer=8,
+                    accelerationPerPlayer=2
                 }
             }
         }

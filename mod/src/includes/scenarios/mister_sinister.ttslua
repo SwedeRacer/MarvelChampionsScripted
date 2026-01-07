@@ -110,19 +110,22 @@ function populateMisterSinisterSchemeStages()
       cardId="40140",
       startingThreat=0,
       startingThreatPerPlayer=1,
-      targetThreatPerPlayer=5
+      targetThreatPerPlayer=5,
+      accelerationPerPlayer=2
     },
     b={
       cardId="40141",
       startingThreat=0,
       startingThreatPerPlayer=1,
-      targetThreatPerPlayer=5
+      targetThreatPerPlayer=5,
+      accelerationPerPlayer=2
     },
     c={
       cardId="40142",
       startingThreat=0,
       startingThreatPerPlayer=1,
-      targetThreatPerPlayer=5
+      targetThreatPerPlayer=5,
+      accelerationPerPlayer=2
     } 
   }
 

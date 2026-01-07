@@ -1,5 +1,6 @@
 scenarios["mansionAttack"] = {
     name = "Mansion Attack",
+    fullyScripted = true,
     tileImageUrl = "https://steamusercontent-a.akamaihd.net/ugc/2292958473528765412/EEBE3A1431B9DDB3BC2A8DE11FCDCA7EDD43682E/",
     villains = {
         brotherhood = {
@@ -38,36 +39,38 @@ scenarios["mansionAttack"] = {
                 stage1 = {
                     cardId = "32125",
                     startingThreat = 0,
-                    targetThreat = 0
+                    targetThreat = 0,
+                    flavorText = ""
                 },
                 stage2 = {
                     cardId = "32126",
                     startingThreatPerPlayer = 1,
-                    targetThreatPerPlayer = 7
+                    targetThreatPerPlayer = 7,
+                    flavorText = "The Brotherhood strike in unison, focusing their attack on the atrium!",
+                    schemeEffect = "Each character gains steady."
                 },
                 stage3 = {
                     cardId = "32127",
                     startingThreatPerPlayer = 1,
-                    targetThreatPerPlayer = 7
+                    targetThreatPerPlayer = 7,
+                    flavorText = "The Brotherhood strike in unison, focusing their attack on the cafeteria!",
+                    schemeEffect = "Each character gains retaliate 1."
                 },
                 stage4 = {
                     cardId = "32128",
                     startingThreatPerPlayer = 1,
-                    targetThreatPerPlayer = 7
+                    targetThreatPerPlayer = 7,
+                    flavorText = "The Brotherhood strike in unison, focusing their attack on the basketball court!",
+                    schemeEffect = "Each ally and minion gains toughness."
                 },
                 stage5 = {
                     cardId = "32129",
                     startingThreatPerPlayer = 1,
-                    targetThreatPerPlayer = 7
+                    targetThreatPerPlayer = 7,
+                    flavorText = "The Brotherhood strike in unison, focusing their attack on the courtyard!",
+                    schemeEffect = "Each character gets ATK +1."
                 }
             }
-        }
-    },
-    cards = {
-        saveTheSchool = {
-            cardId = "32130",
-            position = {15.75, 1.00, 29.25},
-            scale = Vector(Global.getVar("CARD_SCALE_ENCOUNTER"))
         }
     },
     decks = {
@@ -105,6 +108,13 @@ function prepareScenario_mansionAttack()
 
     currentScenario.brotherhoodQueue = villainStages
     currentScenario.brotherhoodStageIndex = 1
+
+    local schemeStages = {"stage2", "stage3", "stage4", "stage5"}
+    schemeStages = Global.call("shuffleTable", {
+        table = schemeStages
+    })
+    currentScenario.mainSchemeQueue = schemeStages
+    currentScenario.mainSchemeStageIndex = 1
 end
 
 function getNextVillainStage_mansionAttack(params)
@@ -132,11 +142,12 @@ function placeVillainStage_mansionAttack(params)
         zoneIndex = "victoryDisplay"
     })
 
-    Global.call("spawnCard", {
+    placeVillainCard({
+        villain = villain,
         cardId = stage.cardId,
+        name = villain.name,
         position = villainPosition,
         scale = villainScale,
-        name = villain.name,
         flipped = false,
         locked = true
     })
@@ -144,19 +155,125 @@ function placeVillainStage_mansionAttack(params)
     local hitPoints = (stage.hitPoints or 0) + ((stage.hitPointsPerPlayer or 0) * heroCount)
     local villainHpCounter = getObjectFromGUID(villain.hpCounter.guid)
 
+    villainHpCounter.setCustomObject({
+        image = stage.tileImageUrl
+    })
+
+    villainHpCounter.call("setValue", {
+        value = hitPoints
+    })
+
+    villainHpCounter.call("setPrimaryButtonOptions", {
+        label = "Next!"
+    })
+
+    if (stage.showAdvanceButton) then
+        villainHpCounter.call("showPrimaryButton")
+    else
+        villainHpCounter.call("hidePrimaryButton")
+    end
+
     Wait.frames(function()
-        villainHpCounter.call("setValue", {
-            value = hitPoints
-        })
+        local reloadedCounter = villainHpCounter.reload()
+    end, 10)
+end
 
-        villainHpCounter.call("setPrimaryButtonOptions", {
-            label = "Next!"
-        })
+function getNextSchemeStage_mansionAttack_main(params)
+    local scheme = params.scheme
+    local currentStageNumber = scheme.currentStageNumber or 0
+    local nextStageKey = "stage" .. (currentStageNumber + 1)
 
-        if (stage.showAdvanceButton) then
-            villainHpCounter.call("showPrimaryButton")
-        else
-            villainHpCounter.call("hidePrimaryButton")
-        end
+    if(nextStageKey == "stage1") then
+        return scheme.stages["stage1"]
+    end
+
+    local nextStage = 
+        currentScenario.schemes["main"].stages[currentScenario.mainSchemeQueue[currentScenario.mainSchemeStageIndex]]
+    currentScenario.mainSchemeStageIndex = currentScenario.mainSchemeStageIndex + 1
+    local lastStage = currentScenario.mainSchemeStageIndex > #currentScenario.mainSchemeQueue
+
+    nextStage.showAdvanceButton = not lastStage
+    return nextStage
+end
+
+function placeSchemeStage_mansionAttack_main(params)
+    local scheme = params.scheme
+    local stage = params.stage
+    local heroCount = params.heroCount
+
+    local schemePosition = scheme.position or defaults.mainSchemeDeck.position
+    local schemeScale = scheme.scale or defaults.mainSchemeDeck.scale
+
+    local currentSchemeCard = Global.call("getCardAtPosition", {position = schemePosition})
+    if (currentSchemeCard) then
+        currentSchemeCard.hide_when_face_down = false
+    end
+
+    Global.call("moveCardFromPosition", {
+        origin = schemePosition,
+        zoneIndex = "victoryDisplay",
+        destinationRotation = {0.00, 90.00, 180.00}
+    })
+
+    Global.call("spawnCard", {
+        cardId = stage.cardId,
+        position = schemePosition,
+        scale = schemeScale,
+        name = scheme.name,
+        flipped = true,
+        landscape = true,
+        locked = true
+    })
+
+    local counter = scheme.threatCounter or {}
+
+    if (not counter.guid) then
+        return
+    end
+
+    local threat = (stage.startingThreat or 0) + ((stage.startingThreatPerPlayer or 0) * heroCount)
+    local targetThreat = (stage.targetThreat or 0) + ((stage.targetThreatPerPlayer or 0) * heroCount)
+    local schemeThreatCounter = getObjectFromGUID(counter.guid)
+
+    if (stage.flavorText) then
+        Global.call("displayMessage", {
+            message = stage.flavorText,
+            messageType = "flavor"
+        })
+    end
+
+    Wait.frames(function()
+        schemeThreatCounter.call("setValue", {
+            value = threat
+        })
+        schemeThreatCounter.call("setTargetValue", {
+            value = targetThreat
+        })
+        configureThreatCounterPrimaryButton(schemeThreatCounter, stage.showAdvanceButton)
     end, 20)
 end
+
+function setUpSchemeStage_mansionAttack_main(params)
+    local stage = params.stage
+    local stageNumber = string.sub(stage.key, -1)
+
+    if(stageNumber == "1") then
+        local saveTheSchoolCardId = "32130"
+        Global.call("moveCardFromEncounterDeckById", {cardId = saveTheSchoolCardId, searchInDiscard = true, zoneIndex = "environment"})
+        
+        Wait.frames(function()
+            advanceSchemeStage("main", getHeroCount())
+        end, 120)
+        return
+    end
+    
+    Global.call("displayMessage", {
+        message = stage.schemeEffect,
+        messageType = Global.getVar("MESSAGE_TYPE_ALERT")
+    })
+
+    Wait.frames(function()
+        Global.call("dealEncounterCardsToAllPlayers", {cardsPerPlayer = 1})
+    end, 120)
+end
+

@@ -116,6 +116,29 @@ function hidePrimaryButton()
     self.UI.hide("primaryButton")
 end
 
+function updateHighlightState()
+    local currentValue = getValue()
+    local targetValue = getDataValue("targetValue", 0)
+
+    if (targetValue == 0 or currentValue < (targetValue / 2)) then
+        self.highlightOff()
+        self.UI.setAttribute("targetValueLabel", "textColor", "rgb(1,1,1)")
+        return
+    end
+    
+    local percentage = (currentValue - (targetValue / 2)) / (targetValue / 2)
+    percentage = math.max(0, math.min(1, percentage))
+
+    local red = 1
+    local green = 1 - percentage 
+    local blue = 0
+    
+    local colorString = "rgb(" .. red .. "," .. green .. "," .. blue .. ")"
+    
+    self.highlightOn({red, green, blue})
+    self.UI.setAttribute("targetValueLabel", "textColor", colorString)
+end
+
 function valueUpdated()
     if debounceTimer then
         Wait.stop(debounceTimer)
@@ -124,26 +147,11 @@ function valueUpdated()
     debounceTimer = Wait.time(function()
         local currentValue = getValue()
         local targetValue = getDataValue("targetValue", 0)
-
-        if (targetValue == 0 or currentValue < (targetValue / 2)) then
-            self.highlightOff()
-            self.UI.setAttribute("targetValueLabel", "textColor", "rgb(1,1,1)")
-            return
-        end
-        
-        local percentage = (currentValue - (targetValue / 2)) / (targetValue / 2)
-        
-        percentage = math.max(0, math.min(1, percentage))
-
-        local red = 1
-        local green = 1 - percentage 
-        local blue = 0
-        
-        local colorString = "rgb(" .. red .. "," .. green .. "," .. blue .. ")"
-        local shouldFlash = currentValue >= (targetValue * 0.75)
+        local shouldFlash = targetValue > 0 and currentValue >= (targetValue * 0.75)
         
         if shouldFlash then
             local flashInterval = 0.5
+            local totalFlashTime = 3 * flashInterval * 2
             
             for i = 1, 3 do
                 Wait.time(function()
@@ -152,13 +160,16 @@ function valueUpdated()
                 end, (i - 1) * flashInterval * 2)
                 
                 Wait.time(function()
-                    self.highlightOn({red, green, blue})
-                    self.UI.setAttribute("targetValueLabel", "textColor", colorString)
+                    updateHighlightState()
                 end, ((i - 1) * flashInterval * 2) + flashInterval)
             end
+            
+            -- Final check after flash sequence completes
+            Wait.time(function()
+                updateHighlightState()
+            end, totalFlashTime)
         else
-            self.highlightOn({red, green, blue})
-            self.UI.setAttribute("targetValueLabel", "textColor", colorString)
+            updateHighlightState()
         end
     end, DEBOUNCE_DELAY)
 end

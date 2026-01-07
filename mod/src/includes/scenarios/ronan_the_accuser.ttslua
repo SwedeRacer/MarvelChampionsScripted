@@ -30,12 +30,14 @@ scenarios["ronan"] =
                 stage1={
                     cardId="16106",
                     startingThreatPerPlayer=2,
-                    targetThreatPerPlayer=7
+                    targetThreatPerPlayer=7,
+                    accelerationPerPlayer=2
                 },
                 stage2={
                     cardId="16107",
                     startingThreatPerPlayer=1,
-                    targetThreatPerPlayer=10
+                    targetThreatPerPlayer=10,
+                    accelerationPerPlayer=2
                 }
             }
         }

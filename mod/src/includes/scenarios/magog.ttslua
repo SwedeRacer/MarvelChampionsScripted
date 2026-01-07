@@ -27,7 +27,8 @@ scenarios["magog"] =
                 stage1={
                     cardId="39002",
                     startingThreatPerPlayer=1,
-                    targetThreatPerPlayer=6
+                    targetThreatPerPlayer=6,
+                    accelerationPerPlayer=2
                 }
             }
         }

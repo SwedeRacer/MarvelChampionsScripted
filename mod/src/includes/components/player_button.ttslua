@@ -233,6 +233,7 @@ function displayHeroUI(obj, playerColor)
                                         placeholder="Deck ID",
                                         characterValidation="Integer",
                                         offsetXY="-400 150",
+                                        textAlignment="MiddleCenter",
                                         onValueChanged="setDeckId"
                                     }
                                 },

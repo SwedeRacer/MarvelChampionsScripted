@@ -322,7 +322,7 @@ end
 function moveCard(params)
     local card = params.card
     local destination = calculateDestination(params)
-
+    
     card.setLock(false)
     card.setPositionSmooth(destination.position, false, false)
     card.setRotationSmooth(destination.rotation, false, false)
@@ -557,11 +557,11 @@ function getCastSizeForCard(params)
 end
 
 function getCardAtPosition(params)
-    position = Vector(params.position)
+    local position = Vector(params.position)
     position["y"] = 0
 
-    local objects = findInRadiusBy(position, 1, isCard, false)
-    
+    local objects = findInRadiusBy(position, 3, isCard, false)
+
     if(#objects == 0) then
         return nil
     end
@@ -570,10 +570,10 @@ function getCardAtPosition(params)
 end
 
 function getDeckAtPosition(params)
-    position = Vector(params.position)
+    local position = Vector(params.position)
     position["y"] = 0
 
-    local objects = findInRadiusBy(position, 1, isDeck, false)
+    local objects = findInRadiusBy(position, 3, isDeck, false)
 
     if(#objects == 0) then
         return nil
@@ -583,7 +583,7 @@ function getDeckAtPosition(params)
 end
 
 function getDeckOrCardAtPosition(params)
-    position = Vector(params.position)
+    local position = Vector(params.position)
     position["y"] = 0
 
     local objects = findInRadiusBy(position, 3, isCardOrDeck, false)
