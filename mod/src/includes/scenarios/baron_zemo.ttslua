@@ -28,7 +28,8 @@ scenarios["baronZemo"] =
                     cardId="50167",
                     startingThreat=0,
                     startingThreatPerPlayer=2,
-                    targetThreatPerPlayer=12
+                    targetThreatPerPlayer=12,
+                    accelerationPerPlayer=2
                 },
                 stage2={
                     cardId="50168",
@@ -38,7 +39,8 @@ scenarios["baronZemo"] =
                 stage3={
                     cardId="50169",
                     startingThreat=0,
-                    targetThreatPerPlayer=12
+                    targetThreatPerPlayer=12,
+                    accelerationPerPlayer=2
                 }
             }
         }

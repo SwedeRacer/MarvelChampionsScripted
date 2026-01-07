@@ -21,7 +21,7 @@ function findInRadiusBy(pos, radius, filter, debug)
        origin       = pos,
        direction    = {0,1,0},
        type         = 2,
-       size         = {radius, radius, radius},
+       size         = {radius, 3, radius},
        max_distance = 0,
        debug        = debug
     })
@@ -34,6 +34,7 @@ function findInRadiusBy(pos, radius, filter, debug)
           table.insert(filteredList, obj.hit_object)
        end
     end
+    
     return filteredList
 end 
 

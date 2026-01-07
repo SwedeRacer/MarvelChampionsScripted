@@ -43,7 +43,7 @@ function showScenarioControlPanel()
 							{
 								tag = "Image",
 								attributes = {
-									image = "https://steamusercontent-a.akamaihd.net/ugc/17306829250394526252/74C15A7C0D4E30910965BB49FED5D2C946E5C6B5/",
+									image = cdnUrl .. "/assets/control-panel-drag-handle.png",
 									preserveAspect = true
 								}
 							}
@@ -62,7 +62,7 @@ function showScenarioControlPanel()
 							{
 								tag = "Image",
 								attributes = {
-									image = "https://steamusercontent-a.akamaihd.net/ugc/12782670079207614076/57F10F28BD2F62536BA04D0D2869B0A30E533251/", -- cdnUrl .. "/assets/control-panel-threat.png",
+									image = cdnUrl .. "/assets/control-panel-threat.png",
 									rectAlignment = "MiddleCenter",
 									height = "40",
 									preserveAspect = true
@@ -84,7 +84,7 @@ function showScenarioControlPanel()
 							{
 								tag = "Image",
 								attributes = {
-									image = "https://steamusercontent-a.akamaihd.net/ugc/16634110925634444748/3BA78927F4723EDBDFF8A567B72FC1B3CA44B7F8/", -- cdnUrl .. "/card-backs/encounter.jpg",
+									image = cdnUrl .. "/assets/control-panel-encounter.png",
 									preserveAspect = true
 								}
 							}
@@ -102,7 +102,7 @@ function showScenarioControlPanel()
 							{
 								tag = "Image",
 								attributes = {
-									image = "https://steamusercontent-a.akamaihd.net/ugc/11948548561271011510/2690C35F818CBA5374500BD49C9836753DAF09F7/", -- cdnUrl .. "/counters/turn.png",
+									image = cdnUrl .. "/assets/control-panel-turn-counter.png",
 									preserveAspect = true
 								}
 							},
@@ -127,28 +127,18 @@ function showScenarioControlPanel()
 						tag = "Panel",
 						attributes = {
 							id = "clearButtonPanel",
-							preferredWidth = "107",
+							preferredWidth = "50",
 							flexibleWidth = "0",
 							tooltip = "Clear the Scenario",
-							tooltipPosition = "Below"
+							tooltipPosition = "Below",
+							onClick = self.getGUID() .. "/clearButtonClicked"
 						},
 						children = {
 							{
 								tag = "Image",
 								attributes = {
-									image = "https://steamusercontent-a.akamaihd.net/ugc/2476508329238019024/F96C056CE02B90986413B56023F34DFA544164B2/",
+									image = cdnUrl .. "/assets/control-panel-clear.png",
 									preserveAspect = true
-								}
-							},
-							{
-								tag = "Button",
-								value = "CLEAR",
-								attributes = {
-									alignment = "MiddleCenter",
-									fontSize = "20",
-									color = "rgba(0,0,0,0)",
-									textColor = "rgb(1,1,1)",
-									onClick = self.getGUID() .. "/clearButtonClicked"
 								}
 							}
 						}
@@ -157,23 +147,20 @@ function showScenarioControlPanel()
 						tag = "Panel",
 						attributes = {
 							id = "clearConfirmPanel",
-							preferredWidth = "107",
+							preferredWidth = "50",
 							flexibleWidth = "0",
-							color = "rgb(0,0,0)",
+							color = "rgba(0,0,0,0)",
 							tooltip = "Are you sure?",
 							tooltipPosition = "Below",
-							active = "false"
+							active = "false",
+							onClick = self.getGUID() .. "/clearConfirmButtonClicked"
 						},
 						children = {
 							{
-								tag = "Button",
-								value = "CONFIRM",
+								tag = "Image",
 								attributes = {
-									alignment = "MiddleCenter",
-									fontSize = "20",
-									color = "rgba(0,0,0,0)",
-									textColor = "rgb(1,0,0)",
-									onClick = self.getGUID() .. "/clearConfirmButtonClicked"
+									image = cdnUrl .. "/assets/control-panel-clear-confirm-1.png",
+									preserveAspect = true
 								}
 							}
 						}
@@ -201,7 +188,7 @@ function threatButtonClicked(player, value, id)
 	local schemeStage = scheme.stages[schemeStageKey]
 	local heroCount = getHeroCount()
 
-	local accelerationFromSchemeStage = (schemeStage.accelaration or 0) + ((schemeStage.accelarationPerPlayer or 1) * heroCount)
+	local accelerationFromSchemeStage = (schemeStage.acceleration or 0) + ((schemeStage.accelerationPerPlayer or 1) * heroCount)
 	local accelerationFromCards = Global.call("countCardIconsInPlay", {iconType="acceleration"})
 	local accelerationFromCounters = Global.call("getTotalAccelerationFromCounters")
 

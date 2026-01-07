@@ -41,6 +41,7 @@ scenarios["riskyBusiness"] =
                     cardId="02005",
                     startingThreatPerPlayer=1,
                     targetThreatPerPlayer=10,
+                    accelerationPerPlayer=2,
                     flavorText="If Norman Osborn succeeds, nothing will stand in the way of his tehnological domination."
                 }
             }
