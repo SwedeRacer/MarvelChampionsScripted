@@ -132,8 +132,14 @@ function getCardFromCardPool(cardId, artVariant)
 
     local card = artVariant ~= nil and cardpool[cardId.."_"..artVariant] or cardpool[cardId]
 
-    --Temporary work-around for cardpool issue
-    if(card == nil) then card = getCardFromCardPool(cardId.."a") end
+    --Account for inconcistencies in MarvelCDB card Ids
+    if(card == nil) then
+        if(string.match(string.sub(cardId, -1), "%d") ~= nil) then
+            card = getCardFromCardPool(cardId.."a") 
+        else
+            card = getCardFromCardPool(string.sub(cardId, 1, -2)) 
+        end
+    end
 
     return card
 end
@@ -144,13 +150,15 @@ function getCard(player)
     local FACE_UP_ROTATION = {0, 180, 0}
     local FACE_DOWN_ROTATION = {0, 180, 180}
     local card = getCardFromCardPool(cardId)
+    
     if (card.duplicate_of == nil) then
         card:spawn({position = position, rotation = FACE_UP_ROTATION})
-        clearUI()
     else
         CARD_ID = card.duplicate_of
         getCard(player)
     end
+
+    clearUI()
 end
 
 function spawnCard(params)
@@ -208,8 +216,6 @@ function spawnCard(params)
             end,
             10)
     end
-
-    clearUI()
 
     return spawnedCard
 end

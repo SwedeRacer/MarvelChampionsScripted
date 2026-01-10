@@ -442,6 +442,11 @@ function setUpScenario()
     finalizeSetUp(currentScenario)
 
     saveData()
+
+    Wait.frames(function()
+        broadcastToAll("calling showScenarioControlPanel")
+        showScenarioControlPanel()
+    end, 1)
 end
 
 function setInitialFirstPlayer()
@@ -1667,10 +1672,6 @@ function advanceVillainStage(villainKey, heroCount)
     setUpVillainStage(villain, nextStage, heroCount)
 
     saveData()
-    
-    Wait.frames(function()
-        showScenarioControlPanel()
-    end, 1)
 end
 
 function getNextVillainStage(villainKey)
@@ -1815,10 +1816,6 @@ function advanceSchemeStage(schemeKey, heroCount)
     setUpSchemeStage(scheme, nextStage, heroCount)
 
     saveData()
-
-    Wait.frames(function()
-        showScenarioControlPanel()
-    end, 1)
 end
 
 function getNextSchemeStage(scheme)
