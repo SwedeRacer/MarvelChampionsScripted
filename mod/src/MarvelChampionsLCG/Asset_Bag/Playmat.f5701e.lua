@@ -417,23 +417,6 @@ function findCardsAtPosition()
    return cards
 end
 
-function findObjectsAtPosition()
-   matPos = self.getPosition()
-   local objList = Physics.cast({
-      origin       = matPos,
-      direction    = {0,1,0},
-      type         = 3,
-      size         = {26,1,15},
-      max_distance = 0,
-      debug        = false,
-   })
-   local objects = {}
-   for _, obj in ipairs(objList) do
-      table.insert(objects, obj.hit_object)
-   end
-   return objects
-end
-
 function drawEncounter(player, value, id)
    Global.call("dealEncounterCardToPlayer", {playerColor = getValue("playerColor"), faceUp = value == "-2"})
 end
@@ -474,32 +457,24 @@ end
 
 function clearPlaymat()
    local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
-   local group = "player" .. getValue("playerColor")
-   local deleteWith = "delete-with-" .. group
+   local playerColor = getValue("playerColor")
+   local group = "player" .. playerColor
 
    if(heroManager) then
-      heroManager.call("clearHero", {playerColor = getValue("playerColor")})
+      heroManager.call("clearHero", {playerColor = playerColor })
    end
 
    Global.call("deleteZoneGroup", {group = group})
+   Global.call("deleteObjectsByGroup", {deleteGroup = playerColor})
+   -- local objects = findObjectsAtPosition()
 
-   local objects = findObjectsAtPosition()
-
-   for _, obj in ipairs(objects) do
-      if(obj.tag ~= "Surface" and obj.tag ~= "Board" and obj.getVar("preventDeletion") ~= true) then
-         obj.destruct()
-      end
-   end
-
-   -- local allObjects = getAllObjects()
-
-   -- for _, obj in ipairs(allObjects) do
-   --    if(obj.hasTag(deleteWith)) then
+   -- for _, obj in ipairs(objects) do
+   --    if(obj.tag ~= "Surface" and obj.tag ~= "Board" and obj.getVar("preventDeletion") ~= true) then
    --       obj.destruct()
    --    end
    -- end
 
-   self.destruct()
+   --self.destruct()
 end
 
 function spawnNemesis()

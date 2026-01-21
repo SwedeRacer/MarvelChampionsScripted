@@ -30,7 +30,7 @@ scenarios["sandman"] =
                 stage1={
                     cardId="27064",
                     startingThreatPerPlayer=2,
-                    targetThreatPerPlayer=7
+                    targetThreatPerPlayer=9
                 }
             }
         }

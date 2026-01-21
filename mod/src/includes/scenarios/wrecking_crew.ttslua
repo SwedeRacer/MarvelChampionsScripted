@@ -285,6 +285,27 @@ scenarios["wreckingCrew"] =
     }
 }
 
+function getEncounterSetControlPanel_wreckingCrew()
+    local encounterSetControlPanel = {
+        tag = "Panel",
+        attributes = {
+            flexibleHeight = "1"
+        },
+        children = {{
+            tag="Text",
+            value = "This scenario does not use modular encounter sets.",
+            attributes = {
+                rectAlignment = "MiddleCenter",
+                alignment = "MiddleCenter",
+                color = "rgba(1,1,1,1)",
+                fontSize = "50"
+            }
+        }}
+    }
+
+    return encounterSetControlPanel
+end
+
 function finalizeSetup_wreckingCrew()
   --TODO: Refactor setUpScenario with coroutines to prevent having to use Wait.frames here
   Wait.frames(

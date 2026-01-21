@@ -70,33 +70,35 @@ function shuffleTable(params)
 end
 
 function displayMessage(params)
-    local message = params.message
-    local messageType = params.messageType or MESSAGE_TYPE_INFO
-    local playerColor = params.playerColor
+   local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
+   scenarioManager.call("displayMessage", params)
+   --  local message = params.message
+   --  local messageType = params.messageType or MESSAGE_TYPE_INFO
+   --  local playerColor = params.playerColor
  
-    if messageType == MESSAGE_TYPE_PLAYER then
-       local messageTint = 
-          playerColor == PLAYER_COLOR_RED and MESSAGE_TINT_RED
-          or playerColor == PLAYER_COLOR_BLUE and MESSAGE_TINT_BLUE
-          or playerColor == PLAYER_COLOR_GREEN and MESSAGE_TINT_GREEN
-          or playerColor == PLAYER_COLOR_YELLOW and MESSAGE_TINT_YELLOW
+   --  if messageType == MESSAGE_TYPE_PLAYER then
+   --     local messageTint = 
+   --        playerColor == PLAYER_COLOR_RED and MESSAGE_TINT_RED
+   --        or playerColor == PLAYER_COLOR_BLUE and MESSAGE_TINT_BLUE
+   --        or playerColor == PLAYER_COLOR_GREEN and MESSAGE_TINT_GREEN
+   --        or playerColor == PLAYER_COLOR_YELLOW and MESSAGE_TINT_YELLOW
  
-       if(Player[playerColor].seated) then
-          broadcastToColor(message, playerColor, messageTint)
-       else
-          broadcastToAll(message, messageTint)
-       end
+   --     if(Player[playerColor].seated) then
+   --        broadcastToColor(message, playerColor, messageTint)
+   --     else
+   --        broadcastToAll(message, messageTint)
+   --     end
  
-       return
-    end
+   --     return
+   --  end
  
-    local messageTint = 
-       messageType == MESSAGE_TYPE_FLAVOR_TEXT and MESSAGE_TINT_FLAVOR
-       or messageType == MESSAGE_TYPE_INSTRUCTION and MESSAGE_TINT_INSTRUCTION
-       or messageType == MESSAGE_TYPE_INFO and MESSAGE_TINT_INFO
-       or messageType == MESSAGE_TYPE_ALERT and MESSAGE_TINT_ALERT
+   --  local messageTint = 
+   --     messageType == MESSAGE_TYPE_FLAVOR_TEXT and MESSAGE_TINT_FLAVOR
+   --     or messageType == MESSAGE_TYPE_INSTRUCTION and MESSAGE_TINT_INSTRUCTION
+   --     or messageType == MESSAGE_TYPE_INFO and MESSAGE_TINT_INFO
+   --     or messageType == MESSAGE_TYPE_ALERT and MESSAGE_TINT_ALERT
  
-    broadcastToAll(message, messageTint)
+   --  broadcastToAll(message, messageTint)
 end
 
 function calculateDestination(params)
@@ -230,4 +232,61 @@ end
 function showScenarioControlPanel()
    local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
    scenarioManager.call("showScenarioControlPanel")
+end
+
+function deleteObjectsByGroup(params)
+    local deleteGroup = params.deleteGroup
+    local deleteTag = "delete-with-" .. deleteGroup
+
+    function cardShouldBeDeletedWithGroup(cardTable)
+        if(cardTable.tags) then
+            for _, tag in ipairs(cardTable.tags) do
+                if(tag == deleteTag) then
+                    return true
+                end
+            end
+        end
+
+        return false
+    end
+
+    local objects = getAllObjects()
+
+    for _, object in ipairs(objects) do
+        if(object.tag == "Deck") then
+            local deckPosition = object.getPosition()
+            local extractPosition = ensureMinimumYPosition({position = deckPosition, minimumY = 3})
+            local cards = object.getObjects()
+            local cardGuidsToRemove = {}
+
+            for _, card in ipairs(cards) do
+                if(cardShouldBeDeletedWithGroup(card)) then
+                    table.insert(cardGuidsToRemove, card.guid)
+                end
+            end
+
+            if(#cardGuidsToRemove >= #cards) then
+                object.destruct()
+            else
+                for _, guid in ipairs(cardGuidsToRemove) do
+                    local cardObject = object.takeObject({guid=guid, position=extractPosition})
+                    cardObject.destruct()
+                end
+            end
+        end
+
+        if object.hasTag(deleteTag) then
+            if(object.tag == "Card") then
+                local itemsOnCard = getItemsOnCard({card = object})
+
+                for i, item in ipairs(itemsOnCard) do
+                    if(item.interactable and item.tag == "Tile") then                    
+                        item.destruct()
+                    end
+                end
+            end
+
+            object.destruct()
+        end
+    end
 end

@@ -2,6 +2,8 @@ require('!/lib/json')
 
 preventDeletion = true
 
+local deleteTag = "delete-with-scenario"
+
 local defaults = {
     villainHpCounter = {
         position = Global.getTable("VILLAIN_HEALTH_COUNTER_POSITION"),
@@ -282,7 +284,8 @@ function placeScenario(scenarioKey, mode)
                     name = villain.name,
                     scale = villainScale,
                     locked = locked,
-                    flipped = flipped
+                    flipped = flipped,
+                    tags = {deleteTag}
                 })
             end
 
@@ -321,7 +324,8 @@ function placeScenario(scenarioKey, mode)
                 name = card.name,
                 scale = card.scale,
                 flipped = card.flipped,
-                landscape = card.landscape
+                landscape = card.landscape,
+                tags = {deleteTag}
             })
         end
     end
@@ -444,7 +448,6 @@ function setUpScenario()
     saveData()
 
     Wait.frames(function()
-        broadcastToAll("calling showScenarioControlPanel")
         showScenarioControlPanel()
     end, 1)
 end
@@ -468,6 +471,7 @@ function placeNotes()
             callback_function = function(spawned_object)
                 spawned_object.setName(v.title)
                 spawned_object.setDescription(v.text)
+                spawned_object.addTag(deleteTag)
             end
         })
     end
@@ -791,6 +795,7 @@ function configureVillainHpCounter(params)
     counter.setName("")
     counter.setDescription("")
     counter.setLock(params.lock)
+    counter.addTag(deleteTag)
     counter.setCustomObject({
         image = params.imageUrl
     })
@@ -853,6 +858,7 @@ function configureMainSchemeThreatCounter(params)
     counter.setName("")
     counter.setDescription("")
     counter.setLock(params.lock)
+    counter.addTag(deleteTag)
 
     Wait.frames(function()
         counter.call("setSchemeKey", {
@@ -1036,7 +1042,8 @@ function setUpCards()
             name = card.name,
             scale = card.scale,
             flipped = card.flipped,
-            landscape = card.landscape
+            landscape = card.landscape,
+            tags = {deleteTag}
         })
     end
 end
@@ -1082,7 +1089,8 @@ function placeVillain(villainKey)
             scale = villainScale,
             name = villain.name,
             flipped = false,
-            locked = true
+            locked = true,
+            tags = {deleteTag}
         })
 
         villain.cardGuid = villainCard.getGUID()
@@ -1100,7 +1108,8 @@ function placeVillain(villainKey)
             cards = villainCards,
             position = villainPosition,
             rotation = villainRotation,
-            scale = villainScale
+            scale = villainScale,
+            cardTags = {deleteTag}
         })
     end
 end
@@ -1130,7 +1139,8 @@ function placeVillainCard(params)
         scale = params.scale,
         name = params.name,
         flipped = params.flipped,
-        locked = params.locked
+        locked = params.locked,
+        tags = {deleteTag}
     })
 
     villain.cardGuid = villainCard.getGUID()
@@ -1161,7 +1171,8 @@ function placeDeck(deck)
         cards = deck.cards,
         position = deckPosition,
         scale = deckScale,
-        name = deck.name
+        name = deck.name,
+        cardTags = {deleteTag}
     })
 
     Wait.frames(function()
@@ -1254,14 +1265,16 @@ function placeScheme(schemeKey)
             position = schemePosition,
             scale = schemeScale,
             landscape = true,
-            flipped = false
+            flipped = false,
+            tags = {deleteTag}
         })
     else
         Global.call("spawnDeck", {
             cards = schemeCards,
             position = schemePosition,
             rotation = schemeRotation,
-            scale = schemeScale
+            scale = schemeScale,
+            cardTags = {deleteTag}
         })
     end
 end
@@ -1356,6 +1369,7 @@ function configureExtra(params)
     extra.setRotation(params.rotation)
     extra.setScale(params.scale)
     extra.setLock(params.locked)
+    extra.addTag(deleteTag)
     addItemToManifest(params.key, extra)
 end
 
@@ -1401,6 +1415,7 @@ function configureBlackHole(params)
     blackHole.setPosition(params.position)
     blackHole.setScale(params.scale) -- Shouldn't have to do this, but the scale wasn't being applied in the takeObject call
     blackHole.setLock(true)
+    blackHole.addTag(deleteTag)
     addItemToManifest("blackHole", blackHole)
 end
 
@@ -1448,7 +1463,8 @@ function placeModularSets(scenario)
             cards = cards,
             position = deckPosition,
             rotation = deckRotation,
-            scale = deckScale
+            scale = deckScale,
+            cardTags = {deleteTag}
         })
     end
 
@@ -1490,6 +1506,7 @@ function configureBoostPanel(params)
     local boostPanel = params.spawnedObject
     boostPanel.setPosition(params.position)
     boostPanel.setLock(true)
+    boostPanel.addTag(deleteTag)
 end
 
 function finalizeSetUp(scenario)
@@ -1506,40 +1523,8 @@ function clearScenario()
     hideScenarioControlPanel()
 
     Global.call("deleteZoneGroup", {group = "scenario"})
-
-    local allObjects = getAllObjects()
-
-    for _, obj in ipairs(allObjects) do
-        if obj.hasTag("delete-with-scenario") then
-            obj.destruct()
-        end
-    end
-
+    Global.call("deleteObjectsByGroup", {deleteGroup = "scenario"})
     Global.setSnapPoints({})
-
-    local clearCards = findCardsAtPosition()
-
-    for _, obj in ipairs(clearCards) do
-        if obj.getVar("preventDeletion") ~= true then
-            obj.destruct()
-        end
-    end
-
-    local clearCards2 = findCardsAtPosition2()
-
-    for _, obj in ipairs(clearCards2) do
-        if obj.getVar("preventDeletion") ~= true then
-            obj.destruct()
-        end
-    end
-
-    local clearCards3 = findCardsAtPosition3()
-
-    for _, obj in ipairs(clearCards3) do
-        if obj.getVar("preventDeletion") ~= true then
-            obj.destruct()
-        end
-    end
 
     clearData()
 
@@ -1628,7 +1613,8 @@ function spawnNemesis(params)
     Global.call("spawnDeck", {
         cards = hero.decks.nemesis,
         position = {0, 1, 0},
-        scale = Global.getTable("CARD_SCALE_ENCOUNTER")
+        scale = Global.getTable("CARD_SCALE_ENCOUNTER"),
+        cardTags = {deleteTag}
     })
 end
 
@@ -1781,6 +1767,7 @@ function configureVillainStage(params)
     villain.setRotation(params.rotation)
     villain.setScale(params.scale)
     villain.setLock(params.locked)
+    villain.addTag(deleteTag)
 end
 
 function setUpVillainStage(villain, stage, heroCount)
@@ -1878,7 +1865,8 @@ function placeSchemeStage(schemeKey, stage, heroCount)
         scale = schemeScale,
         flipped = flipped,
         landscape = true,
-        locked = currentScenario.fullyScripted
+        locked = currentScenario.fullyScripted,
+        tags = {deleteTag}
     })
 
     local counter = scheme.threatCounter or {}

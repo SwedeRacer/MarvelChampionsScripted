@@ -31,7 +31,7 @@ function extendUI(params)
             textColor = "rgb(1,1,1)",
             height = "120",
             width = "475",
-            fontSize = "85",
+            fontSize = "80",
             fontStyle = "Bold",
             active = showPrimaryButton
         }

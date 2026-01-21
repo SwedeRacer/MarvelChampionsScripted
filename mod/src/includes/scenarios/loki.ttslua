@@ -141,7 +141,8 @@ function placeVillainStage_loki(params)
     scale = villainScale,
     name = villain.name,
     flipped = false,
-    locked = true
+    locked = true,
+    tags = {"delete-with-scenario"}
   })
   
   local hitPoints = (stage.hitPoints or 0) + ((stage.hitPointsPerPlayer or 0) * heroCount)
@@ -193,6 +194,7 @@ function lokiSwapVillain(params)
         scale = villainScale, 
         name = villain.name, 
         flipped = false, 
-        locked = true
+        locked = true,
+        tags = {"delete-with-scenario"}
     })
 end

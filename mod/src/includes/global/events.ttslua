@@ -68,7 +68,7 @@ function onObjectNumberTyped(object, playerColor, number)
 end
 
 function onObjectEnterZone(zone, card)
-    if (supressZoneInteractions) then return end
+    --if (supressZoneInteractions) then return end
 
     local zoneDef = getZoneDefinition({zone = zone})
     if (not zoneDef) then
@@ -109,7 +109,7 @@ function onObjectEnterZone(zone, card)
     end
 
     if(zoneDef.addCountersAndTokens) then
-        addCountersAndTokensToCard({card = card, cardData = cardData})
+        addCountersAndTokensToCard({card = card, cardData = cardData, zoneGuid = zone.getGUID()})
     end
 
     local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)

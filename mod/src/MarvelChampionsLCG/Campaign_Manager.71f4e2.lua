@@ -1,5 +1,7 @@
 local campaigns = {}
 local campaignPlaced = false
+local deleteGroup = "campaign"
+local deleteTag = "delete-with-" .. deleteGroup
 
 function onload(saved_data)
     self.interactable = false
@@ -47,48 +49,8 @@ function placeCampaign(params)
 end
 
 function clearCampaign()
-    function cardShouldBeDeletedWithCampaign(cardTable)
-        if(cardTable.tags) then
-            for _, tag in ipairs(cardTable.tags) do
-                if(tag == "delete-with-campaign") then
-                    return true
-                end
-            end
-        end
-
-        return false
-    end
-
-    local objects = getAllObjects()
-
-    for _, object in ipairs(objects) do
-        if(object.tag == "Deck") then
-            local deckPosition = object.getPosition()
-            local extractPosition = {deckPosition[1], deckPosition[2] + 2, deckPosition[3]}
-            local cards = object.getObjects()
-            local cardGuidsToRemove = {}
-
-            for _, card in ipairs(cards) do
-                if(cardShouldBeDeletedWithCampaign(card)) then
-                    table.insert(cardGuidsToRemove, card.guid)
-                end
-            end
-
-            if(#cardGuidsToRemove >= #cards) then
-                object.destruct()
-            else
-                for _, guid in ipairs(cardGuidsToRemove) do
-                    local cardObject = object.takeObject({guid=guid, position=extractPosition})
-                    cardObject.destruct()
-                end
-            end
-        end
-
-        if object.hasTag("delete-with-campaign") then
-            object.destruct()
-        end
-    end
-
+    Global.call("deleteObjectsByGroup", {deleteGroup = deleteGroup})
+    
     campaignPlaced = false
     saveData()
 end
@@ -110,7 +72,7 @@ function placeText(campaign)
                 spawned_object.TextTool.setFontSize(text.fontSize or 100)
                 spawned_object.TextTool.setFontColor(text.fontColor or {1,1,1})
                 spawned_object.interactable = false
-                spawned_object.addTag("delete-with-campaign")
+                spawned_object.addTag(deleteTag)
             end
         })
     end
@@ -127,7 +89,7 @@ function placeCards(campaign)
             name = card.name,
             flipped = card.flipped or false,
             landscape = card.landscape or false,
-            tags = {"delete-with-campaign"}
+            tags = {deleteTag}
         })
     end
 end
@@ -136,7 +98,7 @@ function placeDecks(campaign)
     if(campaign.decks == nil) then return end
 
     for _, deck in ipairs(campaign.decks) do
-        deck.cardTags = {"delete-with-campaign"}
+        deck.cardTags = {deleteTag}
         Global.call("spawnDeck", deck)
     end
 end
@@ -195,7 +157,7 @@ function placePdfs(campaign)
             rotation = pdf.rotation or {0,180,0},
             scale = pdf.scale or {1,1,1},
             callback_function = function(spawned_object)
-                spawned_object.addTag("delete-with-campaign")
+                spawned_object.addTag(deleteTag)
             end
         })
     end
@@ -221,7 +183,7 @@ function configureLog(params)
     log.setPosition(params.position)
     log.setScale(params.scale)
     log.setLock(true)
-    log.addTag("delete-with-campaign")
+    log.addTag(deleteTag)
     log.tooltip = false
 end
 
@@ -235,7 +197,7 @@ function placeNotes(campaign)
         callback_function = function(spawned_object)
           spawned_object.setName(v.title)
           spawned_object.setDescription(v.text)
-          spawned_object.addTag("delete-with-campaign")
+          spawned_object.addTag(deleteTag)
         end
       })
     end
@@ -270,7 +232,7 @@ function configureAsset(params)
     asset.setPosition(params.position)
     asset.setScale(params.scale)
     asset.setLock(params.locked)
-    asset.addTag("delete-with-campaign")
+    asset.addTag(deleteTag)
    
     if(params.rotation ~= nil) then
         asset.setRotation(params.rotation)

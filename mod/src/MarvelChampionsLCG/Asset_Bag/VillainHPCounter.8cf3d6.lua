@@ -13,6 +13,7 @@ function extendUI(params)
     local ui = params.ui
     local primaryButtonLabel = getDataValue("primaryButtonLabel", "ADVANCE")
     local showPrimaryButton = tostring(getDataValue("showPrimaryButton", false))
+    local primaryFontSize = string.len(primaryButtonLabel) > 8 and "75" or "85"
 
     local primaryButton = 
     {
@@ -27,7 +28,7 @@ function extendUI(params)
             textColor = "rgb(1,1,1)",
             height = "120",
             width = "475",
-            fontSize = "85",
+            fontSize = primaryFontSize,
             fontStyle = "Bold",
             active = showPrimaryButton
         }

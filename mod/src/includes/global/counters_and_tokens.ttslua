@@ -133,9 +133,23 @@ end
 
 function addCountersAndTokensToCard(params)
   local card = params.card
+  local zoneGuid = params.zoneGuid
 
   Wait.condition(function()
       if (card.isDestroyed()) then
+        return
+      end
+
+      local zones = card.getZones()
+      local cardIsInZone = false
+      for _, zone in ipairs(zones) do
+        if(zone.getGUID() == zoneGuid) then
+          cardIsInZone = true
+          break
+        end
+      end
+
+      if(not cardIsInZone) then
         return
       end
 
