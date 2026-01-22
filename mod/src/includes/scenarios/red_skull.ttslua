@@ -158,7 +158,7 @@ function redSkullSetUpSchemeStage1()
                 spawned_object.TextTool.setFontSize(60)
                 spawned_object.TextTool.setFontColor({1, 1, 1})
                 spawned_object.interactable = false
-                spawned_object.addTag("delete-with-scenario")
+                spawned_object.addTag("group-scenario")
             end
         })
 

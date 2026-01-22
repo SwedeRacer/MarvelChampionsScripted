@@ -1,5 +1,5 @@
 preventDeletion = true
-local deleteTagPrefix = "delete-with-"
+local groupTagPrefix = "group-"
 local offset = {
  healthCounter = Global.getTable("PLAYMAT_OFFSET_HEALTH_COUNTER"),
  identity = Global.getTable("PLAYMAT_OFFSET_IDENTITY"),
@@ -374,7 +374,7 @@ function configurePlaymat(params)
  local playmatUrl = params.playmatUrl
 
  playmat.addTag("Playmat")
- playmat.addTag(deleteTagPrefix .. params.playerColor)
+ playmat.addTag(groupTagPrefix .. params.playerColor)
  playmat.addTag(params.playerColor)
  playmat.setPosition(params.position)
  playmat.setCustomObject({image = playmatUrl})
@@ -411,7 +411,7 @@ function configureHealthCounter(params)
   counter.setLock(true)
   counter.setPosition(params.position)
   counter.setCustomObject({image = imageUrl})
-  counter.addTag(deleteTagPrefix .. params.playerColor)
+  counter.addTag(groupTagPrefix .. params.playerColor)
 
   local reloadedCounter = nil
   
@@ -450,7 +450,7 @@ function placeIdentity(hero, playmatPosition, playerColor)
   position = position,
   scale = scale,
   flipped = hero.flipIdentityCard == nil or hero.flipIdentityCard,
-  tags = {deleteTagPrefix .. playerColor}
+  tags = {groupTagPrefix .. playerColor}
  })
 
  hero.identityGuid = heroCard.getGUID()
@@ -461,7 +461,7 @@ function configureIdentity(params)
   local hero = selectedHeroes[playerColor]
   local identity = params.spawnedObject
   identity.setPosition(params.position)
-  identity.addTag(deleteTagPrefix .. playerColor)
+  identity.addTag(groupTagPrefix .. playerColor)
   hero.identityGuid = identity.getGUID()
 end
 
@@ -498,7 +498,7 @@ function placeDeck(hero, deckType, playmatPosition, importedDeck, playerColor)
     deck.artVariant = hero.artVariant
   end
 
-  deck.cardTags = {deleteTagPrefix .. playerColor}
+  deck.cardTags = {groupTagPrefix .. playerColor}
 
   local spawnedDeck = Global.call("spawnDeck", deck)
   local linkedCards = spawnedDeck.getGMNotes()
@@ -599,7 +599,7 @@ function placeExtras(hero, playmatPosition, playerColor)
      Wait.frames(
       function()
        counter.call("setValue", {value = item.value or 0})
-       counter.addTag(deleteTagPrefix .. playerColor)
+       counter.addTag(groupTagPrefix .. playerColor)
       end,
       1)
     end
@@ -635,7 +635,7 @@ end
 
 function configureAsset(params)
  local asset = params.spawnedObject
- asset.addTag(deleteTagPrefix .. params.playerColor)
+ asset.addTag(groupTagPrefix .. params.playerColor)
  asset.setPosition(params.position)
 
  if(params.rotation ~= nil) then

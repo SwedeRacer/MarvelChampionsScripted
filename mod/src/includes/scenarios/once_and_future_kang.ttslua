@@ -618,7 +618,7 @@ function kangStage2PlaceVillains()
             landscape = true,
             flipped = true, 
             locked = true,
-            tags = {"delete-with-scenario"}
+            tags = {"group-scenario"}
           })
         end,
         20
@@ -838,7 +838,7 @@ function kangStage3PlaceKangsDominion()
         position = encounterDeckPosition,
         scale = Global.getTable("CARD_SCALE_ENCOUNTER"),
         flipped = true,
-        tags = {"delete-with-scenario"}
+        tags = {"group-scenario"}
       })
     end
  

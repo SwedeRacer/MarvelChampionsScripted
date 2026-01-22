@@ -466,15 +466,6 @@ function clearPlaymat()
 
    Global.call("deleteZoneGroup", {group = group})
    Global.call("deleteObjectsByGroup", {deleteGroup = playerColor})
-   -- local objects = findObjectsAtPosition()
-
-   -- for _, obj in ipairs(objects) do
-   --    if(obj.tag ~= "Surface" and obj.tag ~= "Board" and obj.getVar("preventDeletion") ~= true) then
-   --       obj.destruct()
-   --    end
-   -- end
-
-   --self.destruct()
 end
 
 function spawnNemesis()
@@ -538,7 +529,7 @@ function drawCards(params)
 
    objectToDrawFrom.deal(numberToDraw, getValue("playerColor"))
 
-   Global.call("supressZones")
+   disableZones()
    
    Wait.frames(function()
       if(isPlayerDeck and numberToDraw >= availableCards) then
@@ -557,6 +548,34 @@ function drawCards(params)
       end
    end,
    1)
+end
+
+function disableZones()
+   local zonePrefixes = {"hero-", "heroCounters-", "heroExit-"}
+   local suppressedTag = "suppressed"
+   local playerColor = getValue("playerColor")
+
+   for _, prefix in ipairs(zonePrefixes) do
+      local zoneDef = Global.call("getZoneDefinition", {zoneIndex = prefix .. playerColor})
+      if(zoneDef) then
+         local zone = getObjectFromGUID(zoneDef.guid)
+         if(zone) then
+            zone.addTag(suppressedTag)
+         end
+      end
+   end
+
+   Wait.frames(function()
+      for _, prefix in ipairs(zonePrefixes) do
+         local zoneDef = Global.call("getZoneDefinition", {zoneIndex = prefix .. playerColor})
+         if(zoneDef) then
+            local zone = getObjectFromGUID(zoneDef.guid)
+            if(zone) then
+               zone.removeTag(suppressedTag)
+            end
+         end
+      end
+   end, 60)
 end
 
 function isPlayerDeck(deck)

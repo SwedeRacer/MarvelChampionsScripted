@@ -9,9 +9,9 @@
       "rotX": 3.74561751e-8,
       "rotY": 180,
       "rotZ": 180,
-      "scaleX": 1.88,
+      "scaleX": 1.58,
       "scaleY": 1,
-      "scaleZ": 1.88
+      "scaleZ": 1.58
     },
     "Nickname": "Archangel",
     "Description": "Scanned and imported by Unicorn",
@@ -26,6 +26,9 @@
       "g": 0.713235259,
       "b": 0.713235259
     },
+    "Tags": [
+      "do-not-resize"
+    ],
     "LayoutGroupSortIndex": 0,
     "Value": 0,
     "Locked": false,

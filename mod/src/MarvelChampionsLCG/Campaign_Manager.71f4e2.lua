@@ -1,7 +1,7 @@
 local campaigns = {}
 local campaignPlaced = false
 local deleteGroup = "campaign"
-local deleteTag = "delete-with-" .. deleteGroup
+local groupTag = "group-" .. deleteGroup
 
 function onload(saved_data)
     self.interactable = false
@@ -72,7 +72,7 @@ function placeText(campaign)
                 spawned_object.TextTool.setFontSize(text.fontSize or 100)
                 spawned_object.TextTool.setFontColor(text.fontColor or {1,1,1})
                 spawned_object.interactable = false
-                spawned_object.addTag(deleteTag)
+                spawned_object.addTag(groupTag)
             end
         })
     end
@@ -89,7 +89,7 @@ function placeCards(campaign)
             name = card.name,
             flipped = card.flipped or false,
             landscape = card.landscape or false,
-            tags = {deleteTag}
+            tags = {groupTag}
         })
     end
 end
@@ -98,7 +98,7 @@ function placeDecks(campaign)
     if(campaign.decks == nil) then return end
 
     for _, deck in ipairs(campaign.decks) do
-        deck.cardTags = {deleteTag}
+        deck.cardTags = {groupTag}
         Global.call("spawnDeck", deck)
     end
 end
@@ -157,7 +157,7 @@ function placePdfs(campaign)
             rotation = pdf.rotation or {0,180,0},
             scale = pdf.scale or {1,1,1},
             callback_function = function(spawned_object)
-                spawned_object.addTag(deleteTag)
+                spawned_object.addTag(groupTag)
             end
         })
     end
@@ -183,7 +183,7 @@ function configureLog(params)
     log.setPosition(params.position)
     log.setScale(params.scale)
     log.setLock(true)
-    log.addTag(deleteTag)
+    log.addTag(groupTag)
     log.tooltip = false
 end
 
@@ -197,7 +197,7 @@ function placeNotes(campaign)
         callback_function = function(spawned_object)
           spawned_object.setName(v.title)
           spawned_object.setDescription(v.text)
-          spawned_object.addTag(deleteTag)
+          spawned_object.addTag(groupTag)
         end
       })
     end
@@ -232,7 +232,7 @@ function configureAsset(params)
     asset.setPosition(params.position)
     asset.setScale(params.scale)
     asset.setLock(params.locked)
-    asset.addTag(deleteTag)
+    asset.addTag(groupTag)
    
     if(params.rotation ~= nil) then
         asset.setRotation(params.rotation)

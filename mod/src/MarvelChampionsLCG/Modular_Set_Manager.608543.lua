@@ -122,14 +122,14 @@ function addEncounterSetToDeck(params)
             position = position, 
             scale = scale,
             flipped = true,
-            tags = {"delete-with-scenario"}})
+            tags = {"group-scenario"}})
     else
         Global.call("spawnDeck", {
             cards = modularSet.cards, 
             position = position, 
             rotation = rotation, 
             scale = scale,
-            cardTags = {"delete-with-scenario"}})
+            cardTags = {"group-scenario"}})
     end
 
     Wait.frames(

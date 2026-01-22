@@ -2,7 +2,7 @@ require('!/lib/json')
 
 preventDeletion = true
 
-local deleteTag = "delete-with-scenario"
+local groupTag = "group-scenario"
 
 local defaults = {
     villainHpCounter = {
@@ -285,7 +285,7 @@ function placeScenario(scenarioKey, mode)
                     scale = villainScale,
                     locked = locked,
                     flipped = flipped,
-                    tags = {deleteTag}
+                    tags = {groupTag}
                 })
             end
 
@@ -325,7 +325,7 @@ function placeScenario(scenarioKey, mode)
                 scale = card.scale,
                 flipped = card.flipped,
                 landscape = card.landscape,
-                tags = {deleteTag}
+                tags = {groupTag}
             })
         end
     end
@@ -471,7 +471,7 @@ function placeNotes()
             callback_function = function(spawned_object)
                 spawned_object.setName(v.title)
                 spawned_object.setDescription(v.text)
-                spawned_object.addTag(deleteTag)
+                spawned_object.addTag(groupTag)
             end
         })
     end
@@ -528,7 +528,7 @@ function createVictoryDisplayText()
             spawned_object.TextTool.setFontSize(250)
             spawned_object.TextTool.setFontColor({1, 1, 1})
             spawned_object.interactable = false
-            spawned_object.addTag("delete-with-scenario")
+            spawned_object.addTag("group-scenario")
             addItemToManifest("victoryDisplayHeading", spawned_object)
         end
     })
@@ -542,7 +542,7 @@ function createVictoryDisplayText()
             spawned_object.TextTool.setFontSize(200)
             spawned_object.TextTool.setFontColor({1, 1, 1})
             spawned_object.interactable = false
-            spawned_object.addTag("delete-with-scenario")
+            spawned_object.addTag("group-scenario")
             addItemToManifest("victoryPointsReadout", spawned_object)
         end
     })
@@ -556,7 +556,7 @@ function createVictoryDisplayText()
             spawned_object.TextTool.setFontSize(200)
             spawned_object.TextTool.setFontColor({1, 1, 1})
             spawned_object.interactable = false
-            spawned_object.addTag("delete-with-scenario")
+            spawned_object.addTag("group-scenario")
             addItemToManifest("victoryDisplayItemCountReadout", spawned_object)
         end
     })
@@ -795,7 +795,7 @@ function configureVillainHpCounter(params)
     counter.setName("")
     counter.setDescription("")
     counter.setLock(params.lock)
-    counter.addTag(deleteTag)
+    counter.addTag(groupTag)
     counter.setCustomObject({
         image = params.imageUrl
     })
@@ -858,7 +858,7 @@ function configureMainSchemeThreatCounter(params)
     counter.setName("")
     counter.setDescription("")
     counter.setLock(params.lock)
-    counter.addTag(deleteTag)
+    counter.addTag(groupTag)
 
     Wait.frames(function()
         counter.call("setSchemeKey", {
@@ -1043,7 +1043,7 @@ function setUpCards()
             scale = card.scale,
             flipped = card.flipped,
             landscape = card.landscape,
-            tags = {deleteTag}
+            tags = {groupTag}
         })
     end
 end
@@ -1090,7 +1090,7 @@ function placeVillain(villainKey)
             name = villain.name,
             flipped = false,
             locked = true,
-            tags = {deleteTag}
+            tags = {groupTag}
         })
 
         villain.cardGuid = villainCard.getGUID()
@@ -1109,7 +1109,7 @@ function placeVillain(villainKey)
             position = villainPosition,
             rotation = villainRotation,
             scale = villainScale,
-            cardTags = {deleteTag}
+            cardTags = {groupTag}
         })
     end
 end
@@ -1140,7 +1140,7 @@ function placeVillainCard(params)
         name = params.name,
         flipped = params.flipped,
         locked = params.locked,
-        tags = {deleteTag}
+        tags = {groupTag}
     })
 
     villain.cardGuid = villainCard.getGUID()
@@ -1172,7 +1172,7 @@ function placeDeck(deck)
         position = deckPosition,
         scale = deckScale,
         name = deck.name,
-        cardTags = {deleteTag}
+        cardTags = {groupTag}
     })
 
     Wait.frames(function()
@@ -1191,7 +1191,7 @@ function placeDeck(deck)
                     cardId = linkedCardId,
                     deckPosition = deckPosition,
                     destinationPosition = linkedCardPosition,
-                    tags = {"delete-with-scenario"},
+                    tags = {"group-scenario"},
                     flipCard = true
                 })
 
@@ -1214,7 +1214,7 @@ function placeDeck(deck)
                     spawned_object.TextTool.setFontSize(60)
                     spawned_object.TextTool.setFontColor({1, 1, 1})
                     spawned_object.interactable = false
-                    spawned_object.addTag("delete-with-scenario")
+                    spawned_object.addTag("group-scenario")
                 end
             })
 
@@ -1237,7 +1237,7 @@ function placeDeck(deck)
                 spawned_object.TextTool.setFontSize(60)
                 spawned_object.TextTool.setFontColor({1, 1, 1})
                 spawned_object.interactable = false
-                spawned_object.addTag("delete-with-scenario")
+                spawned_object.addTag("group-scenario")
             end
         })
     end
@@ -1266,7 +1266,7 @@ function placeScheme(schemeKey)
             scale = schemeScale,
             landscape = true,
             flipped = false,
-            tags = {deleteTag}
+            tags = {groupTag}
         })
     else
         Global.call("spawnDeck", {
@@ -1274,7 +1274,7 @@ function placeScheme(schemeKey)
             position = schemePosition,
             rotation = schemeRotation,
             scale = schemeScale,
-            cardTags = {deleteTag}
+            cardTags = {groupTag}
         })
     end
 end
@@ -1369,7 +1369,7 @@ function configureExtra(params)
     extra.setRotation(params.rotation)
     extra.setScale(params.scale)
     extra.setLock(params.locked)
-    extra.addTag(deleteTag)
+    extra.addTag(groupTag)
     addItemToManifest(params.key, extra)
 end
 
@@ -1415,7 +1415,7 @@ function configureBlackHole(params)
     blackHole.setPosition(params.position)
     blackHole.setScale(params.scale) -- Shouldn't have to do this, but the scale wasn't being applied in the takeObject call
     blackHole.setLock(true)
-    blackHole.addTag(deleteTag)
+    blackHole.addTag(groupTag)
     addItemToManifest("blackHole", blackHole)
 end
 
@@ -1464,7 +1464,7 @@ function placeModularSets(scenario)
             position = deckPosition,
             rotation = deckRotation,
             scale = deckScale,
-            cardTags = {deleteTag}
+            cardTags = {groupTag}
         })
     end
 
@@ -1506,7 +1506,7 @@ function configureBoostPanel(params)
     local boostPanel = params.spawnedObject
     boostPanel.setPosition(params.position)
     boostPanel.setLock(true)
-    boostPanel.addTag(deleteTag)
+    boostPanel.addTag(groupTag)
 end
 
 function finalizeSetUp(scenario)
@@ -1614,7 +1614,7 @@ function spawnNemesis(params)
         cards = hero.decks.nemesis,
         position = {0, 1, 0},
         scale = Global.getTable("CARD_SCALE_ENCOUNTER"),
-        cardTags = {deleteTag}
+        cardTags = {groupTag}
     })
 end
 
@@ -1767,7 +1767,7 @@ function configureVillainStage(params)
     villain.setRotation(params.rotation)
     villain.setScale(params.scale)
     villain.setLock(params.locked)
-    villain.addTag(deleteTag)
+    villain.addTag(groupTag)
 end
 
 function setUpVillainStage(villain, stage, heroCount)
@@ -1866,7 +1866,7 @@ function placeSchemeStage(schemeKey, stage, heroCount)
         flipped = flipped,
         landscape = true,
         locked = currentScenario.fullyScripted,
-        tags = {deleteTag}
+        tags = {groupTag}
     })
 
     local counter = scheme.threatCounter or {}

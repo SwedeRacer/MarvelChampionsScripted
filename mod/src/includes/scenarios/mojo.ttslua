@@ -109,7 +109,7 @@ function addNextGenre()
     cardId = genreEnvironmentCardId, 
     position = {20.75, 2.00, 29.75},  --TODO: create a constant (or better yet, add functionality for moving cards to a specific zone)
     scale = defaults.encounterDeck.scale,
-    tags = {"delete-with-scenario"}
+    tags = {"group-scenario"}
   })
 end
 
@@ -158,7 +158,7 @@ function placeGenreSetFromEnvironment(zone, card)
     cards = newGenreSet.cards, 
     position = spawnPosition, 
     scale = defaults.encounterDeck.scale,
-    cardTags = {"delete-with-scenario"}
+    cardTags = {"group-scenario"}
   })
 
   Wait.frames(function() 

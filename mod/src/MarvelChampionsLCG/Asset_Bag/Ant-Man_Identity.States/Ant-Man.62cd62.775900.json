@@ -9,9 +9,9 @@
       "rotX": 2.59698218e-9,
       "rotY": 179.976273,
       "rotZ": 1.90396179e-7,
-      "scaleX": 2.17989063,
+      "scaleX": 2.17,
       "scaleY": 1,
-      "scaleZ": 2.17989063
+      "scaleZ": 2.17
     },
     "Nickname": "Ant-Man",
     "Description": "",
@@ -26,6 +26,9 @@
       "g": 0.713235259,
       "b": 0.713235259
     },
+    "Tags": [
+      "do-not-resize"
+    ],
     "LayoutGroupSortIndex": 0,
     "Value": 0,
     "Locked": false,

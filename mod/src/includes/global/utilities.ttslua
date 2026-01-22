@@ -236,12 +236,12 @@ end
 
 function deleteObjectsByGroup(params)
     local deleteGroup = params.deleteGroup
-    local deleteTag = "delete-with-" .. deleteGroup
+    local groupTag = "group-" .. deleteGroup
 
     function cardShouldBeDeletedWithGroup(cardTable)
         if(cardTable.tags) then
             for _, tag in ipairs(cardTable.tags) do
-                if(tag == deleteTag) then
+                if(tag == groupTag) then
                     return true
                 end
             end
@@ -275,7 +275,7 @@ function deleteObjectsByGroup(params)
             end
         end
 
-        if object.hasTag(deleteTag) then
+        if object.hasTag(groupTag) then
             if(object.tag == "Card") then
                 local itemsOnCard = getItemsOnCard({card = object})
 

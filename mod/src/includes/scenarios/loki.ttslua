@@ -142,7 +142,7 @@ function placeVillainStage_loki(params)
     name = villain.name,
     flipped = false,
     locked = true,
-    tags = {"delete-with-scenario"}
+    tags = {"group-scenario"}
   })
   
   local hitPoints = (stage.hitPoints or 0) + ((stage.hitPointsPerPlayer or 0) * heroCount)
@@ -195,6 +195,6 @@ function lokiSwapVillain(params)
         name = villain.name, 
         flipped = false, 
         locked = true,
-        tags = {"delete-with-scenario"}
+        tags = {"group-scenario"}
     })
 end

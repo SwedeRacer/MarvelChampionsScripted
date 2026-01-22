@@ -165,7 +165,7 @@ function configureUltronDroneButton(params)
     droneButton.setPosition(params.position)
     droneButton.setName("")
     droneButton.setLock(true)
-    droneButton.addTag("delete-with-scenario")
+    droneButton.addTag("group-scenario")
 
     Wait.frames(function()
         droneButton.call("setPlayerColor", {playerColor = playerColor})

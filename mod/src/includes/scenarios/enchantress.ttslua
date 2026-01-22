@@ -122,7 +122,7 @@ function enchantressPlaceHypnoticTrances()
             position = cardPosition,
             scale = cardScale,
             flipped = true,
-            tags = {"delete-with-scenario"}
+            tags = {"group-scenario"}
         })
 
         Wait.frames(function()
@@ -207,7 +207,7 @@ function enchantressPlaceFutureOfDespair(extraThreatPerHero)
         scale = Global.getTable("CARD_SCALE_ENCOUNTER"),
         landscape = true,
         flipped = false,
-        tags = {"delete-with-scenario"}
+        tags = {"group-scenario"}
     })
 
     Wait.frames(function()
