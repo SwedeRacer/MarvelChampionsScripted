@@ -19,9 +19,20 @@ local messageTints = {
 	yellow = Global.getTable("MESSAGE_TINT_YELLOW")
 }
 
+-- Track recent message activity for auto-expand feature
+local lastMessageTime = 0
+local autoExpandActive = false
+local recentMessageChars = 0
+local recentMessageCount = 0
+
 function getMessageColor(message)
 	if(not message or not message.messageType) then
 		return "rgb(1,1,1)"
+	end
+
+	if(message.playerColor) then
+		local tint = messageTints[string.lower(message.playerColor)]
+		return string.format("rgb(%f,%f,%f)", tint[1], tint[2], tint[3])
 	end
 
 	local tint = messageTints[message.messageType]
@@ -142,7 +153,7 @@ function showScenarioControlPanel()
 					id = "messagePanel",
 					rectAlignment = "UpperLeft",
 					offsetXY = "103 0",
-					width = "320",
+					width = "370",
 					height = "50",
 					contentSizeFitter = "vertical"
 				},
@@ -151,7 +162,7 @@ function showScenarioControlPanel()
 						tag="VerticalScrollView",
 						attributes={
 							id = "messageScrollView",
-							width="320",
+							width="370",
 							height="50",
 							rectAlignment="UpperCenter",
 							verticalScrollbarVisibility="AutoHideAndExpandViewport",
@@ -165,7 +176,7 @@ function showScenarioControlPanel()
 								tag = "VerticalLayout",
 								attributes = {
 									rectAlignment = "UpperLeft",
-									width = "300",
+									width = "350",
 									childAlignment = "UpperLeft",
 									contentSizeFitter = "vertical",
 									padding = "10 10 10 10",
@@ -180,8 +191,34 @@ function showScenarioControlPanel()
 			{
 				tag = "Panel",
 				attributes = {
+					id = "expandMessagesButton",
 					rectAlignment = "UpperLeft",
-					offsetXY = "426 0",
+					offsetXY = "443 -50",
+					width = "25",
+					height = "15",
+					color = "rgb(0.9, 0.9, 0.9)",
+					tooltip = "Expand Messages",
+					tooltipPosition = "Below",
+					onClick = self.getGUID() .. "/expandMessagesClicked"
+				},
+				children = {
+					{
+						tag = "Text",
+						attributes = {
+							id = "expandMessagesLabel",
+							text = "▼",
+							alignment = "MiddleCenter",
+							fontSize = "14",
+							color = "rgb(0,0,0)"
+						}
+					}
+				}
+			},
+			{
+				tag = "Panel",
+				attributes = {
+					rectAlignment = "UpperLeft",
+					offsetXY = "483 0",
 					width = "86",
 					height = "50",
 					tooltip = "Turn counter",
@@ -217,7 +254,7 @@ function showScenarioControlPanel()
 				attributes = {
 					id = "clearButtonPanel",
 					rectAlignment = "UpperLeft",
-					offsetXY = "522 0",
+					offsetXY = "579 0",
 					width = "50",
 					height = "50",
 					tooltip = "Clear the Scenario",
@@ -239,7 +276,7 @@ function showScenarioControlPanel()
 				attributes = {
 					id = "clearConfirmPanel",
 					rectAlignment = "UpperLeft",
-					offsetXY = "522 0",
+					offsetXY = "579 0",
 					width = "50",
 					height = "50",
 					color = "rgba(0,0,0,0)",
@@ -286,6 +323,14 @@ function threatButtonClicked(player, value, id)
 	local totalAcceleration = accelerationFromSchemeStage + accelerationFromCards + accelerationFromCounters
 
 	threatCounter.call("adjustValue", {adjustment = totalAcceleration})
+
+	--TODO: post message about threat added (including sources)
+
+	local functionName = "threatAdded_" .. currentScenario.key
+
+    if (self.getVar(functionName) ~= nil) then
+        self.call(functionName)
+    end
 end
 
 function encounterCardsButtonClicked(player, value, id)
@@ -295,6 +340,8 @@ function encounterCardsButtonClicked(player, value, id)
 	local hazardFromCards = Global.call("countCardIconsInPlay", {iconType="hazard"})
 	local cardsToDeal = heroCount + hazardFromCards
 	Global.call("dealEncounterCardsToAllPlayers", {numberOfCards = cardsToDeal})
+
+	--TODO: post message about cards dealt (including sources)
 end
 
 function turnCounterClicked(player, value, id)
@@ -306,19 +353,28 @@ end
 
 function messageClicked(player, value, id)
 	local messageIndex = tonumber(string.match(id, "%d+"))
-	if(not currentScenario) then return end
-	if(not currentScenario.messages)then
-		currentScenario.messages = {}
-	end
+
+	if(not currentScenario or not currentScenario.messages) then return end
 
 	local message = currentScenario.messages[messageIndex]
-	if(message) then
-		table.remove(currentScenario.messages, messageIndex)
-	else
-		currentScenario.messages[messageIndex] = {text = Global.UI.getAttribute(id, "text"), color = Global.UI.getAttribute(id, "color")}
-	end
+	if(not message) then return end
 
-	saveData()
+	-- Only handle clicks on instruction messages
+	if(message.type == messageTypes.instruction) then
+		-- Remove the message from the table and reconstruct to eliminate nil values
+		local newMessages = {}
+		for i, msg in ipairs(currentScenario.messages) do
+			if i ~= messageIndex then
+				table.insert(newMessages, msg)
+			end
+		end
+		currentScenario.messages = newMessages
+
+		-- Hide the UI element
+		Global.UI.hide(id)
+		
+		saveData()
+	end
 end
 
 function clearButtonClicked(player, value, id)
@@ -354,14 +410,122 @@ function displayMessage(params)
 		currentScenario.messages = {}
 	end
 
-	table.insert(currentScenario.messages, 1, {text = params.message, type = params.messageType})
+	local messageText = params.message
+	local messageType = params.messageType or messageTypes.info
+
+	if(messageType == messageTypes.instruction) then
+		messageText = messageText .. "\n<b>(click to dismiss)</b>"
+	end
+
+	table.insert(currentScenario.messages, {text = messageText, type = messageType})
 	local messageCount = #currentScenario.messages
 	local messageLabelKey = "message-" .. tostring(messageCount)
 
-	Global.UI.setAttribute(messageLabelKey, "text", params.message)
+	Global.UI.setAttribute(messageLabelKey, "text", messageText)
 	Global.UI.setAttribute(messageLabelKey, "color", getMessageColor(params))
 	Global.UI.show(messageLabelKey)
 	Global.UI.setAttribute("messageScrollView", "verticalNormalizedPosition", "1")
 	
+	-- Flash the new message to draw attention
+	flashMessage(messageLabelKey, getMessageColor(params))
+	
+	-- Track message activity for auto-expand feature
+	local currentTime = os.time()
+	local timeSinceLastMessage = currentTime - lastMessageTime
+	
+	-- Reset counters if more than 3 seconds have passed since last message
+	if timeSinceLastMessage >= 3 then
+		recentMessageChars = 0
+		recentMessageCount = 0
+	end
+	
+	-- Add current message to recent activity
+	recentMessageChars = recentMessageChars + string.len(params.message)
+	recentMessageCount = recentMessageCount + 1
+	lastMessageTime = currentTime
+	
+	-- Expand panel if more than 100 chars or more than 2 messages within recent window
+	if (recentMessageChars > 100 or recentMessageCount > 2) and not autoExpandActive then
+		autoExpandPanel()
+	end
+	
 	saveData()
+end
+
+function flashMessage(messageLabelKey, originalColor)
+	local flashCount = 0
+	local maxFlashes = 6 -- 3 complete on/off cycles
+	
+	-- Use black as alternate color if original is white, otherwise use white
+	local alternateColor = "rgb(0,0,0)"
+	if originalColor ~= "rgb(1,1,1)" and originalColor ~= "rgb(1.000000,1.000000,1.000000)" then
+		alternateColor = "rgb(1,1,1)"
+	end
+	
+	local function toggleFlash()
+		flashCount = flashCount + 1
+		if flashCount > maxFlashes then
+			-- Restore original color
+			Global.UI.setAttribute(messageLabelKey, "color", originalColor)
+			return
+		end
+		
+		-- Alternate between original color and alternate color
+		if flashCount % 2 == 1 then
+			Global.UI.setAttribute(messageLabelKey, "color", alternateColor)
+		else
+			Global.UI.setAttribute(messageLabelKey, "color", originalColor)
+		end
+		
+		Wait.time(toggleFlash, 0.15)
+	end
+	
+	Wait.time(toggleFlash, 0.15)
+end
+
+function autoExpandPanel()
+	local wasExpanded = Global.UI.getAttribute("messageScrollView", "height") == "150"
+	autoExpandActive = true
+	
+	-- Only expand if not already manually expanded
+	if not wasExpanded then
+		Global.UI.setAttribute("messagePanel", "height", "150")
+		Global.UI.setAttribute("messageScrollView", "height", "150")
+		Global.UI.setAttribute("expandMessagesButton", "offsetXY", "443 -150")
+		Global.UI.setAttribute("expandMessagesButton", "tooltip", "Collapse Messages")
+		Global.UI.setAttribute("expandMessagesLabel", "text", "▲")
+		
+		-- Collapse back after 5 seconds (only if we expanded it)
+		Wait.time(function()
+			autoExpandActive = false
+			-- Only collapse if it's still expanded (user didn't manually collapse)
+			if Global.UI.getAttribute("messageScrollView", "height") == "150" then
+				Global.UI.setAttribute("messagePanel", "height", "50")
+				Global.UI.setAttribute("messageScrollView", "height", "50")
+				Global.UI.setAttribute("expandMessagesButton", "offsetXY", "443 -50")
+				Global.UI.setAttribute("expandMessagesButton", "tooltip", "Expand Messages")
+				Global.UI.setAttribute("expandMessagesLabel", "text", "▼")
+			end
+		end, 5)
+	else
+		-- Panel was already expanded, so don't auto-collapse
+		autoExpandActive = false
+	end
+end
+
+function expandMessagesClicked(player, value, id)
+	local isExpanded = Global.UI.getAttribute("messageScrollView", "height") == "150"
+	if(isExpanded) then
+		Global.UI.setAttribute("messagePanel", "height", "50")
+		Global.UI.setAttribute("messageScrollView", "height", "50")
+		Global.UI.setAttribute("expandMessagesButton", "offsetXY", "443 -50")
+		Global.UI.setAttribute("expandMessagesButton", "tooltip", "Expand Messages")
+		Global.UI.setAttribute("expandMessagesLabel", "text", "▼")
+	else
+		Global.UI.setAttribute("messagePanel", "height", "150")
+		Global.UI.setAttribute("messageScrollView", "height", "150")
+		Global.UI.setAttribute("expandMessagesButton", "offsetXY", "443 -150")
+		Global.UI.setAttribute("expandMessagesButton", "tooltip", "Collapse Messages")
+		Global.UI.setAttribute("expandMessagesLabel", "text", "▲")
+	end
 end

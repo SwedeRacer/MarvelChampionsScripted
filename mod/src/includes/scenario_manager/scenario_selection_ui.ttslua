@@ -846,11 +846,7 @@ function displayScenarioSelectionUI()
     local heroCount = heroManager.call("getHeroCount")
 
     if(heroCount < 1) then
-        Global.call("displayMessage", {
-            message = "Please select at least one hero before selecting a scenario.",
-            messageType = Global.getVar("MESSAGE_TYPE_INSTRUCTION")
-        })
-
+        broadcastToAll("Please select at least one hero before selecting a scenario.", {1,0,0})
         return
     end
 

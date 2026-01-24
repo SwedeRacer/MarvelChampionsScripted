@@ -570,7 +570,10 @@ function getItemsOnCard(params)
     local items = {}
 
     for _, obj in ipairs(objList) do
-        table.insert(items, obj.hit_object)
+        local object = obj.hit_object
+        if(object.hasTag("counter") or object.hasTag("token")) then
+            table.insert(items, object)
+        end
     end
 
     return items
@@ -925,13 +928,19 @@ function refreshPlayerDeck(params)
     local discardPosition = params.discardPosition
     local playerColor = params.playerColor
 
+    local heroManager = getObjectFromGUID(GUID_HERO_MANAGER)
+    local hero = heroManager.call("getSelectedHero", {
+        positionColor = playerColor
+    })
+    local heroName = hero.name
+
     refreshDeck({
         deckPosition = deckPosition,
         discardPosition = discardPosition,
         deckType = playerColor
     })
     displayMessage({
-        message = "You cycled your deck. Time for an encounter card!",
+        message = heroName .. " cycled their deck. Time for an encounter card!",
         messageType = MESSAGE_TYPE_INFO,
         playerColor = playerColor
     })

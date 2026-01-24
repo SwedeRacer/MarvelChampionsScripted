@@ -138,7 +138,9 @@ scenarios["wreckingCrew"] =
             threatCounter={
                 position={-27.90, 1.04, 21.75},
                 scale={1.00, 1.00, 1.00}
-            }
+            },
+            villainKey="wrecker",
+            triggerEffect="Deal 2 damage to each friendly character. Remove all but 3 threat from Day of Reckoning."
         },
         thunderballScheme={
             stages={
@@ -154,7 +156,9 @@ scenarios["wreckingCrew"] =
             threatCounter={
                 position={-5.90, 1.04, 21.75},
                 scale={1.00, 1.00, 1.00}
-            }
+            },
+            villainKey="thunderball",
+            triggerEffect="Stun each friendly character. Remove all but 3 threat from Thunderstruck."
         },
         piledriverScheme={
             stages={
@@ -170,7 +174,9 @@ scenarios["wreckingCrew"] =
             threatCounter={
                 position={16.05, 1.04, 21.75},
                 scale={1.00, 1.00, 1.00}
-            }
+            },
+            villainKey="piledriver",
+            triggerEffect="Each player must discard the upgrade or support they control with the highest cost. Remove all but 3 threat from Pile It On!"
         },
         bulldozerScheme={
             stages={
@@ -186,7 +192,9 @@ scenarios["wreckingCrew"] =
             threatCounter={
                 position={38.10, 1.04, 21.75},
                 scale={1.00, 1.00, 1.00}
-            }
+            },
+            villainKey="bulldozer",
+            triggerEffect="Each player must discard the top 10 cards of their deck. Remove all but 3 threat from Clear the Road."
         }
     },
     decks={
@@ -344,5 +352,62 @@ function wreckingCrewActivate(params)
       hpCounter.call("hideHighlight")
       hpCounter.call("showSecondaryButton")
     end
-  end  
+  end
+
+  currentScenario.activeVillainKey = villainKey
+  saveData()
+end
+
+function threatAdded_wreckingCrew()
+    local highestThreat = 0
+    local highestThreatVillains = {}
+    local triggeredSchemeMessages = {}
+
+    for schemeKey, scheme in pairs(currentScenario.schemes) do
+        if(scheme.key ~= "main") then
+            local threatCounter = getObjectFromGUID(scheme.threatCounter.guid)
+            threatCounter.call("adjustValue", {adjustment = 1})
+            local currentThreat = threatCounter.call("getValue")
+
+            if(currentThreat == highestThreat) then
+                table.insert(highestThreatVillains, scheme.villainKey)
+            end
+
+            if(currentThreat > highestThreat) then
+                highestThreat = currentThreat
+                highestThreatVillains = {scheme.villainKey}
+            end
+
+            if(currentThreat >= 10) then
+                table.insert(triggeredSchemeMessages, scheme.triggerEffect)
+            end
+        end
+    end
+
+    if(#highestThreatVillains > 1) then
+        villainList = ""
+
+        for _, villainKey in ipairs(highestThreatVillains) do
+            if(villainList ~= "") then
+                villainList = villainList .. ", "
+            end
+
+            local villain = currentScenario.villains[villainKey]
+            villainList = villainList .. villain.name
+        end
+
+        displayMessage({message = "Make one of these villains active: " .. villainList .. ".", messageType = messageTypes.instruction})
+    else
+        local villainKey = highestThreatVillains[1]
+        if(villainKey ~= currentScenario.activeVillainKey) then
+            wreckingCrewActivate({villainKey = villainKey})
+
+            local villain = currentScenario.villains[villainKey]
+            displayMessage({message = villain.name .. " becomes the active villain!", messageType = messageTypes.info})
+        end
+    end
+
+    for _, message in ipairs(triggeredSchemeMessages) do
+        displayMessage({message = message, messageType = messageTypes.instruction})
+    end
 end

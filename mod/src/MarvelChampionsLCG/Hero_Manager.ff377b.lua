@@ -898,7 +898,11 @@ function setFirstPlayer(params)
   local scenarioManager = getObjectFromGUID(Global.getVar("GUID_SCENARIO_MANAGER"))
   scenarioManager.call("adjustTurnCount", {adjustment = 1})
 
-  Global.call("displayMessage", {message = playerColor .. " is the first player!", messageType = Global.getVar("MESSAGE_TYPE_INFO")})
+  Global.call("displayMessage", {
+    message = playerColor .. " is the first player!", 
+    messageType = Global.getVar("MESSAGE_TYPE_INFO"), 
+    playerColor = playerColor})
+    
   firstPlayer = playerColor
   saveData()
 end

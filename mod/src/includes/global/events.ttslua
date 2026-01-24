@@ -326,13 +326,6 @@ function onObjectDestroy(object)
     end
 end
 
--- function onObjectSpawn(object)
---     if (not isCard(object)) then return end
-    
---     -- Ensure newly spawned/created cards (including from decks) can be picked up
---     object.use_hands = true
--- end
-
 function onObjectRotate(object, spin, flip, player_color, old_spin, old_flip)
     if (not isCard(object)) then return end
     if (spin == old_spin) then return end
