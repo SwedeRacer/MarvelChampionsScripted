@@ -113,7 +113,10 @@ function placeDarkBeastEnvironment()
 
   local encounterSet = encounterSetManager.call("getModularSet", {modularSetKey = encounterSetKey})
 
-  broadcastToAll(encounterSet.name .. " encounter set has been added to encounter deck.", {1,1,1})
+  Global.call("displayMessage", {
+      message = encounterSet.name .. " encounter set has been added to encounter deck.",
+      messageType = Global.getVar("MESSAGE_TYPE_INFO")
+  })
 
   currentScenario.environmentIndex = currentScenario.environmentIndex + 1
 end
@@ -145,7 +148,8 @@ function darkBeastDiscardSettingEnvironments(params)
           local vTraits = vCardData.traits or ""
 
           if (vCardId ~= cardId and string.find(vTraits, "Setting.", 1, true)) then
-            Global.call("discardCard", {card = v})
+            Global.call("discardEncounterCard", {discardFromPosition = v.getPosition()})
+            --Global.call("discardCard", {card = v})
           end
         end
       end

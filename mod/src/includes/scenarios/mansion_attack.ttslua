@@ -222,7 +222,8 @@ function placeSchemeStage_mansionAttack_main(params)
         name = scheme.name,
         flipped = true,
         landscape = true,
-        locked = true
+        locked = true,
+        tags = {"group-scenario"}
     })
 
     local counter = scheme.threatCounter or {}

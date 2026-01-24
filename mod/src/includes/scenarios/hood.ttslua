@@ -115,44 +115,151 @@ function prepareScenario_hood()
   clearSelectedSets()
 end
 
-function selectHoodEasyModularSets()
-  clearSelectedSets()
+function getEncounterSetControlPanel_hood()
+    local guid = self.getGUID()
+    local encounterSetControlPanel = {
+        tag = "Panel",
+        attributes = {
+            preferredHeight = "100",
+        },
+        children = {
+            {
+                tag = "VerticalLayout",
+                attributes = {
+                    rectAlignment = "UpperLeft",
+                    childAlignment = "UpperCenter",
+                    childForceExpandHeight = "false",
+                    spacing = "10",
+                    contentSizeFitter = "vertical"
+                },
+                children = {
+            {
+                tag = "Text",
+                value = "Select at least seven modular encounter sets. Click the Easy, Medium, or Hard buttons for preselected combinations, use the Random button for a completely random selection, or choose whatever sets you'd like.",
+                attributes = {
+                    rectAlignment = "UpperLeft",
+                    alignment = "UpperLeft",
+                    color = "rgba(1,1,1,1)"
+                }
+            },
+            {
+                tag = "HorizontalLayout",
+                attributes = {
+                    class = "togglePanelContainer"
+                },
+                children = {
+                    {
+                        tag = "Panel",
+                        attributes = {
+                            class = "togglePanel",
+                            onClick = guid .. "/selectHoodEasyModularSets"
+                        },
+                        children = {
+                            {
+                                tag="Text",
+                                value = "Easy",
+                                attributes = {
+                                    class = "togglePanelLabel"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        tag = "Panel",
+                        attributes = {
+                            class = "togglePanel",
+                            onClick = guid .. "/selectHoodMediumModularSets"
+                        },
+                        children = {
+                            {
+                                tag="Text",
+                                value = "Medium",
+                                attributes = {
+                                    class = "togglePanelLabel"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        tag = "Panel",
+                        attributes = {
+                            class = "togglePanel",
+                            onClick = guid .. "/selectHoodHardModularSets"
+                        },
+                        children = {
+                            {
+                                tag="Text",
+                                value = "Hard",
+                                attributes = {
+                                    class = "togglePanelLabel"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        tag = "Panel",
+                        attributes = {
+                            class = "togglePanel",
+                            onClick = guid .. "/selectHoodRandomModularSets"
+                        },
+                        children = {
+                            {
+                                tag="Text",
+                                value = "Random",
+                                attributes = {
+                                    class = "togglePanelLabel"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+                }
+            }
+        }
+    }
 
-  addRemoveSelectedSet({encounterSetKey = "streetsOfMayhem"})
-  addRemoveSelectedSet({encounterSetKey = "brothersGrimm"})
-  addRemoveSelectedSet({encounterSetKey = "ransackedArmory"})
-  addRemoveSelectedSet({encounterSetKey = "stateOfEmergency"})
-  addRemoveSelectedSet({encounterSetKey = "beastyBoys"})
-  addRemoveSelectedSet({encounterSetKey = "misterHyde"})
-  addRemoveSelectedSet({encounterSetKey = "sinisterSyndicate"})
+    return encounterSetControlPanel
+end
+
+function selectHoodEasyModularSets()
+    clearSelectedModularEncounterSets()
+
+    selectEncounterSet("streetsOfMayhem")
+    selectEncounterSet("brothersGrimm")
+    selectEncounterSet("ransackedArmory")
+    selectEncounterSet("stateOfEmergency")
+    selectEncounterSet("beastyBoys")
+    selectEncounterSet("misterHyde")
+    selectEncounterSet("sinisterSyndicate")
 end
 
 function selectHoodMediumModularSets()
-  clearSelectedSets()
+    clearSelectedModularEncounterSets()
 
-  addRemoveSelectedSet({encounterSetKey = "brothersGrimm"})
-  addRemoveSelectedSet({encounterSetKey = "ransackedArmory"})
-  addRemoveSelectedSet({encounterSetKey = "stateOfEmergency"})
-  addRemoveSelectedSet({encounterSetKey = "beastyBoys"})
-  addRemoveSelectedSet({encounterSetKey = "misterHyde"})
-  addRemoveSelectedSet({encounterSetKey = "sinisterSyndicate"})
-  addRemoveSelectedSet({encounterSetKey = "crossfiresCrew"})
+    selectEncounterSet("brothersGrimm")
+    selectEncounterSet("ransackedArmory")
+    selectEncounterSet("stateOfEmergency")
+    selectEncounterSet("beastyBoys")
+    selectEncounterSet("misterHyde")
+    selectEncounterSet("sinisterSyndicate")
+    selectEncounterSet("crossfiresCrew")
 end
 
 function selectHoodHardModularSets()
-  clearSelectedSets()
+    clearSelectedModularEncounterSets()
 
-  addRemoveSelectedSet({encounterSetKey = "ransackedArmory"})
-  addRemoveSelectedSet({encounterSetKey = "stateOfEmergency"})
-  addRemoveSelectedSet({encounterSetKey = "beastyBoys"})
-  addRemoveSelectedSet({encounterSetKey = "misterHyde"})
-  addRemoveSelectedSet({encounterSetKey = "sinisterSyndicate"})
-  addRemoveSelectedSet({encounterSetKey = "crossfiresCrew"})
-  addRemoveSelectedSet({encounterSetKey = "wreckingCrew"})
+    selectEncounterSet("ransackedArmory")
+    selectEncounterSet("stateOfEmergency")
+    selectEncounterSet("beastyBoys")
+    selectEncounterSet("misterHyde")
+    selectEncounterSet("sinisterSyndicate")
+    selectEncounterSet("crossfiresCrew")
+    selectEncounterSet("wreckingCrew")
 end
 
 function selectHoodRandomModularSets()
-  clearSelectedSets()
+  clearSelectedModularEncounterSets()
   math.randomseed(os.time())
 
   local encounterSetManager = getObjectFromGUID(Global.getVar("GUID_MODULAR_SET_MANAGER"))
@@ -169,7 +276,7 @@ function selectHoodRandomModularSets()
     end  
   
     local randomSetKey = unselectedSets[math.random(#unselectedSets)]
-    addRemoveSelectedSet({encounterSetKey = randomSetKey})
+    selectEncounterSet(randomSetKey)
   end
 end
 

@@ -43,10 +43,6 @@ function onObjectNumberTyped(object, playerColor, number)
         return false
     end
 
-    if(object.type == "Card") then
-        removeCountersFromCard({card = object})
-    end
-
     local nearbyObjects = findInRadiusBy(object.getPosition(), 4)
     local playmat = nil
 
@@ -54,6 +50,20 @@ function onObjectNumberTyped(object, playerColor, number)
         if obj.hasTag("playmat") then
             playmat = obj
             break
+        end
+    end
+
+    if(object.type == "Card") then
+        local cardData = getCardData({card = object})
+        if(not cardData) then return false end
+        if(cardData.aspect == "encounter" or cardData.type == "hero") then return true end
+
+        removeCountersFromCard({card = object})
+
+        if(not playmat) then
+            local cardPlayerColor = getCardPlayerColor({card = object})
+            object.deal(1, cardPlayerColor)
+            return true
         end
     end
 
@@ -65,10 +75,11 @@ function onObjectNumberTyped(object, playerColor, number)
         
         return true
     end
+
+    return false
 end
 
 function onObjectEnterZone(zone, card)
-    if (supressZoneInteractions) then return end
 
     local zoneDef = getZoneDefinition({zone = zone})
     if (not zoneDef) then
@@ -76,9 +87,6 @@ function onObjectEnterZone(zone, card)
     end
     if (not isCard(card)) then return end
     if(isFaceDown({object = card})) then return end
-    -- if (not isFaceUp({object = card})) then
-    --     return
-    -- end
 
     local cardData = getCardData({
         card = card
@@ -109,7 +117,7 @@ function onObjectEnterZone(zone, card)
     end
 
     if(zoneDef.addCountersAndTokens) then
-        addCountersAndTokensToCard({card = card, cardData = cardData})
+        addCountersAndTokensToCard({card = card, cardData = cardData, zoneGuid = zone.getGUID()})
     end
 
     local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
@@ -131,6 +139,7 @@ end
 function resizeCardOnEnterZone(card, scale)
     if (card.isDestroyed()) then return end
     if( not scale ) then return end
+    if(card.hasTag("do-not-resize")) then return end
 
     card.setScale(scale)
 end
@@ -153,7 +162,6 @@ function positionCardOnEnterZone(card, zoneIndex)
 end
 
 function onObjectLeaveZone(zone, card)
-    --if (supressZoneInteractions) then return end
     if (not card or card.isDestroyed() or not zone or zone.IsDestroyed()) then return end
     if (not isCard(card)) then return end
 
@@ -300,8 +308,6 @@ end
 
 function onObjectDestroy(object)
     if (not isCard(object)) then return end
-
-    object.use_hands = true
     
     local cardGuid = object.getGUID()
 

@@ -26,6 +26,10 @@
       "g": 1,
       "b": 1
     },
+    "Tags": [
+      "counter",
+      "general"
+    ],
     "LayoutGroupSortIndex": 0,
     "Value": 0,
     "Locked": false,

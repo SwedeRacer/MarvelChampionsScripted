@@ -240,10 +240,26 @@ function spawnDeck(params)
     local artVariant = params.artVariant
     local rotation = {0, y, z}
 
+    local deepcopy = function(t)
+        local copy = {}
+        for k,v in pairs(t) do
+            if type(v) == 'table' then
+                copy[k] = deepcopy(v)
+            else
+                copy[k] = v
+            end
+        end
+        return copy
+    end
+
     deck = {}
     for cardId,number in pairs(cards) do
         for i = 1, number, 1 do
             local card = getCardFromCardPool(cardId, artVariant)
+            
+            if(card.duplicate_of) then
+                card = getCardFromCardPool(card.duplicate_of, artVariant)
+            end
             
             if(card.linked) then
                 for linkedCardId in string.gmatch(card.linked, "([^,]+)") do
@@ -255,12 +271,9 @@ function spawnDeck(params)
                 end
             end
 
-            if (card.duplicate_of == nil) then
-                addTagsToCard(card, cardTags)
-                table.insert(deck, card)
-            else
-                table.insert(deck, getCardFromCardPool(card.duplicate_of, artVariant))
-            end
+            card = deepcopy(card)
+            addTagsToCard(card, cardTags)
+            table.insert(deck, card)
         end
     end
 
@@ -273,12 +286,13 @@ function spawnDeck(params)
             for i = 1, number, 1 do
                 local card = getCardFromCardPool(cardId, artVariant)
 
-                if (card.duplicate_of == nil) then
-                    addTagsToCard(card, cardTags)
-                    table.insert(deck, card)
-                else
-                    table.insert(deck, getCardFromCardPool(card.duplicate_of, artVariant))
+                if(card.duplicate_of) then
+                    card = getCardFromCardPool(card.duplicate_of, artVariant)
                 end
+
+                card = deepcopy(card)
+                addTagsToCard(card, cardTags)
+                table.insert(deck, card)
             end
         end
     end

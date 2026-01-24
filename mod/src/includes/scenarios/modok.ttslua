@@ -258,7 +258,8 @@ function modokPlaceAdaptoidEnvironment()
     Global.call("spawnCard", {
         cardId = environmentCardId, 
         position = encounterDeckPosition, 
-        scale = Global.getTable("CARD_SCALE_ENCOUNTER")
+        scale = Global.getTable("CARD_SCALE_ENCOUNTER"),
+        tags = {"group-scenario"}
     })
     
     Wait.frames(function()
@@ -296,7 +297,8 @@ function modokPlaceHoldingCellPrisoner()
         cardId = holdingCellCardId, 
         position = prisonerCardPosition, 
         scale = Global.getTable("CARD_SCALE_ENCOUNTER"), 
-        locked = true
+        locked = true,
+        tags = {"group-scenario"}
     })
 
     holdingCellPanel.call("setLockValue", {value = heroCount * 2})

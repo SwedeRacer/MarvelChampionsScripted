@@ -100,14 +100,29 @@ scenarios["thunderbolts"] =
     }
 }
 
--- function customSetup_thunderbolts(params)
---     local setupStep = params.setupStep
-  
---     if(setupStep == "modular-sets") then   
---       local layoutManager = getObjectFromGUID(Global.getVar("GUID_LAYOUT_MANAGER"))
---       layoutManager.call("colorCodeModularSets", {sets = currentScenario.thunderboltsModularSets})
---     end
--- end
+function getEncounterSetControlPanel_thunderbolts()
+    local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
+    local heroCount = heroManager.call("getHeroCount")
+    local encounterSetControlPanel = {
+        tag = "Panel",
+        attributes = {
+            
+        },
+        children = {
+            {
+                tag = "Text",
+                value = "Select at least " .. (heroCount + 1) .. " Thunderbolt modular encounter sets (highlighted in yellow).",
+                attributes = {
+                    rectAlignment = "UpperLeft",
+                    alignment = "UpperLeft",
+                    color = "rgba(1,1,1,1)"
+                }
+            }
+        }
+    }
+
+    return encounterSetControlPanel
+end
 
 function modularSetsAreValid_thunderbolts(params)
     local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))

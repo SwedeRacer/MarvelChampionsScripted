@@ -133,9 +133,23 @@ end
 
 function addCountersAndTokensToCard(params)
   local card = params.card
+  local zoneGuid = params.zoneGuid
 
   Wait.condition(function()
       if (card.isDestroyed()) then
+        return
+      end
+
+      local zones = card.getZones()
+      local cardIsInZone = false
+      for _, zone in ipairs(zones) do
+        if(zone.getGUID() == zoneGuid) then
+          cardIsInZone = true
+          break
+        end
+      end
+
+      if(not cardIsInZone) then
         return
       end
 
@@ -281,13 +295,15 @@ function addCounterToCard(params)
   local offset = Vector({baseOffset[1] * scaleFactor, baseOffset[2] * scaleFactor, baseOffset[3] * scaleFactor})
   local cardPosition = card.getPosition()
   local counterPosition = Vector({cardPosition[1] + offset[1], cardPosition[2] + offset[2], cardPosition[3] + offset[3]})
+  local stagingPosition = {0, -5, 0}
   local counter = counterBag.takeObject(
     {
-      position = counterPosition, 
+      position = stagingPosition, 
       smooth = false,
       callback_function=function(obj)
         Wait.frames(function() 
           obj.setScale(counterScale)
+          obj.setPosition(counterPosition)
           obj.setName(counterName)
           obj.call("setValue", {value = value})
         end, 
@@ -450,27 +466,47 @@ function rotateCountersWithCard(params)
   if(spinDelta > 180) then spinDelta = spinDelta - 360 end
   if(spinDelta < -180) then spinDelta = spinDelta + 360 end
   if(spinDelta == -180) then spinDelta = 180 end
-  local counterClasses = {"standard", "configured"}
 
-  for _, counterClass in ipairs(counterClasses) do
-    local counterGuid = getCardValue({cardGuid = card.getGUID(), property = counterClass .. "CounterGuid"})
-    if(counterGuid) then
-      local counter = getObjectFromGUID(counterGuid)
-      if(counter) then
-        local counterPosition = counter.getPosition()
-        local offset = counterPosition - cardPosition
-        local radians = math.rad(spinDelta)
-        local cosTheta = math.cos(radians)
-        local sinTheta = math.sin(radians)
-        local rotatedOffset = Vector(
-          offset.x * cosTheta - offset.z * sinTheta,
-          offset.y,
-          offset.x * sinTheta + offset.z * cosTheta
-        )
-        counter.setPosition(cardPosition + rotatedOffset, false, false)
+  local itemsOnCard = getItemsOnCard({card = card})
+
+  for _, item in ipairs(itemsOnCard) do
+      local itemPosition = item.getPosition()
+      local offset = itemPosition - cardPosition
+      local radians = math.rad(spinDelta)
+      local cosTheta = math.cos(radians)
+      local sinTheta = math.sin(radians)
+      local rotatedOffset = Vector(
+        offset.x * cosTheta - offset.z * sinTheta,
+        offset.y,
+        offset.x * sinTheta + offset.z * cosTheta
+      )
+      item.setPosition(cardPosition + rotatedOffset, false, false)
+      if(item.hasTag("token")) then
+        item.setRotation({0, item.getRotation()[2] - spinDelta, 0})
       end
-    end
   end
+
+  -- local counterClasses = {"standard", "configured"}
+
+  -- for _, counterClass in ipairs(counterClasses) do
+  --   local counterGuid = getCardValue({cardGuid = card.getGUID(), property = counterClass .. "CounterGuid"})
+  --   if(counterGuid) then
+  --     local counter = getObjectFromGUID(counterGuid)
+  --     if(counter) then
+  --       local counterPosition = counter.getPosition()
+  --       local offset = counterPosition - cardPosition
+  --       local radians = math.rad(spinDelta)
+  --       local cosTheta = math.cos(radians)
+  --       local sinTheta = math.sin(radians)
+  --       local rotatedOffset = Vector(
+  --         offset.x * cosTheta - offset.z * sinTheta,
+  --         offset.y,
+  --         offset.x * sinTheta + offset.z * cosTheta
+  --       )
+  --       counter.setPosition(cardPosition + rotatedOffset, false, false)
+  --     end
+  --   end
+  -- end
 end
 
 function getTotalAccelerationFromCounters()

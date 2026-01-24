@@ -162,7 +162,7 @@ function configureEvidenceEnvelope(params)
     local envelope = params.spawnedObject
     envelope.setPosition(params.position)
     envelope.setLock(true)
-    envelope.addTag("delete-with-scenario")
+    envelope.addTag("group-scenario")
 end
 
 function baronZemoAttachBoardMemberToVillain(moleCardId)

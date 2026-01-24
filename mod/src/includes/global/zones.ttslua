@@ -1,13 +1,3 @@
-supressZoneInteractions = false
-
-function supressZones()
-   supressZoneInteractions = true
-
-   Wait.time(function()
-      supressZoneInteractions = false
-   end, 3)
-end
-
 function repositionCardsInZone(params)
    local zone = params.zone
    local zoneDef = getZoneDefinition({zone = zone})

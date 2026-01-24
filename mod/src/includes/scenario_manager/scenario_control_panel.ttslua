@@ -1,9 +1,71 @@
 local cdnUrl = Global.getVar("CDN_URL")
 
+local messageTypes = {
+	flavor = Global.getVar("MESSAGE_TYPE_FLAVOR_TEXT"),
+	instruction = Global.getVar("MESSAGE_TYPE_INSTRUCTION"),
+	info = Global.getVar("MESSAGE_TYPE_INFO"),
+	alert = Global.getVar("MESSAGE_TYPE_ALERT"),
+	player = Global.getVar("MESSAGE_TYPE_PLAYER")
+}
+
+local messageTints = {
+	flavor = Global.getTable("MESSAGE_TINT_FLAVOR"),
+	instruction = Global.getTable("MESSAGE_TINT_INSTRUCTION"),
+	info = Global.getTable("MESSAGE_TINT_INFO"),
+	alert = Global.getTable("MESSAGE_TINT_ALERT"),
+	red = Global.getTable("MESSAGE_TINT_RED"),
+	blue = Global.getTable("MESSAGE_TINT_BLUE"),
+	green = Global.getTable("MESSAGE_TINT_GREEN"),
+	yellow = Global.getTable("MESSAGE_TINT_YELLOW")
+}
+
+-- Track recent message activity for auto-expand feature
+local lastMessageTime = 0
+local autoExpandActive = false
+local recentMessageChars = 0
+local recentMessageCount = 0
+
+function getMessageColor(message)
+	if(not message or not message.messageType) then
+		return "rgb(1,1,1)"
+	end
+
+	if(message.playerColor) then
+		local tint = messageTints[string.lower(message.playerColor)]
+		return string.format("rgb(%f,%f,%f)", tint[1], tint[2], tint[3])
+	end
+
+	local tint = messageTints[message.messageType]
+	if(tint) then
+		return string.format("rgb(%f,%f,%f)", tint[1], tint[2], tint[3])
+	end
+
+	return "rgb(1,1,1)"
+end
+
 function showScenarioControlPanel()
 	if(not currentScenario) then 
 		Global.UI.setXml("")
 		return 
+	end
+
+	local messages = {}
+	for i = 100, 1, -1 do
+		local message = currentScenario.messages and currentScenario.messages[i] or {}
+
+		local messageLabel = {
+			tag = "Text",
+			attributes = {
+				id = "message-" .. tostring(i),
+				text = message.text or "",
+				color = getMessageColor(message),
+				alignment = "UpperLeft",
+				onClick = self.getGUID() .. "/messageClicked",
+				active = tostring(message.text ~= nil)
+			}
+		}
+
+		table.insert(messages, messageLabel)
 	end
 
 	local turnCount = currentScenario.turnCount or 1
@@ -13,161 +75,227 @@ function showScenarioControlPanel()
         attributes = {
             id = "scenarioControlPanel",
             height = "50",
-            width = "325",
+            width = "585",
             color = "rgba(0,0,0,0)",
-            rectAlignment = "UpperRight",
-            offsetXY = "-205 -5",
+            rectAlignment = "UpperCenter",
+            offsetXY = "0 -70",
             allowDragging = "true",
             returnToOriginalPositionWhenReleased = "false"
         },
         children = {
 			{
-				tag = "HorizontalLayout",
+				tag = "Panel",
 				attributes = {
-					childAlignment = "UpperLeft",
-					childForceExpandWidth = false,
-					spacing = "10"
+					id = "dragHandle",
+					rectAlignment = "UpperLeft",
+					width = "13",
+					height = "50",
+					color = "rgba(0,0,0,0)",
+					tooltip = "Drag toolbar to move",
+					tooltipPosition = "Below",
 				},
 				children = {
 					{
-						tag = "Panel",
+						tag = "Image",
 						attributes = {
-							id = "dragHandle",
-							preferredWidth = "13",
-							flexibleWidth = "0",
-							color = "rgba(0,0,0,0)",
-							tooltip = "Drag toolbar to move",
-							tooltipPosition = "Below",
-						},
-						children = {
-							{
-								tag = "Image",
-								attributes = {
-									image = cdnUrl .. "/assets/control-panel-drag-handle.png",
-									preserveAspect = true
-								}
-							}
+							image = cdnUrl .. "/assets/control-panel-drag-handle.png",
+							preserveAspect = true
 						}
-					},
+					}
+				}
+			},
+			{
+				tag = "Panel",
+				attributes = {
+					rectAlignment = "UpperLeft",
+					width = "50",
+					height = "50",
+					tooltip = "Add threat to the main scheme",
+					tooltipPosition = "Below",
+					onClick = self.getGUID() .. "/threatButtonClicked"
+				},
+				children = {
 					{
-						tag = "Panel",
+						tag = "Image",
 						attributes = {
-							preferredWidth = "50",
-							flexibleWidth = "0",
-							tooltip = "Add threat to the main scheme",
-							tooltipPosition = "Below",
-							onClick = self.getGUID() .. "/threatButtonClicked"
-						},
-						children = {
-							{
-								tag = "Image",
-								attributes = {
-									image = cdnUrl .. "/assets/control-panel-threat.png",
-									rectAlignment = "MiddleCenter",
-									height = "40",
-									preserveAspect = true
-								}
-							}
+							image = cdnUrl .. "/assets/control-panel-threat.png",
+							rectAlignment = "MiddleCenter",
+							height = "40",
+							preserveAspect = true
 						}
-					},
+					}
+				}
+			},
+			{
+				tag = "Panel",
+				attributes = {
+					rectAlignment = "UpperLeft",
+					offsetXY = "60 0",
+					width = "33",
+					height = "50",
+					tooltip = "Deal encounter cards to all players",
+					tooltipPosition = "Below",
+					onClick = self.getGUID() .. "/encounterCardsButtonClicked"
+				},
+				children = {
 					{
-						tag = "Panel",
+						tag = "Image",
 						attributes = {
-							preferredWidth = "33",
-							contentSizeFitter = "horizontal",
-							flexibleWidth = "0",
-							tooltip = "Deal encounter cards to all players",
-							tooltipPosition = "Below",
-							onClick = self.getGUID() .. "/encounterCardsButtonClicked"
-						},
-						children = {
-							{
-								tag = "Image",
-								attributes = {
-									image = cdnUrl .. "/assets/control-panel-encounter.png",
-									preserveAspect = true
-								}
-							}
+							image = cdnUrl .. "/assets/control-panel-encounter.png",
+							preserveAspect = true
 						}
-					},
+					}
+				}
+			},
+			{
+				tag = "Panel",
+				attributes = {
+					id = "messagePanel",
+					rectAlignment = "UpperLeft",
+					offsetXY = "103 0",
+					width = "370",
+					height = "50",
+					contentSizeFitter = "vertical"
+				},
+				children = {
 					{
-						tag = "Panel",
-						attributes = {
-							preferredWidth = "86",
-							flexibleWidth = "0",
-							tooltip = "Turn counter",
-							tooltipPosition = "Below"
+						tag="VerticalScrollView",
+						attributes={
+							id = "messageScrollView",
+							width="370",
+							height="50",
+							rectAlignment="UpperCenter",
+							verticalScrollbarVisibility="AutoHideAndExpandViewport",
+							horizontalScrollbarVisibility="Hidden",
+							scrollSensitivity="75",
+							raycastTarget = "true",
+							color = "rgb(0,0,0)"
 						},
 						children = {
 							{
-								tag = "Image",
+								tag = "VerticalLayout",
 								attributes = {
-									image = cdnUrl .. "/assets/control-panel-turn-counter.png",
-									preserveAspect = true
-								}
-							},
-							{
-								tag = "Button",
-								value = tostring(turnCount),
-								attributes = {
-									id = "turnCountButton",
-									rectAlignment = "MiddleLeft",
-									onClick = self.getGUID() .. "/turnCounterClicked",
-									color = "rgba(0,0,0,0)",
-									textColor = "rgb(0,0,0)",
-									height = "40",
-									width = "45",
-									fontSize = "30",
-									fontStyle = "Bold"
-								}
-							}
-						}
-					},
-					{
-						tag = "Panel",
-						attributes = {
-							id = "clearButtonPanel",
-							preferredWidth = "50",
-							flexibleWidth = "0",
-							tooltip = "Clear the Scenario",
-							tooltipPosition = "Below",
-							onClick = self.getGUID() .. "/clearButtonClicked"
-						},
-						children = {
-							{
-								tag = "Image",
-								attributes = {
-									image = cdnUrl .. "/assets/control-panel-clear.png",
-									preserveAspect = true
-								}
-							}
-						}
-					},
-					{
-						tag = "Panel",
-						attributes = {
-							id = "clearConfirmPanel",
-							preferredWidth = "50",
-							flexibleWidth = "0",
-							color = "rgba(0,0,0,0)",
-							tooltip = "Are you sure?",
-							tooltipPosition = "Below",
-							active = "false",
-							onClick = self.getGUID() .. "/clearConfirmButtonClicked"
-						},
-						children = {
-							{
-								tag = "Image",
-								attributes = {
-									image = cdnUrl .. "/assets/control-panel-clear-confirm-1.png",
-									preserveAspect = true
-								}
+									rectAlignment = "UpperLeft",
+									width = "350",
+									childAlignment = "UpperLeft",
+									contentSizeFitter = "vertical",
+									padding = "10 10 10 10",
+									spacing = "8"
+								},
+								children = messages
 							}
 						}
 					}
 				}
+			},
+			{
+				tag = "Panel",
+				attributes = {
+					id = "expandMessagesButton",
+					rectAlignment = "UpperLeft",
+					offsetXY = "443 -50",
+					width = "25",
+					height = "15",
+					color = "rgb(0.9, 0.9, 0.9)",
+					tooltip = "Expand Messages",
+					tooltipPosition = "Below",
+					onClick = self.getGUID() .. "/expandMessagesClicked"
+				},
+				children = {
+					{
+						tag = "Text",
+						attributes = {
+							id = "expandMessagesLabel",
+							text = "▼",
+							alignment = "MiddleCenter",
+							fontSize = "14",
+							color = "rgb(0,0,0)"
+						}
+					}
+				}
+			},
+			{
+				tag = "Panel",
+				attributes = {
+					rectAlignment = "UpperLeft",
+					offsetXY = "483 0",
+					width = "86",
+					height = "50",
+					tooltip = "Turn counter",
+					tooltipPosition = "Below"
+				},
+				children = {
+					{
+						tag = "Image",
+						attributes = {
+							image = cdnUrl .. "/assets/control-panel-turn-counter.png",
+							preserveAspect = true
+						}
+					},
+					{
+						tag = "Button",
+						value = tostring(turnCount),
+						attributes = {
+							id = "turnCountButton",
+							rectAlignment = "MiddleLeft",
+							onClick = self.getGUID() .. "/turnCounterClicked",
+							color = "rgba(0,0,0,0)",
+							textColor = "rgb(0,0,0)",
+							height = "40",
+							width = "45",
+							fontSize = "30",
+							fontStyle = "Bold"
+						}
+					}
+				}
+			},
+			{
+				tag = "Panel",
+				attributes = {
+					id = "clearButtonPanel",
+					rectAlignment = "UpperLeft",
+					offsetXY = "579 0",
+					width = "50",
+					height = "50",
+					tooltip = "Clear the Scenario",
+					tooltipPosition = "Below",
+					onClick = self.getGUID() .. "/clearButtonClicked"
+				},
+				children = {
+					{
+						tag = "Image",
+						attributes = {
+							image = cdnUrl .. "/assets/control-panel-clear.png",
+							preserveAspect = true
+						}
+					}
+				}
+			},
+			{
+				tag = "Panel",
+				attributes = {
+					id = "clearConfirmPanel",
+					rectAlignment = "UpperLeft",
+					offsetXY = "579 0",
+					width = "50",
+					height = "50",
+					color = "rgba(0,0,0,0)",
+					tooltip = "Are you sure?",
+					tooltipPosition = "Below",
+					active = "false",
+					onClick = self.getGUID() .. "/clearConfirmButtonClicked"
+				},
+				children = {
+					{
+						tag = "Image",
+						attributes = {
+							image = cdnUrl .. "/assets/control-panel-clear-confirm-2.png",
+							preserveAspect = true
+						}
+					}
+				}
 			}
-    	}
+		}
 	}}
 
     Global.UI.setXmlTable(scenarioControlPanelUI)
@@ -195,6 +323,14 @@ function threatButtonClicked(player, value, id)
 	local totalAcceleration = accelerationFromSchemeStage + accelerationFromCards + accelerationFromCounters
 
 	threatCounter.call("adjustValue", {adjustment = totalAcceleration})
+
+	--TODO: post message about threat added (including sources)
+
+	local functionName = "threatAdded_" .. currentScenario.key
+
+    if (self.getVar(functionName) ~= nil) then
+        self.call(functionName)
+    end
 end
 
 function encounterCardsButtonClicked(player, value, id)
@@ -204,6 +340,8 @@ function encounterCardsButtonClicked(player, value, id)
 	local hazardFromCards = Global.call("countCardIconsInPlay", {iconType="hazard"})
 	local cardsToDeal = heroCount + hazardFromCards
 	Global.call("dealEncounterCardsToAllPlayers", {numberOfCards = cardsToDeal})
+
+	--TODO: post message about cards dealt (including sources)
 end
 
 function turnCounterClicked(player, value, id)
@@ -211,6 +349,32 @@ function turnCounterClicked(player, value, id)
 	local adjustment = rightClick and -1 or 1
 
 	adjustTurnCount({adjustment = adjustment})
+end
+
+function messageClicked(player, value, id)
+	local messageIndex = tonumber(string.match(id, "%d+"))
+
+	if(not currentScenario or not currentScenario.messages) then return end
+
+	local message = currentScenario.messages[messageIndex]
+	if(not message) then return end
+
+	-- Only handle clicks on instruction messages
+	if(message.type == messageTypes.instruction) then
+		-- Remove the message from the table and reconstruct to eliminate nil values
+		local newMessages = {}
+		for i, msg in ipairs(currentScenario.messages) do
+			if i ~= messageIndex then
+				table.insert(newMessages, msg)
+			end
+		end
+		currentScenario.messages = newMessages
+
+		-- Hide the UI element
+		Global.UI.hide(id)
+		
+		saveData()
+	end
 end
 
 function clearButtonClicked(player, value, id)
@@ -238,4 +402,130 @@ function adjustTurnCount(params)
 	saveData()
 
 	Global.UI.setAttribute("turnCountButton", "text", tostring(turnCount))
+end
+
+function displayMessage(params)
+	if(not currentScenario) then return end
+	if(not currentScenario.messages)then
+		currentScenario.messages = {}
+	end
+
+	local messageText = params.message
+	local messageType = params.messageType or messageTypes.info
+
+	if(messageType == messageTypes.instruction) then
+		messageText = messageText .. "\n<b>(click to dismiss)</b>"
+	end
+
+	table.insert(currentScenario.messages, {text = messageText, type = messageType})
+	local messageCount = #currentScenario.messages
+	local messageLabelKey = "message-" .. tostring(messageCount)
+
+	Global.UI.setAttribute(messageLabelKey, "text", messageText)
+	Global.UI.setAttribute(messageLabelKey, "color", getMessageColor(params))
+	Global.UI.show(messageLabelKey)
+	Global.UI.setAttribute("messageScrollView", "verticalNormalizedPosition", "1")
+	
+	-- Flash the new message to draw attention
+	flashMessage(messageLabelKey, getMessageColor(params))
+	
+	-- Track message activity for auto-expand feature
+	local currentTime = os.time()
+	local timeSinceLastMessage = currentTime - lastMessageTime
+	
+	-- Reset counters if more than 3 seconds have passed since last message
+	if timeSinceLastMessage >= 3 then
+		recentMessageChars = 0
+		recentMessageCount = 0
+	end
+	
+	-- Add current message to recent activity
+	recentMessageChars = recentMessageChars + string.len(params.message)
+	recentMessageCount = recentMessageCount + 1
+	lastMessageTime = currentTime
+	
+	-- Expand panel if more than 100 chars or more than 2 messages within recent window
+	if (recentMessageChars > 100 or recentMessageCount > 2) and not autoExpandActive then
+		autoExpandPanel()
+	end
+	
+	saveData()
+end
+
+function flashMessage(messageLabelKey, originalColor)
+	local flashCount = 0
+	local maxFlashes = 6 -- 3 complete on/off cycles
+	
+	-- Use black as alternate color if original is white, otherwise use white
+	local alternateColor = "rgb(0,0,0)"
+	if originalColor ~= "rgb(1,1,1)" and originalColor ~= "rgb(1.000000,1.000000,1.000000)" then
+		alternateColor = "rgb(1,1,1)"
+	end
+	
+	local function toggleFlash()
+		flashCount = flashCount + 1
+		if flashCount > maxFlashes then
+			-- Restore original color
+			Global.UI.setAttribute(messageLabelKey, "color", originalColor)
+			return
+		end
+		
+		-- Alternate between original color and alternate color
+		if flashCount % 2 == 1 then
+			Global.UI.setAttribute(messageLabelKey, "color", alternateColor)
+		else
+			Global.UI.setAttribute(messageLabelKey, "color", originalColor)
+		end
+		
+		Wait.time(toggleFlash, 0.15)
+	end
+	
+	Wait.time(toggleFlash, 0.15)
+end
+
+function autoExpandPanel()
+	local wasExpanded = Global.UI.getAttribute("messageScrollView", "height") == "150"
+	autoExpandActive = true
+	
+	-- Only expand if not already manually expanded
+	if not wasExpanded then
+		Global.UI.setAttribute("messagePanel", "height", "150")
+		Global.UI.setAttribute("messageScrollView", "height", "150")
+		Global.UI.setAttribute("expandMessagesButton", "offsetXY", "443 -150")
+		Global.UI.setAttribute("expandMessagesButton", "tooltip", "Collapse Messages")
+		Global.UI.setAttribute("expandMessagesLabel", "text", "▲")
+		
+		-- Collapse back after 5 seconds (only if we expanded it)
+		Wait.time(function()
+			autoExpandActive = false
+			-- Only collapse if it's still expanded (user didn't manually collapse)
+			if Global.UI.getAttribute("messageScrollView", "height") == "150" then
+				Global.UI.setAttribute("messagePanel", "height", "50")
+				Global.UI.setAttribute("messageScrollView", "height", "50")
+				Global.UI.setAttribute("expandMessagesButton", "offsetXY", "443 -50")
+				Global.UI.setAttribute("expandMessagesButton", "tooltip", "Expand Messages")
+				Global.UI.setAttribute("expandMessagesLabel", "text", "▼")
+			end
+		end, 5)
+	else
+		-- Panel was already expanded, so don't auto-collapse
+		autoExpandActive = false
+	end
+end
+
+function expandMessagesClicked(player, value, id)
+	local isExpanded = Global.UI.getAttribute("messageScrollView", "height") == "150"
+	if(isExpanded) then
+		Global.UI.setAttribute("messagePanel", "height", "50")
+		Global.UI.setAttribute("messageScrollView", "height", "50")
+		Global.UI.setAttribute("expandMessagesButton", "offsetXY", "443 -50")
+		Global.UI.setAttribute("expandMessagesButton", "tooltip", "Expand Messages")
+		Global.UI.setAttribute("expandMessagesLabel", "text", "▼")
+	else
+		Global.UI.setAttribute("messagePanel", "height", "150")
+		Global.UI.setAttribute("messageScrollView", "height", "150")
+		Global.UI.setAttribute("expandMessagesButton", "offsetXY", "443 -150")
+		Global.UI.setAttribute("expandMessagesButton", "tooltip", "Collapse Messages")
+		Global.UI.setAttribute("expandMessagesLabel", "text", "▲")
+	end
 end

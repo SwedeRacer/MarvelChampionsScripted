@@ -301,8 +301,8 @@
           "normalized": "environment"
         },
         {
-          "displayed": "delete-with-scenario",
-          "normalized": "delete-with-scenario"
+          "displayed": "group-scenario",
+          "normalized": "group-scenario"
         },
         {
           "displayed": "villain",

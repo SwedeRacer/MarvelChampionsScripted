@@ -121,7 +121,8 @@ function enchantressPlaceHypnoticTrances()
             cardId = hypnoticTranceCardId,
             position = cardPosition,
             scale = cardScale,
-            flipped = true
+            flipped = true,
+            tags = {"group-scenario"}
         })
 
         Wait.frames(function()
@@ -205,7 +206,8 @@ function enchantressPlaceFutureOfDespair(extraThreatPerHero)
         position = newSideSchemePosition,
         scale = Global.getTable("CARD_SCALE_ENCOUNTER"),
         landscape = true,
-        flipped = false
+        flipped = false,
+        tags = {"group-scenario"}
     })
 
     Wait.frames(function()

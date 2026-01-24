@@ -417,23 +417,6 @@ function findCardsAtPosition()
    return cards
 end
 
-function findObjectsAtPosition()
-   matPos = self.getPosition()
-   local objList = Physics.cast({
-      origin       = matPos,
-      direction    = {0,1,0},
-      type         = 3,
-      size         = {26,1,15},
-      max_distance = 0,
-      debug        = false,
-   })
-   local objects = {}
-   for _, obj in ipairs(objList) do
-      table.insert(objects, obj.hit_object)
-   end
-   return objects
-end
-
 function drawEncounter(player, value, id)
    Global.call("dealEncounterCardToPlayer", {playerColor = getValue("playerColor"), faceUp = value == "-2"})
 end
@@ -474,32 +457,15 @@ end
 
 function clearPlaymat()
    local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
-   local group = "player" .. getValue("playerColor")
-   local deleteWith = "delete-with-" .. group
+   local playerColor = getValue("playerColor")
+   local group = "player" .. playerColor
 
    if(heroManager) then
-      heroManager.call("clearHero", {playerColor = getValue("playerColor")})
+      heroManager.call("clearHero", {playerColor = playerColor })
    end
 
    Global.call("deleteZoneGroup", {group = group})
-
-   local objects = findObjectsAtPosition()
-
-   for _, obj in ipairs(objects) do
-      if(obj.tag ~= "Surface" and obj.tag ~= "Board" and obj.getVar("preventDeletion") ~= true) then
-         obj.destruct()
-      end
-   end
-
-   -- local allObjects = getAllObjects()
-
-   -- for _, obj in ipairs(allObjects) do
-   --    if(obj.hasTag(deleteWith)) then
-   --       obj.destruct()
-   --    end
-   -- end
-
-   self.destruct()
+   Global.call("deleteObjectsByGroup", {deleteGroup = playerColor})
 end
 
 function spawnNemesis()
@@ -563,16 +529,17 @@ function drawCards(params)
 
    objectToDrawFrom.deal(numberToDraw, getValue("playerColor"))
 
-   Global.call("supressZones")
+   --disableZones()
    
    Wait.frames(function()
       if(isPlayerDeck and numberToDraw >= availableCards) then
          local deckPosition = getPlayerDeckPosition()
          local discardPosition = getPlayerDiscardPosition()
 
-         Global.call("refreshDeck", {deckPosition = deckPosition, discardPosition = discardPosition, deckType = positionColor})
-         Global.call("displayMessage", {message = "You cycled your deck. Time for an encounter card!", messageType = Global.getVar("MESSAGE_TYPE_INFO"), playerColor = positionColor})
-         Global.call("dealEncounterCardToPlayer", {playerColor = positionColor})
+         Global.call("refreshPlayerDeck", {
+            deckPosition = deckPosition, 
+            discardPosition = discardPosition, 
+            playerColor = positionColor})
 
          Wait.frames(function()
             local playerDeck = Global.call("getDeckOrCardAtPosition", {position = deckPosition})
@@ -582,6 +549,34 @@ function drawCards(params)
       end
    end,
    1)
+end
+
+function disableZones()
+   local zonePrefixes = {"hero-", "heroCounters-", "heroExit-"}
+   local suppressedTag = "suppressed"
+   local playerColor = getValue("playerColor")
+
+   for _, prefix in ipairs(zonePrefixes) do
+      local zoneDef = Global.call("getZoneDefinition", {zoneIndex = prefix .. playerColor})
+      if(zoneDef) then
+         local zone = getObjectFromGUID(zoneDef.guid)
+         if(zone) then
+            zone.addTag(suppressedTag)
+         end
+      end
+   end
+
+   Wait.frames(function()
+      for _, prefix in ipairs(zonePrefixes) do
+         local zoneDef = Global.call("getZoneDefinition", {zoneIndex = prefix .. playerColor})
+         if(zoneDef) then
+            local zone = getObjectFromGUID(zoneDef.guid)
+            if(zone) then
+               zone.removeTag(suppressedTag)
+            end
+         end
+      end
+   end, 60)
 end
 
 function isPlayerDeck(deck)

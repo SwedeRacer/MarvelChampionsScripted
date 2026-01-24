@@ -1,5 +1,5 @@
 preventDeletion = true
-
+local groupTagPrefix = "group-"
 local offset = {
  healthCounter = Global.getTable("PLAYMAT_OFFSET_HEALTH_COUNTER"),
  identity = Global.getTable("PLAYMAT_OFFSET_IDENTITY"),
@@ -177,6 +177,7 @@ function placeHero(heroKey, playerColor, deckType, importedDeck)
   )
   
   placeHealthCounter(
+    playerColor,
     playmatPosition,
     hero.tileImageUrl,
     hero.hitPoints
@@ -192,7 +193,8 @@ function placeHero(heroKey, playerColor, deckType, importedDeck)
     hero,
     deckType,
     playmatPosition,
-    importedDeck
+    importedDeck,
+    playerColor
   )
 
   Wait.frames(
@@ -210,7 +212,8 @@ function placeHero(heroKey, playerColor, deckType, importedDeck)
     function()
     placeExtras(
       hero,
-      playmatPosition
+      playmatPosition,
+      playerColor
     )
     end,
     120
@@ -370,10 +373,8 @@ function configurePlaymat(params)
  local playmat = params.spawnedObject
  local playmatUrl = params.playmatUrl
 
- playmat.setName("")
- playmat.setDescription("")
- playmat.setLock(true)
  playmat.addTag("Playmat")
+ playmat.addTag(groupTagPrefix .. params.playerColor)
  playmat.addTag(params.playerColor)
  playmat.setPosition(params.position)
  playmat.setCustomObject({image = playmatUrl})
@@ -381,14 +382,16 @@ function configurePlaymat(params)
 
  Wait.frames(
   function()
+   reloadedPlaymat.interactable = false
    reloadedPlaymat.call("setPlayerColor", {color = params.playerColor})
   end,
  30)
 end
 
-function placeHealthCounter(playmatPosition, imageUrl, hitPoints)
+function placeHealthCounter(playerColor, playmatPosition, imageUrl, hitPoints)
  spawnAsset({
   guid = Global.getVar("ASSET_GUID_HERO_HEALTH_COUNTER"),
+  playerColor = playerColor,
   position = getOffsetPosition(playmatPosition, offset.healthCounter),
   rotation = defaultRotation,
   scale = scale.healthCounter,
@@ -408,6 +411,7 @@ function configureHealthCounter(params)
   counter.setLock(true)
   counter.setPosition(params.position)
   counter.setCustomObject({image = imageUrl})
+  counter.addTag(groupTagPrefix .. params.playerColor)
 
   local reloadedCounter = nil
   
@@ -432,10 +436,10 @@ function placeIdentity(hero, playmatPosition, playerColor)
  if(hero.identityAssetGuid ~= nil) then
   spawnAsset({
    guid = hero.identityAssetGuid,
+   playerColor = playerColor,
    position = position,
    rotation = defaultRotation,
    scale = scale,
-   playerColor = playerColor,
    callback = "configureIdentity"
   })
   return
@@ -445,7 +449,8 @@ function placeIdentity(hero, playmatPosition, playerColor)
   cardId = hero.identityCardId,
   position = position,
   scale = scale,
-  flipped = hero.flipIdentityCard == nil or hero.flipIdentityCard
+  flipped = hero.flipIdentityCard == nil or hero.flipIdentityCard,
+  tags = {groupTagPrefix .. playerColor}
  })
 
  hero.identityGuid = heroCard.getGUID()
@@ -456,10 +461,11 @@ function configureIdentity(params)
   local hero = selectedHeroes[playerColor]
   local identity = params.spawnedObject
   identity.setPosition(params.position)
+  identity.addTag(groupTagPrefix .. playerColor)
   hero.identityGuid = identity.getGUID()
 end
 
-function placeDeck(hero, deckType, playmatPosition, importedDeck)
+function placeDeck(hero, deckType, playmatPosition, importedDeck, playerColor)
  local deckPosition = getOffsetPosition(playmatPosition, offset.deck)
  local discardPostition = getOffsetPosition(playmatPosition, offset.discard)
 
@@ -491,6 +497,8 @@ function placeDeck(hero, deckType, playmatPosition, importedDeck)
   if(hero.artVariant) then
     deck.artVariant = hero.artVariant
   end
+
+  deck.cardTags = {groupTagPrefix .. playerColor}
 
   local spawnedDeck = Global.call("spawnDeck", deck)
   local linkedCards = spawnedDeck.getGMNotes()
@@ -556,7 +564,7 @@ function placeCards(hero, playerColor, playmatPosition)
  end
 end
 
-function placeExtras(hero, playmatPosition)
+function placeExtras(hero, playmatPosition, playerColor)
  if(hero.extras == nil) then
   return
  end
@@ -591,6 +599,7 @@ function placeExtras(hero, playmatPosition)
      Wait.frames(
       function()
        counter.call("setValue", {value = item.value or 0})
+       counter.addTag(groupTagPrefix .. playerColor)
       end,
       1)
     end
@@ -617,6 +626,7 @@ function placeExtras(hero, playmatPosition)
     guid = item.assetGuid,
     position = itemPosition,
     rotation = item.rotation,
+    playerColor = playerColor,
     callback = "configureAsset"
    })
   end
@@ -625,6 +635,7 @@ end
 
 function configureAsset(params)
  local asset = params.spawnedObject
+ asset.addTag(groupTagPrefix .. params.playerColor)
  asset.setPosition(params.position)
 
  if(params.rotation ~= nil) then
@@ -887,7 +898,11 @@ function setFirstPlayer(params)
   local scenarioManager = getObjectFromGUID(Global.getVar("GUID_SCENARIO_MANAGER"))
   scenarioManager.call("adjustTurnCount", {adjustment = 1})
 
-  Global.call("displayMessage", {message = playerColor .. " is the first player!", messageType = Global.getVar("MESSAGE_TYPE_INFO")})
+  Global.call("displayMessage", {
+    message = playerColor .. " is the first player!", 
+    messageType = Global.getVar("MESSAGE_TYPE_INFO"), 
+    playerColor = playerColor})
+    
   firstPlayer = playerColor
   saveData()
 end

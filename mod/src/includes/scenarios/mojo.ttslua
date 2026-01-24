@@ -108,7 +108,8 @@ function addNextGenre()
   Global.call("spawnCard", {
     cardId = genreEnvironmentCardId, 
     position = {20.75, 2.00, 29.75},  --TODO: create a constant (or better yet, add functionality for moving cards to a specific zone)
-    scale = defaults.encounterDeck.scale
+    scale = defaults.encounterDeck.scale,
+    tags = {"group-scenario"}
   })
 end
 
@@ -156,7 +157,9 @@ function placeGenreSetFromEnvironment(zone, card)
   Global.call("spawnDeck", {
     cards = newGenreSet.cards, 
     position = spawnPosition, 
-    scale = defaults.encounterDeck.scale})
+    scale = defaults.encounterDeck.scale,
+    cardTags = {"group-scenario"}
+  })
 
   Wait.frames(function() 
     Global.call("shuffleDeck", {deckPosition = encounterDeckPos})
