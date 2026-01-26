@@ -746,19 +746,6 @@ function findAndPlacePlayerCard(params)
   startLuaCoroutine(self, "moveCardCoroutine")
 end
 
-function findCardInDecks(decks, cardName)
- for _, deck in pairs(decks) do
-  for _, card in pairs(deck.getObjects()) do
-   if(card.name == cardName) then
-    return {
-     deck = deck,
-     cardGuid = card.guid
-    }
-   end
-  end
- end
-end
-
 function placeCardFromDeck(deck, cardGuid, position, scale, rotation, flipped, deleteCard)
  local cardScale = scale or deck.getScale()
  local cardRotation = rotation or deck.getRotation()

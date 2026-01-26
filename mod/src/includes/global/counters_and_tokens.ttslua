@@ -363,8 +363,8 @@ end
 function cardCanHaveStatus(params)
     local card = params.card
     local cardPosition = card.getPosition()
-    local cardName = card.getName()
-    local targetType = Global.call("getCardProperty", {card = card, property = "type"})
+    local cardName = stripCardSuffix({cardName = card.getName()})
+    local targetType = getCardProperty({card = card, property = "type"})
     local statusType = params.statusType
   
     statusCount = getStatusCount({card = card, statusType = statusType})
@@ -441,7 +441,8 @@ function placeStatusToken(params)
       end
     })
   
-    local message = card.getName() .. " is " .. statusType .. "!"
+    local cardName = stripCardSuffix({cardName = card.getName()})
+    local message = cardName .. " is " .. statusType .. "!"
   
     if(statusType == "stunned" or statusType == "confused") then
       message = message .. "\n(If there is an effect in play that makes this character steady, they may need another status card to actually be " .. statusType .. ".\nIf they are stalwart, you may need to remove this status card.)"
