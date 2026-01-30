@@ -321,7 +321,14 @@ end
 
 function importDeck()
     if(not importDeckId or importDeckId == "") then
-        broadcastToColor("Please enter a valid deck ID", positionColor, tint)
+        local message = "Please enter a valid deck ID"
+
+        if(Player[positionColor].seated) then
+            broadcastToColor(message, positionColor, tint)
+        else
+            broadcastToAll(message, tint)
+        end
+
         return
     end
 

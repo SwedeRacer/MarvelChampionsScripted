@@ -75,7 +75,7 @@ function removeCountersFromCard(params)
   for _, counterClass in ipairs(counterClasses) do
     local counterGuid = cardValues[counterClass .. "CounterGuid"]
 
-    if (counterGuid) then
+    if(counterGuid) then
       removeCounterFromCard({cardGuid = cardGuid, counterGuid = counterGuid, counterClass = counterClass})
     end
   end
@@ -86,6 +86,9 @@ function removeCounterFromCard(params)
   local counterGuid = params.counterGuid
   local counterClass = params.counterClass or "standard"
   local counter = getObjectFromGUID(counterGuid)
+
+  if(not counter) then return end
+
   local value = counter.call("getValue")
 
   setCardValue({cardGuid = cardGuid, property = counterClass .. "RetainedValue", value = value})

@@ -83,31 +83,13 @@ scenarios["ultron"] =
             onEnterFunction = "ultronCardEnterSideSchemeZone"
          }
     }
-    -- extras={
-    --     droneCounterBag={
-    --         name="Drone Counters",
-    --         guid="be0acf",
-    --         position={31, 1.06, 33.25},
-    --         rotation={0, 180, 0},
-    --         scale={1.55, 1.00, 1.55},
-    --         locked=true
-    --     },
-    --     upgradedDroneCounterBag={
-    --         name="Upgraded Drone Counters",
-    --         guid="fb7d65",
-    --         position={31, 1.06, 29.25},
-    --         rotation={0, 180, 0},
-    --         scale={1.55, 1.00, 1.55},
-    --         locked=true
-    --     }
-    -- }
 }
 
 function prepareScenario_ultron()
     currentScenario.droneDefinition = {
             name = "Ultron Drone",
             type = "minion",
-            aspect = "encounter",
+            --aspect = "encounter",
             health = "1",
             attack = "1",
             scheme = "1"
@@ -227,6 +209,9 @@ function ultronDiscardPlayerCardsAsDrones(params)
     })
     local deckPosition = Vector(playmat.call("getPlayerDeckPosition"))
     local tempDestination = Vector({deckPosition[1], deckPosition[2] + 3, deckPosition[3]})
+    local zoneDelay = droneCount * 100
+
+    playmat.call("disableZones", {delay = zoneDelay})
 
     function discardUltronDroneCoroutine()
         for i = 1, droneCount do

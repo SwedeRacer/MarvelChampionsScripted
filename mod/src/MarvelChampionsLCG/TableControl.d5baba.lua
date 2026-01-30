@@ -11,8 +11,8 @@ function setUpUI()
         {
             tag="Panel",
             attributes= {
-                height = "100",
-                width = "300",
+                height = "160",
+                width = "1000",
                 position = "0 0 -200",
 				color = "rgba(0,0,0,0)",
                 rotation = "0 0 180"
@@ -31,7 +31,17 @@ function setUpUI()
                         fontSize = "120",
                         fontStyle = "Bold"
                     }
-                }
+                },
+				{
+					tag = "Panel",
+					attributes = {
+						rectAlignment = "UpperCenter",
+						height = "10",
+						width = "300",
+						position = "0 -60 0",
+						color = "rgba(0,0,0,0)"
+					}
+				}
             }
         }
     }

@@ -1,6 +1,7 @@
 function onLoad()
     local blockComp = self.getComponent("AudioSource")
     blockComp.set("mute", true)
+    self.interactable = false
 end
 
 function spawnAsset(params)

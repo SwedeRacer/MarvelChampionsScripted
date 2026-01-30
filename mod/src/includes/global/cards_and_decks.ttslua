@@ -1170,14 +1170,19 @@ function getPlayerColorFromDeck(params)
 end
 
 function discardCardOrDeck(params)
-    local cardOrDeck = params.object
-    if(not cardOrDeck) then return end
+    local object = params.object
+    if(not object) then return end
 
-    local objectType = cardOrDeck.tag
+    if(object.hasTag("counter") or object.hasTag("token")) then
+        object.destruct()
+        return
+    end
+ 
+    local objectType = object.tag
 
     if(objectType == "Deck") then
         --If the object is a player deck, discard from that deck (refresh if needed))
-        local playerDeckColor = getPlayerColorFromDeck({deck = cardOrDeck})
+        local playerDeckColor = getPlayerColorFromDeck({deck = object})
 
         if playerDeckColor then
             discardFromPlayerDeck({
@@ -1192,7 +1197,7 @@ function discardCardOrDeck(params)
         local encounterDeckPosition = scenarioManager.call("getEncounterDeckPosition")
 
         if objectIsAtPosition({
-            object = cardOrDeck,
+            object = object,
             position = Vector(encounterDeckPosition)
         }) then
             discardFromEncounterDeck({
@@ -1202,7 +1207,7 @@ function discardCardOrDeck(params)
         end
 
         --Check the top card of the deck to determine where to discard
-        local card = cardOrDeck.takeObject()
+        local card = object.takeObject()
         local cardData = getCardData({card = card})
         if(not cardData) then return end
 
@@ -1226,30 +1231,30 @@ function discardCardOrDeck(params)
 
     if(objectType ~= "Card") then return end
 
-    local cardData = getCardData({card = cardOrDeck})
+    local cardData = getCardData({card = object})
 
     if(cardData.type == "hero") then return end
 
     --Don't discard locked cards
-    if cardOrDeck.getLock() then return end
+    if object.getLock() then return end
 
     --If the card is in a player zone, discard to that player's discard pile
-    local zones = cardOrDeck.getZones()
+    local zones = object.getZones()
 
     for _, zone in pairs(zones) do
         if(zone.tag == "Hand") then
             local playerColor = zone.getValue()
 
-            cardOrDeck.use_hands = false
+            object.use_hands = false
 
             discardPlayerCard({
-                card = cardOrDeck,
+                card = object,
                 playerColor = playerColor
             })
 
             Wait.frames(function()
-                if(not cardOrDeck.isDestroyed()) then
-                    cardOrDeck.use_hands = true
+                if(not object.isDestroyed()) then
+                    object.use_hands = true
                 end
             end, 20)
 
@@ -1259,9 +1264,9 @@ function discardCardOrDeck(params)
         local zoneDef = getZoneDefinition({zoneGuid = zone.getGUID()})
 
         if(zoneDef and (zoneDef.zoneType == "heroExit")) then
-            removeCountersFromCard({card = cardOrDeck})
+            removeCountersFromCard({card = object})
             discardPlayerCard({
-                card = cardOrDeck,
+                card = object,
                 playerColor = zoneDef.playerColor
             })
             return
@@ -1270,18 +1275,18 @@ function discardCardOrDeck(params)
 
     --If the card is an encounter card, discard to the encounter discard pile
     if(cardData.aspect == "encounter") then
-        removeCountersFromCard({card = cardOrDeck})
+        removeCountersFromCard({card = object})
         discardEncounterCard({
-            discardFromPosition = cardOrDeck.getPosition()
+            discardFromPosition = object.getPosition()
         })
         return
     end
 
     --If the card has a playerColor tag, discard to that player's discard pile
-    local cardPlayerColor = getCardPlayerColor({card = cardOrDeck})
+    local cardPlayerColor = getCardPlayerColor({card = object})
     if(cardPlayerColor) then
         discardPlayerCard({
-            card = cardOrDeck,
+            card = object,
             playerColor = cardPlayerColor
         })
         return
@@ -1290,9 +1295,9 @@ function discardCardOrDeck(params)
     --If the player is seated, discard to their discard pile
     local playerColor = params.playerColor
     if(playerColor == "Red" or playerColor == "Blue" or playerColor == "Green" or playerColor == "Yellow") then
-        removeCountersFromCard({card = cardOrDeck})
+        removeCountersFromCard({card = object})
         discardPlayerCard({
-            card = cardOrDeck,
+            card = object,
             playerColor = playerColor
         })    
         return

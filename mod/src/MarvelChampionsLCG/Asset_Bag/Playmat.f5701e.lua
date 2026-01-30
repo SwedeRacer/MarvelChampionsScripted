@@ -529,7 +529,7 @@ function drawCards(params)
 
    objectToDrawFrom.deal(numberToDraw, getValue("playerColor"))
 
-   --disableZones()
+   disableZones()
    
    Wait.frames(function()
       if(isPlayerDeck and numberToDraw >= availableCards) then
@@ -551,10 +551,11 @@ function drawCards(params)
    1)
 end
 
-function disableZones()
-   local zonePrefixes = {"hero-", "heroCounters-", "heroExit-"}
+function disableZones(params)
+   local zonePrefixes = {"hero-", "heroExit-"}
    local suppressedTag = "suppressed"
    local playerColor = getValue("playerColor")
+   local delay = params and params.delay or 60
 
    for _, prefix in ipairs(zonePrefixes) do
       local zoneDef = Global.call("getZoneDefinition", {zoneIndex = prefix .. playerColor})
@@ -576,7 +577,7 @@ function disableZones()
             end
          end
       end
-   end, 60)
+   end, delay)
 end
 
 function isPlayerDeck(deck)
