@@ -1,4 +1,5 @@
 local baseImageUrl = Global.getVar("CDN_URL") .. "/tabletops/"
+local overridePanelOpen = false
 
 function onload()
 	self.interactable = false
@@ -8,6 +9,55 @@ end
 function setUpUI()
 	local ui = 
     {
+		{
+			tag = "Defaults",
+			children = {
+				{
+					tag = "Panel",
+					attributes = {
+						class = "sectionHeading",
+						preferredHeight = "150",
+						flexibleHeight = "0",
+						padding = "0 0 60 15"
+					}
+				},
+				{
+					tag = "Text",
+					attributes = {
+						class = "sectionHeading",
+						rectAlignment = "UpperLeft",
+						alignment = "UpperCenter",
+						fontSize = "75",
+						color = "rgba(1,1,1,1)",
+						contentSizeFitter = "vertical"
+					}
+				},
+				{
+					tag = "HorizontalLayout",
+					attributes = {
+						class = "buttonPanel",
+						preferredHeight = "90",
+						flexibleHeight = "0",
+						padding = "70 70 5 5",
+						spacing = "40",
+						contentSizeFitter = "vertical"
+					}
+				},
+				{
+					tag = "Button",
+					attributes = {
+						class = "overrideButton",
+						height = "70",
+						flexibleHeight = "0",
+						color = "rgba(0,0,0,1)",
+						textColor = "rgb(1,1,1)",
+						outline = "rgba(1,1,1,1)",
+						outlineSize = "1 1",
+						fontSize = "60"
+					}
+				}
+        	}
+		},
         {
             tag="Panel",
             attributes= {
@@ -36,10 +86,163 @@ function setUpUI()
 					tag = "Panel",
 					attributes = {
 						rectAlignment = "UpperCenter",
-						height = "10",
-						width = "300",
-						position = "0 -60 0",
+						height = "110",
+						width = "1000",
+						offsetXY = "0 -310",
 						color = "rgba(0,0,0,0)"
+					},
+					children = {
+						{
+							tag = "Button",
+							value = "MANUAL OVERRIDES",
+							attributes = {
+								id = "overrideButton",
+								rectAlignment = "MiddleCenter",
+								color = "rgba(0,0,0,0)",
+								textColor = "rgb(1,1,1)",
+								height = "110",
+								width = "1000",
+								fontSize = "90",
+								fontStyle = "Bold",
+								onClick = self.getGUID() .. "/overrideButtonClicked",
+							}
+						}
+					}
+				},
+				{
+					tag = "VerticalLayout",
+					attributes = {
+						id = "overridesPanel",
+						rectAlignment = "UpperCenter",
+						offsetXY = "0 -430",
+						height = "2000",
+						width = "1000",
+                		padding = "10 10 0 10",
+                		childAlignment = "UpperCenter",
+                		childForceExpandHeight = "false",
+                		spacing = "0",
+                		contentSizeFitter = "vertical",
+						color = "rgba(0,0,0,0)",
+						active = "false"
+					},
+					children = {
+						{
+							tag = "Panel",
+							attributes = {
+								class = "sectionHeading"
+							},
+							children = {
+								{
+									tag = "Text",
+									value = "SCENARIO BUTTON",
+									attributes = {
+										class = "sectionHeading"
+									}
+								}
+							}
+						},
+						{
+							tag = "HorizontalLayout",
+							attributes = {
+								class = "buttonPanel"
+							},
+							children = {
+								{
+									tag = "Button",
+									value = "SHOW",
+									attributes = {
+										class = "overrideButton",
+										onClick = self.getGUID() .. "/showScenarioButton"
+									}
+								},
+								{
+									tag = "Button",
+									value = "HIDE",
+									attributes = {
+										class = "overrideButton",
+										onClick = self.getGUID() .. "/hideScenarioButton"
+									}
+								}
+							}
+						},
+						{
+							tag = "Panel",
+							attributes = {
+								class = "sectionHeading"
+							},
+							children = {
+								{
+									tag = "Text",
+									value = "SCENARIO TOOLBAR",
+									attributes = {
+										class = "sectionHeading"
+									}
+								}
+							}
+						},
+						{
+							tag = "HorizontalLayout",
+							attributes = {
+								class = "buttonPanel"
+							},
+							children = {
+								{
+									tag = "Button",
+									value = "SHOW",
+									attributes = {
+										class = "overrideButton",
+										onClick = self.getGUID() .. "/showScenarioToolbar"
+									}
+								},
+								{
+									tag = "Button",
+									value = "HIDE",
+									attributes = {
+										class = "overrideButton",
+										onClick = self.getGUID() .. "/hideScenarioToolbar"
+									}
+								}
+							}
+						},
+						{
+							tag = "Panel",
+							attributes = {
+								class = "sectionHeading"
+							},
+							children = {
+								{
+									tag = "Text",
+									value = "HERO BUTTONS",
+									attributes = {
+										class = "sectionHeading"
+									}
+								}
+							}
+						},
+						{
+							tag = "HorizontalLayout",
+							attributes = {
+								class = "buttonPanel"
+							},
+							children = {
+								{
+									tag = "Button",
+									value = "SHOW",
+									attributes = {
+										class = "overrideButton",
+										onClick = self.getGUID() .. "/showPlaymatRemoveButtons"
+									}
+								},
+								{
+									tag = "Button",
+									value = "HIDE",
+									attributes = {
+										class = "overrideButton",
+										onClick = self.getGUID() .. "/hidePlaymatRemoveButtons"
+									}
+								}
+							}
+						}
 					}
 				}
             }
@@ -246,6 +449,20 @@ function changeTableButtonClicked(player, value, id)
     Global.UI.setXmlTable(scenarioUI)
 end
 
+function overrideButtonClicked(player, value, id)
+	if overridePanelOpen then
+		self.UI.hide("overridesPanel")
+		self.UI.setAttribute("overrideButton", "text", "MANUAL OVERRIDES")
+		self.UI.setAttribute("overrideButton", "textColor", "rgba(1,1,1,1)")
+		overridePanelOpen = false
+	else
+		self.UI.show("overridesPanel")
+		self.UI.setAttribute("overrideButton", "text", "HIDE OVERRIDES")
+		self.UI.setAttribute("overrideButton", "textColor", "rgba(1,1,1,1)")
+		overridePanelOpen = true
+	end
+end
+
 function setTableImage(player, value, id)
 	Global.call("showScenarioControlPanel")
 	local currentCover = Global.call("findObjectByTag", {tag="table-cover"})
@@ -316,4 +533,33 @@ function setTableImage(player, value, id)
 			30)
 		end
 	})
+end
+
+function showScenarioButton()
+	local scenarioButton = getObjectFromGUID(Global.getVar("GUID_SCENARIO_BUTTON"))
+	scenarioButton.call("showUI")
+end
+
+function hideScenarioButton()
+	local scenarioButton = getObjectFromGUID(Global.getVar("GUID_SCENARIO_BUTTON"))
+	scenarioButton.call("hideUI")
+end
+
+function showScenarioToolbar()
+	local scenarioManager = getObjectFromGUID(Global.getVar("GUID_SCENARIO_MANAGER"))
+	scenarioManager.call("showScenarioControlPanel")
+end
+
+function hideScenarioToolbar()
+	Global.UI.setXml("")
+end
+
+function showPlaymatRemoveButtons()
+	local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
+	heroManager.call("showHeroSelection", {skipScenarioCheck = true})
+end
+
+function hidePlaymatRemoveButtons()
+	local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
+	heroManager.call("hideHeroSelection")
 end

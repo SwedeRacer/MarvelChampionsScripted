@@ -14,19 +14,22 @@ function onload()
     createSuitUpButton()
 end
 
-function createSuitUpButton()
+function createSuitUpButton(params)
+    local skipScenarioCheck = params and params.skipScenarioCheck
     local buttons = self.getButtons()
     if(#buttons > 1) then return end
 
     local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
-    local scenarioManager = getObjectFromGUID(Global.getVar("GUID_SCENARIO_MANAGER"))
 
     if(heroManager.call("getSelectedHero", {positionColor=positionColor})) then
         return
     end
 
-    if(scenarioManager.call("isScenarioInProgress")) then
-        return
+    if not skipScenarioCheck then
+        local scenarioManager = getObjectFromGUID(Global.getVar("GUID_SCENARIO_MANAGER"))
+        if scenarioManager.call("isScenarioInProgress") then
+            return
+        end
     end
 
     self.createButton({

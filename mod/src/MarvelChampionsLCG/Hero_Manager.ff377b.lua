@@ -236,10 +236,11 @@ function saveData()
 end
 
 function clearHero(params)
+  local skipScenarioCheck = params and params.skipScenarioCheck
   selectedHeroes[params.playerColor] = nil
   local playerControl = getPlayerControl({playerColor = params.playerColor})
 
-  playerControl.call("createSuitUpButton")
+  playerControl.call("createSuitUpButton", {skipScenarioCheck = skipScenarioCheck})
 end
 
 function hideHeroSelection()
@@ -255,7 +256,8 @@ function hideHeroSelection()
   end
 end
 
-function showHeroSelection()
+function showHeroSelection(params)
+  local skipScenarioCheck = params and params.skipScenarioCheck
   local objects = getAllObjects()
 
   for _, object in pairs(objects) do
@@ -263,7 +265,7 @@ function showHeroSelection()
       object.call("showRemoveButton")
     end
     if(object.hasTag("player-control")) then
-      object.call("createSuitUpButton")
+      object.call("createSuitUpButton", {skipScenarioCheck = skipScenarioCheck})
     end
   end
 end

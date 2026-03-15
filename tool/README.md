@@ -1,5 +1,38 @@
 # A few important how-to's
 
+## How to sanitize text for card data
+
+When adding new card text from third-party sources, you need to sanitize it to remove control characters and problematic Unicode that can cause parsing errors in Tabletop Simulator.
+
+### Using npm (recommended)
+```bash
+# Sanitize the Cardpool_Data file and recompile
+npm run sanitize
+```
+
+### Using the scripts directly
+```bash
+# Node.js
+node tool/sanitize-text.js
+
+# PowerShell
+.\tool\sanitize-text.ps1
+```
+
+### What gets sanitized:
+- Control characters (bytes 1-31, except tab, newline, carriage return)
+- Em dash (—) → hyphen (-)
+- En dash (–) → hyphen (-)
+- Minus sign (−) → hyphen (-)
+- Smart quotes (' ' " ") → straight quotes (' ")
+- Ellipsis (…) → three periods (...)
+- Bullets (• ·) → asterisk (*)
+- Arrows (→ ←) → ASCII arrows (-> <-)
+- Musical notes (♫ ♪) → [music]
+- BOM (Byte Order Mark) → removed
+
+After sanitizing, always run `npm run compile` to rebuild the mod.
+
 ## How to add a new modular encounter set
 1. Create a deck for the modular encounter set named "[name] Modular Set"
 2. Add them to the Modular Set bag face down

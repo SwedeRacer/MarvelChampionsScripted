@@ -1,5 +1,5 @@
 function onLoad()
-    showReleaseNotesUI()
+    --showReleaseNotesUI()
 
     addContextMenuItem("Spawn Card", createUI)
 
@@ -64,7 +64,6 @@ function onObjectNumberTyped(object, playerColor, number)
 end
 
 function onObjectEnterZone(zone, card)
-
     local zoneDef = getZoneDefinition({zone = zone})
     if (not zoneDef) then
         return
@@ -101,7 +100,7 @@ function onObjectEnterZone(zone, card)
     end
 
     if(zoneDef.addCountersAndTokens) then
-        addCountersAndTokensToCard({card = card, cardData = cardData, zoneGuid = zone.getGUID()})
+        addCountersAndTokensToCard({card = card, cardData = cardData, zoneGuid = zone.getGUID(), longDelay = zoneDef.repositionCards})
     end
 
     local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)

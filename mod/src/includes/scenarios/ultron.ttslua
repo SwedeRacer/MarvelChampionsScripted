@@ -89,7 +89,6 @@ function prepareScenario_ultron()
     currentScenario.droneDefinition = {
             name = "Ultron Drone",
             type = "minion",
-            --aspect = "encounter",
             health = "1",
             attack = "1",
             scheme = "1"

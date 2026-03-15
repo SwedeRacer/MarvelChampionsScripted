@@ -461,7 +461,7 @@ function clearPlaymat()
    local group = "player" .. playerColor
 
    if(heroManager) then
-      heroManager.call("clearHero", {playerColor = playerColor })
+      heroManager.call("clearHero", {playerColor = playerColor, skipScenarioCheck = true})
    end
 
    Global.call("deleteZoneGroup", {group = group})

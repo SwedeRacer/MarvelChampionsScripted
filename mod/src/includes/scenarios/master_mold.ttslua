@@ -42,10 +42,9 @@ scenarios["masterMold"] =
     },
     cards={
         magnetoAlly={
-            cardId="32172",
+            cardId="32172b",
             position={0, 1.00, 1.25},
-            scale=Vector(Global.getVar("CARD_SCALE_PLAYER")),
-            flipped=true
+            scale=Vector(Global.getVar("CARD_SCALE_PLAYER"))
         }
     },
     decks={

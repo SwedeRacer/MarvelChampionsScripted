@@ -137,8 +137,10 @@ end
 function addCountersAndTokensToCard(params)
   local card = params.card
   local zoneGuid = params.zoneGuid
+  local longDelay = params.longDelay or false
+  local delay = longDelay and 3 or 1
 
-  Wait.condition(function()
+  local addCounterFunction = function()
       if (card.isDestroyed()) then
         return
       end
@@ -167,11 +169,15 @@ function addCountersAndTokensToCard(params)
             })
         end
       end, 15)
-    end, 
+    end
+
+  Wait.condition(
+    addCounterFunction, 
     function()
       return card.isDestroyed() or card.resting
     end, 
-    3)
+    delay,
+    addCounterFunction)
 end
 
 function addStandardCounterToCard(params)
@@ -244,7 +250,9 @@ function addConfiguredCounterToCard(params)
   end
 
   local cardData = params.cardData or getCardData({card = card})
-  if(not cardData or not cardData.counter) then return end
+  if(not cardData or not cardData.counter) then
+    return
+  end
 
   local value = 0
   local retainedValue = getCardValue({cardGuid = card.getGUID(), property = "configuredRetainedValue"})
