@@ -1,5 +1,5 @@
 function onLoad()
-    --showReleaseNotesUI()
+    showReleaseNotesUI()
 
     addContextMenuItem("Spawn Card", createUI)
 
@@ -328,7 +328,7 @@ function showReleaseNotesUI()
             {
                 tag = "Image",
                 attributes = {
-                    image = "https://steamusercontent-a.akamaihd.net/ugc/13113401984033737242/B2F326B7B8AFC8C424244CECAA35918B5D1981D7/",
+                    image = "https://d2xdqryaauvaie.cloudfront.net/assets/release-notes-20260418a.png",
                     rectAlignment = "MiddleCenter",
                     raycastTarget = "true",
                     height = "500",

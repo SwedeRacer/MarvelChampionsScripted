@@ -365,9 +365,13 @@ function threatAdded_wreckingCrew()
 
     for schemeKey, scheme in pairs(currentScenario.schemes) do
         if(scheme.key ~= "main") then
+            local currentThreat = 0
             local threatCounter = getObjectFromGUID(scheme.threatCounter.guid)
-            threatCounter.call("adjustValue", {adjustment = 1})
-            local currentThreat = threatCounter.call("getValue")
+
+            if(threatCounter) then
+                threatCounter.call("adjustValue", {adjustment = 1})
+                currentThreat = threatCounter.call("getValue")
+            end
 
             if(currentThreat == highestThreat) then
                 table.insert(highestThreatVillains, scheme.villainKey)

@@ -481,20 +481,28 @@ function rotateCountersWithCard(params)
 
   local itemsOnCard = getItemsOnCard({card = card})
 
+  local configuredCounterGuid = getCardValue({cardGuid = card.getGUID(), property = "configuredCounterGuid"})
+  local standardCounterGuid = getCardValue({cardGuid = card.getGUID(), property = "standardCounterGuid"})
+
   for _, item in ipairs(itemsOnCard) do
-      local itemPosition = item.getPosition()
-      local offset = itemPosition - cardPosition
-      local radians = math.rad(spinDelta)
-      local cosTheta = math.cos(radians)
-      local sinTheta = math.sin(radians)
-      local rotatedOffset = Vector(
-        offset.x * cosTheta - offset.z * sinTheta,
-        offset.y,
-        offset.x * sinTheta + offset.z * cosTheta
-      )
-      item.setPosition(cardPosition + rotatedOffset, false, false)
-      if(item.hasTag("token")) then
-        item.setRotation({0, item.getRotation()[2] - spinDelta, 0})
+      local itemGuid = item.getGUID()
+      local shouldRotateItem = (not item.hasTag("counter")) or itemGuid == configuredCounterGuid or itemGuid == standardCounterGuid
+
+      if (shouldRotateItem) then
+        local itemPosition = item.getPosition()
+        local offset = itemPosition - cardPosition
+        local radians = math.rad(spinDelta)
+        local cosTheta = math.cos(radians)
+        local sinTheta = math.sin(radians)
+        local rotatedOffset = Vector(
+          offset.x * cosTheta - offset.z * sinTheta,
+          offset.y,
+          offset.x * sinTheta + offset.z * cosTheta
+        )
+        item.setPosition(cardPosition + rotatedOffset, false, false)
+        if(item.hasTag("token")) then
+          item.setRotation({0, item.getRotation()[2] - spinDelta, 0})
+        end
       end
   end
 

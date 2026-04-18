@@ -529,7 +529,7 @@ function drawCards(params)
 
    objectToDrawFrom.deal(numberToDraw, getValue("playerColor"))
 
-   disableZones()
+   --disableZones()
    
    Wait.frames(function()
       if(isPlayerDeck and numberToDraw >= availableCards) then
@@ -551,34 +551,34 @@ function drawCards(params)
    1)
 end
 
-function disableZones(params)
-   local zonePrefixes = {"hero-", "heroExit-"}
-   local suppressedTag = "suppressed"
-   local playerColor = getValue("playerColor")
-   local delay = params and params.delay or 60
+-- function disableZones(params)
+--    local zonePrefixes = {"hero-", "heroExit-"}
+--    local suppressedTag = "suppressed"
+--    local playerColor = getValue("playerColor")
+--    local delay = params and params.delay or 60
 
-   for _, prefix in ipairs(zonePrefixes) do
-      local zoneDef = Global.call("getZoneDefinition", {zoneIndex = prefix .. playerColor})
-      if(zoneDef) then
-         local zone = getObjectFromGUID(zoneDef.guid)
-         if(zone) then
-            zone.addTag(suppressedTag)
-         end
-      end
-   end
+--    for _, prefix in ipairs(zonePrefixes) do
+--       local zoneDef = Global.call("getZoneDefinition", {zoneIndex = prefix .. playerColor})
+--       if(zoneDef) then
+--          local zone = getObjectFromGUID(zoneDef.guid)
+--          if(zone) then
+--             zone.addTag(suppressedTag)
+--          end
+--       end
+--    end
 
-   Wait.frames(function()
-      for _, prefix in ipairs(zonePrefixes) do
-         local zoneDef = Global.call("getZoneDefinition", {zoneIndex = prefix .. playerColor})
-         if(zoneDef) then
-            local zone = getObjectFromGUID(zoneDef.guid)
-            if(zone) then
-               zone.removeTag(suppressedTag)
-            end
-         end
-      end
-   end, delay)
-end
+--    Wait.frames(function()
+--       for _, prefix in ipairs(zonePrefixes) do
+--          local zoneDef = Global.call("getZoneDefinition", {zoneIndex = prefix .. playerColor})
+--          if(zoneDef) then
+--             local zone = getObjectFromGUID(zoneDef.guid)
+--             if(zone) then
+--                zone.removeTag(suppressedTag)
+--             end
+--          end
+--       end
+--    end, delay)
+-- end
 
 function isPlayerDeck(deck)
    local deckPosition = deck.getPosition()

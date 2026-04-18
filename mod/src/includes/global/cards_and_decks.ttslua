@@ -636,124 +636,436 @@ function getDeckOrCardAtPosition(params)
     return card
 end
 
-function discardFromEncounterDeck(params)
-    local searchFunction = params.searchFunction
-    local searchFunctionTarget = params.searchFunctionTarget
-    local searchForCards = searchFunction ~= nil
-    local cardsToDiscard = params.cardsToDiscard or 0
-    local cardsToFind = params.cardsToFind or 0
-    local stopWhenCardsFound = params.stopWhenCardsFound
-    params.minimumY = 2.5
+function getDeckOrCardCount(params)
+    local object = params.object
 
-    local callBackFunction = params.callBackFunction
-    local callBackTarget = params.callBackTarget
-
-    local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
-    local deckPosition = Vector(scenarioManager.call("getEncounterDeckPosition"))
-    local discardPosition = Vector(scenarioManager.call("getEncounterDiscardPosition"))
-
-    local destination = calculateDestination(params)
-    local deckDepleted = false
-    local cardsDiscarded = 0
-    local cardsFound = 0
-    local stopDiscarding = false
-
-    local deck = getDeckOrCardAtPosition({
-        position = deckPosition
-    })
-    local discardPile = getDeckOrCardAtPosition({
-        position = discardPosition
-    })
-
-    if not deck then
-        refreshEncounterDeck()
+    if (not object and params.position) then
+        object = getDeckOrCardAtPosition({
+            position = params.position
+        })
     end
 
-    Wait.condition(
-        function()
-            startLuaCoroutine(self, "discardEncounterCoroutine")
-        end, 
-        function()
-            return discardPile == nil or discardPile.isDestroyed() or discardPile.resting
-        end, 
-        3, 
-        function()
-            startLuaCoroutine(self, "discardEncounterCoroutine")
+    if (not object) then
+        return 0
+    end
+
+    if (object.tag == "Deck") then
+        return object.getQuantity()
+    end
+
+    return 1
+end
+
+function getDeckOrCardAtExactPosition(params)
+    local position = Vector(params.position)
+    local tolerance = params.tolerance or 0.75
+    local objects = findInRadiusBy(position, tolerance, isCardOrDeck, false)
+    local card = nil
+    local cardDistance = nil
+
+    position["y"] = 0
+
+    for _, object in pairs(objects) do
+        local objectPosition = object.getPosition()
+        local dx = objectPosition.x - position.x
+        local dz = objectPosition.z - position.z
+        local distance = (dx * dx) + (dz * dz)
+
+        if (object.tag == "Deck") then
+            return object
+        elseif (object.tag == "Card" and (not cardDistance or distance < cardDistance)) then
+            card = object
+            cardDistance = distance
         end
-    )
+    end
+
+    return card
+end
+
+function discardFromEncounterDeck(params)
+    encounterDiscardQueue = encounterDiscardQueue or {}
+    encounterDiscardActive = encounterDiscardActive or false
+
+    local request = {}
+
+    for key, value in pairs(params) do
+        request[key] = value
+    end
+
+    request.minimumY = 2.5
+
+    table.insert(encounterDiscardQueue, request)
+
+    if (encounterDiscardActive) then
+        return
+    end
+
+    encounterDiscardActive = true
 
     function discardEncounterCoroutine()
-        while not stopDiscarding do
-            local card = discardCardFromDeck({
-                deckPosition = deckPosition,
-                discardPosition = discardPosition,
-                discardRotation = destination.rotation
+        local shuffleFlag = "shuffling-encounter"
+        local burstWindowFrames = 6
+        local deckPollFrames = 20
+        local idleExitFrames = 6
+
+        local function getEncounterPositions()
+            local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
+
+            if (not scenarioManager) then
+                return nil, nil
+            end
+
+            return Vector(scenarioManager.call("getEncounterDeckPosition")),
+                Vector(scenarioManager.call("getEncounterDiscardPosition"))
+        end
+
+        local function waitForDeckObject(deckPosition, maxFrames)
+            local object = getDeckOrCardAtPosition({
+                position = deckPosition
             })
 
-            cardsDiscarded = cardsDiscarded + 1
+            if (object) then
+                return object
+            end
 
-            if not card then
-                deckDepleted = true
+            object = getDeckOrCardAtExactPosition({
+                position = deckPosition
+            })
+
+            local count = 0
+
+            while (not object and count < maxFrames) do
+                count = count + 1
+                coroutine.yield(0)
+                object = getDeckOrCardAtExactPosition({
+                    position = deckPosition
+                })
+            end
+
+            return object
+        end
+
+        local function waitForDiscardedCard(card, discardPosition, maxFrames)
+            local count = 0
+
+            while (count < maxFrames) do
+                local discardPile = getDeckOrCardAtExactPosition({
+                    position = discardPosition,
+                    tolerance = 3
+                })
+
+                if (card) then
+                    if (card.isDestroyed and card.isDestroyed()) then
+                        if (discardPile and discardPile.resting) then
+                            return
+                        end
+                    elseif (card.resting and objectIsAtPosition({
+                        object = card,
+                        position = discardPosition,
+                        tolerance = 3
+                    })) then
+                        return
+                    end
+                elseif (discardPile and discardPile.resting) then
+                    return
+                end
+
+                count = count + 1
+                coroutine.yield(0)
+            end
+        end
+
+        local function waitForEncounterDeck(deckPosition)
+            local deckOrCard = waitForDeckObject(deckPosition, deckPollFrames)
+
+            if (deckOrCard) then
+                return deckOrCard
+            end
+
+            refreshEncounterDeck()
+
+            local count = 0
+
+            while (count < 180) do
+                deckOrCard = getDeckOrCardAtPosition({
+                    position = deckPosition
+                })
+
+                if (not deckOrCard) then
+                    deckOrCard = getDeckOrCardAtExactPosition({
+                        position = deckPosition
+                    })
+                end
+
+                if ((not Global.getVar(shuffleFlag)) and deckOrCard and deckOrCard.resting) then
+                    return deckOrCard
+                end
+
+                count = count + 1
+                coroutine.yield(0)
+            end
+
+            return waitForDeckObject(deckPosition, deckPollFrames)
+        end
+
+        local function discardNextEncounterCard(discardPosition, discardRotation)
+            local deckPosition = nil
+            deckPosition = select(1, getEncounterPositions())
+
+            if (not deckPosition) then
+                return nil
+            end
+
+            local deckOrCard = waitForEncounterDeck(deckPosition)
+
+            if (not deckOrCard) then
+                return nil
+            end
+
+            local card = nil
+
+            if (deckOrCard.tag == "Deck") then
+                card = deckOrCard.takeObject()
+            else
+                card = deckOrCard
+            end
+
+            moveCard({
+                card = card,
+                destinationPosition = discardPosition,
+                destinationRotation = discardRotation,
+                moveFast = true
+            })
+
+            return card
+        end
+
+        local function isSimpleEncounterDiscard(nextRequest)
+            return (nextRequest.cardsToDiscard or 0) == 1 and
+                nextRequest.searchFunction == nil and
+                (nextRequest.cardsToFind or 0) == 0 and
+                not nextRequest.stopWhenCardsFound and
+                nextRequest.callBackFunction == nil
+        end
+
+        local function countLeadingSimpleDiscards()
+            local count = 0
+
+            for _, queuedRequest in ipairs(encounterDiscardQueue) do
+                if (not isSimpleEncounterDiscard(queuedRequest)) then
+                    break
+                end
+
+                count = count + 1
+            end
+
+            return count
+        end
+
+        while true do
+            if (#encounterDiscardQueue == 0) then
+                local idleCount = 0
+
+                while (#encounterDiscardQueue == 0 and idleCount < idleExitFrames) do
+                    idleCount = idleCount + 1
+                    coroutine.yield(0)
+                end
+
+                if (#encounterDiscardQueue == 0) then
+                    break
+                end
+            end
+
+            local deckPosition, discardPosition = getEncounterPositions()
+
+            if (not deckPosition or not discardPosition) then
+                encounterDiscardQueue = {}
                 break
             end
 
-            if (searchForCards and cardsFound < cardsToFind) then
-                local cardIsMatch = searchFunctionTarget.call(searchFunction, {
-                    card = card
-                })
-                if (cardIsMatch) then
-                    moveCard({
-                        card = card,
-                        destinationPosition = destination.position,
-                        destinationRotation = destination.rotation,
-                        moveFast = true
-                    })
-                    cardsFound = cardsFound + 1
+            local nextRequest = encounterDiscardQueue[1]
+
+            if (isSimpleEncounterDiscard(nextRequest)) then
+                local destination = calculateDestination(nextRequest)
+                local deckOrCard = waitForEncounterDeck(deckPosition)
+
+                if (not deckOrCard) then
+                    table.remove(encounterDiscardQueue, 1)
+                else
+                    for i = 1, burstWindowFrames do
+                        coroutine.yield(0)
+                    end
+
+                    deckOrCard = waitForEncounterDeck(deckPosition)
+
+                    if (not deckOrCard) then
+                        table.remove(encounterDiscardQueue, 1)
+                    else
+                        local pendingDiscards = countLeadingSimpleDiscards()
+                        local deckCount = getDeckOrCardCount({
+                            object = deckOrCard
+                        })
+                        local discardsToProcess = math.min(pendingDiscards, deckCount)
+                        local shouldRefresh = pendingDiscards >= deckCount
+                        local completedDiscards = 0
+                        local lastDiscardedCard = nil
+
+                        for i = 1, discardsToProcess do
+                            table.remove(encounterDiscardQueue, 1)
+                        end
+
+                        for i = 1, discardsToProcess do
+                            local card = discardNextEncounterCard(discardPosition, destination.rotation)
+
+                            if (not card) then
+                                break
+                            end
+
+                            completedDiscards = i
+                            lastDiscardedCard = card
+
+                            if (i < discardsToProcess) then
+                                local count = 0
+                                local nextDeckObject = getDeckOrCardAtExactPosition({
+                                    position = deckPosition
+                                })
+
+                                while (not nextDeckObject and count < deckPollFrames) do
+                                    count = count + 1
+                                    coroutine.yield(0)
+                                    nextDeckObject = getDeckOrCardAtExactPosition({
+                                        position = deckPosition
+                                    })
+                                end
+                            end
+                        end
+
+                        if (shouldRefresh and completedDiscards == discardsToProcess) then
+                            waitForDiscardedCard(lastDiscardedCard, discardPosition, 150)
+                            refreshEncounterDeck()
+
+                            local count = 0
+
+                            while (count < 180) do
+                                local deck = getDeckOrCardAtPosition({
+                                    position = deckPosition
+                                })
+
+                                if ((not Global.getVar(shuffleFlag)) and deck and deck.resting) then
+                                    break
+                                end
+
+                                count = count + 1
+                                coroutine.yield(0)
+                            end
+                        end
+                    end
                 end
-            end
+            else
+                local currentRequest = table.remove(encounterDiscardQueue, 1)
+                local searchFunction = currentRequest.searchFunction
+                local searchFunctionTarget = currentRequest.searchFunctionTarget
+                local searchForCards = searchFunction ~= nil
+                local cardsToDiscard = currentRequest.cardsToDiscard or 0
+                local cardsToFind = currentRequest.cardsToFind or 0
+                local stopWhenCardsFound = currentRequest.stopWhenCardsFound
+                local callBackFunction = currentRequest.callBackFunction
+                local callBackTarget = currentRequest.callBackTarget
+                local destination = calculateDestination(currentRequest)
+                local deckDepleted = false
+                local cardsDiscarded = 0
+                local cardsFound = 0
+                local stopDiscarding = false
+                local lastDiscardedCard = nil
 
-            stopDiscarding = deckDepleted or (stopWhenCardsFound and cardsFound >= cardsToFind) or
-                                 (cardsToDiscard > 0 and cardsDiscarded >= cardsToDiscard)
+                while not stopDiscarding do
+                    local card = discardNextEncounterCard(discardPosition, destination.rotation)
 
-            if (not stopDiscarding) then
-                for i = 1, 40 do
-                    coroutine.yield(0)
+                    if (not card) then
+                        deckDepleted = true
+                        break
+                    end
+
+                    cardsDiscarded = cardsDiscarded + 1
+                    lastDiscardedCard = card
+
+                    if (searchForCards and cardsFound < cardsToFind) then
+                        local cardIsMatch = searchFunctionTarget.call(searchFunction, {
+                            card = card
+                        })
+
+                        if (cardIsMatch) then
+                            moveCard({
+                                card = card,
+                                destinationPosition = destination.position,
+                                destinationRotation = destination.rotation,
+                                moveFast = true
+                            })
+                            cardsFound = cardsFound + 1
+                        end
+                    end
+
+                    deckDepleted = getDeckOrCardAtExactPosition({
+                        position = deckPosition
+                    }) == nil
+                    stopDiscarding = deckDepleted or
+                        (stopWhenCardsFound and cardsFound >= cardsToFind) or
+                        (cardsToDiscard > 0 and cardsDiscarded >= cardsToDiscard)
+
+                    if (not stopDiscarding) then
+                        for i = 1, 40 do
+                            coroutine.yield(0)
+                        end
+                    end
                 end
-            end
-        end
 
-        if callBackFunction then
-            callBackTarget.call(callBackFunction)
-        end
+                if (callBackFunction) then
+                    callBackTarget.call(callBackFunction)
+                end
 
-        if searchForCards and cardsFound < cardsToFind then
-            message = params.notFoundMessage
-            messageType = params.notFoundMessageType or MESSAGE_TYPE_INFO
-            playerColor = params.playerColor
+                if (searchForCards and cardsFound < cardsToFind) then
+                    local message = currentRequest.notFoundMessage
+                    local messageType = currentRequest.notFoundMessageType or MESSAGE_TYPE_INFO
+                    local playerColor = currentRequest.playerColor
 
-            if (message) then
-                displayMessage({
-                    message = message,
-                    messageType = messageType,
-                    playerColor = playerColor
-                })
-            end
-        end
+                    if (message) then
+                        displayMessage({
+                            message = message,
+                            messageType = messageType,
+                            playerColor = playerColor
+                        })
+                    end
+                end
 
-        Wait.frames(function()
-            local deck = getDeckOrCardAtPosition({
-                position = deckPosition
-            })
-            if (not deck) then
-                Wait.frames(function()
-                    broadcastToAll("refreshing encounter deck.", {1,1,1})
+                if (deckDepleted and lastDiscardedCard) then
+                    waitForDiscardedCard(lastDiscardedCard, discardPosition, 150)
                     refreshEncounterDeck()
-                end, 45)
+
+                    local count = 0
+
+                    while (count < 180) do
+                        local deck = getDeckOrCardAtPosition({
+                            position = deckPosition
+                        })
+
+                        if ((not Global.getVar(shuffleFlag)) and deck and deck.resting) then
+                            break
+                        end
+
+                        count = count + 1
+                        coroutine.yield(0)
+                    end
+                end
             end
-        end, 30)
+        end
+
+        encounterDiscardActive = false
+        discardEncounterCoroutine = nil
 
         return 1
     end
+
+    startLuaCoroutine(self, "discardEncounterCoroutine")
 end
 
 function discardCardFromDeck(params)
@@ -861,13 +1173,19 @@ end
 
 function discardFromPlayerDeck(params)
     local playerColor = params.playerColor
-    local numberOfCards = params.numberOfCards
+    local numberOfCards = params.numberOfCards or 1
     local heroManager = getObjectFromGUID(GUID_HERO_MANAGER)
     local playmat = heroManager.call("getPlaymat", {
         playerColor = playerColor
     })
     local deckPosition = Vector(playmat.call("getPlayerDeckPosition"))
     local discardPosition = Vector(playmat.call("getPlayerDiscardPosition"))
+    local pendingDiscardVar = "pending-player-deck-discard-" .. playerColor
+    local activeDiscardVar = "discarding-player-deck-" .. playerColor
+    local shuffleFlag = "shuffling-" .. playerColor
+    local burstWindowFrames = 6
+    local deckPollFrames = 20
+    local idleExitFrames = 6
 
     local destination = calculateDestination({
         destinationPosition = discardPosition,
@@ -875,52 +1193,198 @@ function discardFromPlayerDeck(params)
         minimumY = 2.5
     })
 
-    function discardCoroutine()
-        for i = 1, numberOfCards do
-            local card = discardCardFromDeck({
-                deckPosition = deckPosition,
-                discardPosition = destination.position,
-                discardRotation = destination.rotation
+    Global.setVar(pendingDiscardVar, (Global.getVar(pendingDiscardVar) or 0) + numberOfCards)
+
+    if (Global.getVar(activeDiscardVar)) then
+        return
+    end
+
+    Global.setVar(activeDiscardVar, true)
+
+    local coroutineName = "discardCoroutine_" .. playerColor
+
+    _G[coroutineName] = function()
+        local function waitForDeckObject(maxFrames)
+            local object = getDeckOrCardAtPosition({
+                position = deckPosition
             })
 
-            if (not card) then
-                Wait.frames(function()
-                    refreshPlayerDeck({
-                        deckPosition = deckPosition,
-                        discardPosition = discardPosition,
-                        playerColor = playerColor
-                    })
-                end, 30)
-
-                return 1
+            if (object) then
+                return object
             end
 
+            object = getDeckOrCardAtExactPosition({
+                position = deckPosition
+            })
+
             local count = 0
-            while count < 40 do
+
+            while (not object and count < maxFrames) do
+                count = count + 1
+                coroutine.yield(0)
+                object = getDeckOrCardAtExactPosition({
+                    position = deckPosition
+                })
+            end
+
+            return object
+        end
+
+        local function waitForDiscardedCard(card, maxFrames)
+            local count = 0
+
+            while (count < maxFrames) do
+                local discardPile = getDeckOrCardAtExactPosition({
+                    position = discardPosition,
+                    tolerance = 3
+                })
+
+                if (card) then
+                    if (card.isDestroyed and card.isDestroyed()) then
+                        if (discardPile and discardPile.resting) then
+                            return
+                        end
+                    elseif (card.resting and objectIsAtPosition({
+                        object = card,
+                        position = discardPosition,
+                        tolerance = 3
+                    })) then
+                        return
+                    end
+                elseif (discardPile and discardPile.resting) then
+                    return
+                end
+
                 count = count + 1
                 coroutine.yield(0)
             end
         end
 
-        Wait.frames(function()
-            local deck = getDeckOrCardAtPosition({
-                position = deckPosition
-            })
-            if (not deck) then
-                Wait.frames(function()
-                    refreshPlayerDeck({
-                        deckPosition = deckPosition,
-                        discardPosition = discardPosition,
-                        playerColor = playerColor
-                    })
-                end, 20)
+        local function discardNextCard()
+            local deckOrCard = waitForDeckObject(deckPollFrames)
+
+            if (not deckOrCard) then
+                return nil
             end
-        end, 30)
+
+            local card = nil
+
+            if (deckOrCard.tag == "Deck") then
+                card = deckOrCard.takeObject()
+            else
+                card = deckOrCard
+            end
+
+            moveCard({
+                card = card,
+                destinationPosition = destination.position,
+                destinationRotation = destination.rotation,
+                moveFast = true
+            })
+
+            return card
+        end
+
+        while true do
+            if ((Global.getVar(pendingDiscardVar) or 0) == 0) then
+                local idleCount = 0
+
+                while ((Global.getVar(pendingDiscardVar) or 0) == 0 and idleCount < idleExitFrames) do
+                    idleCount = idleCount + 1
+                    coroutine.yield(0)
+                end
+
+                if ((Global.getVar(pendingDiscardVar) or 0) == 0) then
+                    break
+                end
+            end
+
+            local deckOrCard = waitForDeckObject(deckPollFrames)
+
+            if (not deckOrCard) then
+                Global.setVar(pendingDiscardVar, 0)
+                break
+            end
+
+            local deckCount = getDeckOrCardCount({
+                object = deckOrCard
+            })
+
+            for i = 1, burstWindowFrames do
+                coroutine.yield(0)
+            end
+
+            local pendingDiscards = Global.getVar(pendingDiscardVar) or 0
+            local discardsToProcess = math.min(pendingDiscards, deckCount)
+            local shouldRefresh = discardsToProcess >= deckCount
+
+            if (discardsToProcess == 0) then
+                break
+            end
+
+            Global.setVar(pendingDiscardVar, math.max(0, pendingDiscards - discardsToProcess))
+            local completedDiscards = 0
+            local lastDiscardedCard = nil
+
+            for i = 1, discardsToProcess do
+                local card = discardNextCard()
+
+                if (not card) then
+                    Global.setVar(pendingDiscardVar, 0)
+                    break
+                end
+
+                completedDiscards = i
+                lastDiscardedCard = card
+
+                if (i < discardsToProcess) then
+                    local count = 0
+                    local nextDeckObject = getDeckOrCardAtExactPosition({
+                        position = deckPosition
+                    })
+
+                    while (not nextDeckObject and count < deckPollFrames) do
+                        count = count + 1
+                        coroutine.yield(0)
+                        nextDeckObject = getDeckOrCardAtExactPosition({
+                            position = deckPosition
+                        })
+                    end
+                end
+            end
+
+            if (shouldRefresh and completedDiscards == discardsToProcess) then
+                waitForDiscardedCard(lastDiscardedCard, 150)
+                refreshPlayerDeck({
+                    deckPosition = deckPosition,
+                    discardPosition = discardPosition,
+                    playerColor = playerColor
+                })
+
+                local count = 0
+
+                while (count < 180) do
+                    local deck = getDeckOrCardAtPosition({
+                        position = deckPosition
+                    })
+
+                    if ((not Global.getVar(shuffleFlag)) and deck and deck.resting) then
+                        break
+                    end
+
+                    count = count + 1
+                    coroutine.yield(0)
+                end
+            end
+        end
+
+        Global.setVar(activeDiscardVar, false)
+        _G[coroutineName] = nil
 
         return 1
     end
 
-    startLuaCoroutine(self, "discardCoroutine")
+    startLuaCoroutine(self, coroutineName)
 end
 
 function refreshPlayerDeck(params)
@@ -1106,7 +1570,7 @@ function countCardIconsInPlay(params)
     return count, cardList
 end
 
-function getDeckPositions()
+function getDeckPositions(includeDeck, includeDiscard)
     local deckPositions = {}
     local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
     local heroManager = getObjectFromGUID(GUID_HERO_MANAGER)
@@ -1115,10 +1579,14 @@ function getDeckPositions()
         return deckPositions
     end
 
-    local heroDeckPositions = heroManager.call("getAllPlayerDeckPositions", {includeDiscard = true}) or {}
+    local heroDeckPositions = heroManager.call("getAllPlayerDeckPositions", {includeDeck = includeDeck, includeDiscard = includeDiscard}) or {}
 
-    table.insert(deckPositions, Vector(scenarioManager.call('getEncounterDeckPosition')))
-    table.insert(deckPositions, Vector(scenarioManager.call('getEncounterDiscardPosition')))
+    if(includeDeck) then
+        table.insert(deckPositions, Vector(scenarioManager.call('getEncounterDeckPosition')))
+    end
+    if(includeDiscard) then
+        table.insert(deckPositions, Vector(scenarioManager.call('getEncounterDiscardPosition')))
+    end
 
     for _, position in pairs(heroDeckPositions) do
         table.insert(deckPositions, Vector(position))
@@ -1173,12 +1641,24 @@ function discardCardOrDeck(params)
     local object = params.object
     if(not object) then return end
 
-    if(object.hasTag("counter") or object.hasTag("token")) then
+    if(not object.getLock() and (object.hasTag("counter") or object.hasTag("token"))) then
         object.destruct()
         return
     end
  
     local objectType = object.tag
+
+    local deckPositions = getDeckPositions(true, false)
+
+    for _, deckPosition in pairs(deckPositions) do
+        if objectIsAtPosition({
+            object = object,
+            position = deckPosition
+        }) then
+            objectType = "Deck"
+            break
+        end
+    end
 
     if(objectType == "Deck") then
         --If the object is a player deck, discard from that deck (refresh if needed))
