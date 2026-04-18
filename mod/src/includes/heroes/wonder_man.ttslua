@@ -1,0 +1,51 @@
+heroes["wonderMan"] = {
+    name = "Wonder Man",
+    identityCardId = "58001",
+    hitPoints = 12,
+    tileImageUrl = "https://steamusercontent-a.akamaihd.net/ugc/13614362273256811224/EF181C5DA07E3894118B35B8461E2F2D7CF10D8A/",
+    playmatImageUrl = "https://d2xdqryaauvaie.cloudfront.net/playmats/playmat-wonder-man.png",
+    obligationCardId = "58025",
+    teams = "avengers",
+    decks = {
+        hero = {
+			["58002"] = 1,
+			["58003"] = 3,
+			["58004"] = 2,
+			["58005"] = 3,
+			["58006"] = 2,
+			["58007"] = 1,
+			["58008"] = 1,
+			["58009"] = 1,
+			["58010"] = 1,
+			["58011"] = 1
+        },
+        starter = {
+			["58012"] = 1,
+			["58013"] = 1,
+			["58014"] = 1,
+			["58015"] = 1,
+			["58016"] = 3,
+			["58017"] = 3,
+			["58018"] = 3,
+			["58019"] = 3,
+			["58020"] = 3,
+			["58021"] = 3,
+			["58022"] = 1,
+			["01088"] = 1,
+			["58024"] = 1
+        },
+        nemesis = {
+			["58026"] = 1,
+			["58027"] = 1,
+			["58028"] = 1,
+			["58029"] = 2
+        }
+    },
+	cards = {
+        ionicPhysiology = {
+            cardId = "58002",
+            name = "Ionic Physiology",
+            offset = {-4.94, 3, -0.02}
+        }
+    }
+}

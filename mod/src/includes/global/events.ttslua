@@ -1,23 +1,7 @@
 function onLoad()
-    -- Create context Menus
+    showReleaseNotesUI()
+
     addContextMenuItem("Spawn Card", createUI)
-
-    spawnObject({
-        type = "Notecard",
-        position = {0,1,0},
-        callback_function = function(spawned_object)
-            spawned_object.setName("Release Notes")
-            spawned_object.setDescription(
-[[Lots of changes in the latest update!
-- New scenario toolbar
-- Custom hotkeys (including new context-sensitive discard)
-- Deck import will now look for both private and public decks
-- Updated rulebook to version 1.7
-- Various bug fixes and improvements
-
-Check out the mod's page for more info!]]
-            )
-        end})
 
     addHotkey("Begin villain phase (add threat)", function(playerColor, object, pointerPosition, isKeyUp)
         local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
@@ -80,7 +64,6 @@ function onObjectNumberTyped(object, playerColor, number)
 end
 
 function onObjectEnterZone(zone, card)
-
     local zoneDef = getZoneDefinition({zone = zone})
     if (not zoneDef) then
         return
@@ -117,7 +100,7 @@ function onObjectEnterZone(zone, card)
     end
 
     if(zoneDef.addCountersAndTokens) then
-        addCountersAndTokensToCard({card = card, cardData = cardData, zoneGuid = zone.getGUID()})
+        addCountersAndTokensToCard({card = card, cardData = cardData, zoneGuid = zone.getGUID(), longDelay = zoneDef.repositionCards})
     end
 
     local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
@@ -331,4 +314,40 @@ function onObjectRotate(object, spin, flip, player_color, old_spin, old_flip)
     if (spin == old_spin) then return end
 
     rotateCountersWithCard({card = object, spin = spin, oldSpin = old_spin})
+end
+
+function showReleaseNotesUI()
+    local scenarioUI = {{
+        tag = "Panel",
+        attributes = {
+            height = "500",
+            width = "750",
+            color = "rgba(0,0,0,1)"
+        },
+        children = {
+            {
+                tag = "Image",
+                attributes = {
+                    image = "https://d2xdqryaauvaie.cloudfront.net/assets/release-notes-20260418a.png",
+                    rectAlignment = "MiddleCenter",
+                    raycastTarget = "true",
+                    height = "500",
+                    width = "750",
+                    onClick = "hideReleaseNotesUI"
+                }
+            }
+        }
+    }}
+
+    Global.UI.setXmlTable(scenarioUI)
+end
+
+function hideReleaseNotesUI()
+    local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
+    if(not scenarioManager or not scenarioManager.call("isScenarioInProgress")) then
+        Global.UI.setXml("")
+        return
+    end
+
+    scenarioManager.call("displayScenarioSelectionUI")
 end

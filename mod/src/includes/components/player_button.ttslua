@@ -14,19 +14,22 @@ function onload()
     createSuitUpButton()
 end
 
-function createSuitUpButton()
+function createSuitUpButton(params)
+    local skipScenarioCheck = params and params.skipScenarioCheck
     local buttons = self.getButtons()
     if(#buttons > 1) then return end
 
     local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
-    local scenarioManager = getObjectFromGUID(Global.getVar("GUID_SCENARIO_MANAGER"))
 
     if(heroManager.call("getSelectedHero", {positionColor=positionColor})) then
         return
     end
 
-    if(scenarioManager.call("isScenarioInProgress")) then
-        return
+    if not skipScenarioCheck then
+        local scenarioManager = getObjectFromGUID(Global.getVar("GUID_SCENARIO_MANAGER"))
+        if scenarioManager.call("isScenarioInProgress") then
+            return
+        end
     end
 
     self.createButton({
@@ -321,7 +324,14 @@ end
 
 function importDeck()
     if(not importDeckId or importDeckId == "") then
-        broadcastToColor("Please enter a valid deck ID", positionColor, tint)
+        local message = "Please enter a valid deck ID"
+
+        if(Player[positionColor].seated) then
+            broadcastToColor(message, positionColor, tint)
+        else
+            broadcastToAll(message, tint)
+        end
+
         return
     end
 

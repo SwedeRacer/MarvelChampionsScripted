@@ -275,10 +275,12 @@ function placeVillainStage_kang(params)
 
   if(stage.stageNumber == 1) then
     kangPlaceStage1(params.heroCount)
+    currentScenario.schemes.main.currentStageNumber = 1
     return
   end
 
   if(stage.stageNumber == 2) then
+    currentScenario.schemes.main.currentStageNumber = 2
     kangPlaceStage2()
     return
   end

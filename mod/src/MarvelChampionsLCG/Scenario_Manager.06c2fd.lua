@@ -389,6 +389,13 @@ function setUpScenario()
         return
     end
 
+    if(not currentScenario.fullyScripted) then
+        displayMessage({
+            message = "This scenario is not fully scripted. You may need to perform some steps of setup and villain or theme advancement manually.",
+            messageType = Global.getVar("MESSAGE_TYPE_ALERT")
+        })
+    end
+
     currentScenario.inProgress = true
 
     local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))

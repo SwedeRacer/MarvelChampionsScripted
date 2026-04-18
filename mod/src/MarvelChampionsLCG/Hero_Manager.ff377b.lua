@@ -236,10 +236,11 @@ function saveData()
 end
 
 function clearHero(params)
+  local skipScenarioCheck = params and params.skipScenarioCheck
   selectedHeroes[params.playerColor] = nil
   local playerControl = getPlayerControl({playerColor = params.playerColor})
 
-  playerControl.call("createSuitUpButton")
+  playerControl.call("createSuitUpButton", {skipScenarioCheck = skipScenarioCheck})
 end
 
 function hideHeroSelection()
@@ -255,7 +256,8 @@ function hideHeroSelection()
   end
 end
 
-function showHeroSelection()
+function showHeroSelection(params)
+  local skipScenarioCheck = params and params.skipScenarioCheck
   local objects = getAllObjects()
 
   for _, object in pairs(objects) do
@@ -263,7 +265,7 @@ function showHeroSelection()
       object.call("showRemoveButton")
     end
     if(object.hasTag("player-control")) then
-      object.call("createSuitUpButton")
+      object.call("createSuitUpButton", {skipScenarioCheck = skipScenarioCheck})
     end
   end
 end
@@ -279,14 +281,21 @@ function getHeroByPlayerColor(params)
 end
 
 function getPlayerDeckPositions(params)
- local includeDiscard = params.includeDiscard or false
- local hero = params.hero
+  local includeDeck = true
+  local includeDiscard = true
+  
+  if(params.includeDeck ~= nil) then includeDeck = params.includeDeck end
+  if(params.includeDiscard ~= nil) then includeDiscard = params.includeDiscard end
+
+  local hero = params.hero
 
  local deckPositions = {}
  local deckPosition = hero.deckPosition
  deckPosition[2] = -0.5
 
- table.insert(deckPositions, deckPosition)
+ if(includeDeck) then
+  table.insert(deckPositions, deckPosition)
+ end
 
  if(includeDiscard) then
   local discardPosition = hero.discardPosition
@@ -298,11 +307,16 @@ function getPlayerDeckPositions(params)
 end
 
 function getAllPlayerDeckPositions(params)
-  local includeDiscard = params.includeDiscard or false
+  local includeDeck = true
+  local includeDiscard = true
+  
+  if(params.includeDeck ~= nil) then includeDeck = params.includeDeck end
+  if(params.includeDiscard ~= nil) then includeDiscard = params.includeDiscard end
+
   local deckPositions = {}
 
   for _, hero in pairs(selectedHeroes) do
-    local playerDeckPositions = getPlayerDeckPositions({hero = hero, includeDiscard = includeDiscard})
+    local playerDeckPositions = getPlayerDeckPositions({hero = hero, includeDeck = includeDeck, includeDiscard = includeDiscard})
 
     for _, position in pairs(playerDeckPositions) do
       table.insert(deckPositions, position)
@@ -709,7 +723,7 @@ function findAndPlacePlayerCard(params)
   local scale = params.scale or cardScale.player
   local flipCard = params.flipped or false
   local settings = params.settings or {}
-  local deckPositions = getPlayerDeckPositions({hero = hero, includeDiscard = true})
+  local deckPositions = getPlayerDeckPositions({hero = hero})
   local decks = {}
   local rotation = params.rotation or {0, 180, 0}
 
@@ -744,19 +758,6 @@ function findAndPlacePlayerCard(params)
   end
 
   startLuaCoroutine(self, "moveCardCoroutine")
-end
-
-function findCardInDecks(decks, cardName)
- for _, deck in pairs(decks) do
-  for _, card in pairs(deck.getObjects()) do
-   if(card.name == cardName) then
-    return {
-     deck = deck,
-     cardGuid = card.guid
-    }
-   end
-  end
- end
 end
 
 function placeCardFromDeck(deck, cardGuid, position, scale, rotation, flipped, deleteCard)
@@ -979,3 +980,5 @@ require('!/heroes/falcon')
 require('!/heroes/winter_soldier')
 require('!/heroes/tigra')
 require('!/heroes/hulkling')
+require('!/heroes/wonder_man')
+require('!/heroes/hercules')

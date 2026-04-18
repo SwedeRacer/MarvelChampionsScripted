@@ -253,3 +253,16 @@ modularSets["tricksterTango"] =
         ["55066"]=1
     }
 }
+
+modularSets["allVersusAll"] =
+{
+    name="All Versus All",
+    modular=true,
+    cards = {
+        ["59041"]=1,
+        ["59042"]=1,
+        ["59043"]=1,
+        ["59044"]=1,
+        ["59045"]=1
+    }
+}

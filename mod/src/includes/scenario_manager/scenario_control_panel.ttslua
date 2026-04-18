@@ -68,6 +68,15 @@ function showScenarioControlPanel()
 		table.insert(messages, messageLabel)
 	end
 
+	local messagePanelHeight = 50
+	local expandIcon = "▼"
+
+	if recentMessageChars > 100 or recentMessageCount > 2 then
+		messagePanelHeight = 150
+		autoExpandActive = true
+		expandIcon = "▲"
+	end
+
 	local turnCount = currentScenario.turnCount or 1
 
     local scenarioControlPanelUI = {{
@@ -154,7 +163,7 @@ function showScenarioControlPanel()
 					rectAlignment = "UpperLeft",
 					offsetXY = "103 0",
 					width = "370",
-					height = "50",
+					height = tostring(messagePanelHeight),
 					contentSizeFitter = "vertical"
 				},
 				children = {
@@ -163,7 +172,7 @@ function showScenarioControlPanel()
 						attributes={
 							id = "messageScrollView",
 							width="370",
-							height="50",
+							height=tostring(messagePanelHeight),
 							rectAlignment="UpperCenter",
 							verticalScrollbarVisibility="AutoHideAndExpandViewport",
 							horizontalScrollbarVisibility="Hidden",
@@ -193,7 +202,7 @@ function showScenarioControlPanel()
 				attributes = {
 					id = "expandMessagesButton",
 					rectAlignment = "UpperLeft",
-					offsetXY = "443 -50",
+					offsetXY = "443 -" .. tostring(messagePanelHeight),
 					width = "25",
 					height = "15",
 					color = "rgb(0.9, 0.9, 0.9)",
@@ -206,7 +215,7 @@ function showScenarioControlPanel()
 						tag = "Text",
 						attributes = {
 							id = "expandMessagesLabel",
-							text = "▼",
+							text = expandIcon,
 							alignment = "MiddleCenter",
 							fontSize = "14",
 							color = "rgb(0,0,0)"
@@ -317,14 +326,52 @@ function threatButtonClicked(player, value, id)
 	local heroCount = getHeroCount()
 
 	local accelerationFromSchemeStage = (schemeStage.acceleration or 0) + ((schemeStage.accelerationPerPlayer or 1) * heroCount)
-	local accelerationFromCards = Global.call("countCardIconsInPlay", {iconType="acceleration"})
+	local accelerationFromCards, accelerationCardList = Global.call("countCardIconsInPlay", {iconType="acceleration"})
 	local accelerationFromCounters = Global.call("getTotalAccelerationFromCounters")
 
 	local totalAcceleration = accelerationFromSchemeStage + accelerationFromCards + accelerationFromCounters
 
 	threatCounter.call("adjustValue", {adjustment = totalAcceleration})
 
-	--TODO: post message about threat added (including sources)
+	local threatSources = {}
+
+	if(accelerationFromCounters > 0) then
+		table.insert(threatSources, tostring(accelerationFromCounters) .. " from acceleration counters")
+	end
+
+	if(accelerationFromCards > 0) then
+		local cardListString = ""
+		if #accelerationCardList == 1 then
+			cardListString = accelerationCardList[1]
+		elseif #accelerationCardList == 2 then
+			cardListString = accelerationCardList[1] .. " and " .. accelerationCardList[2]
+		elseif #accelerationCardList > 2 then
+			for i = 1, #accelerationCardList - 1 do
+				cardListString = cardListString .. accelerationCardList[i] .. ", "
+			end
+			cardListString = cardListString .. "and " .. accelerationCardList[#accelerationCardList]
+		end
+		
+		local cardMessage = ""
+
+		if(#accelerationCardList == 1) then
+			cardMessage = "1 from the acceleration icon on " .. cardListString
+		else
+			cardMessage = tostring(accelerationFromCards) .. " from the acceleration icons on " .. cardListString
+		end
+		
+		table.insert(threatSources, cardMessage)
+	end
+
+	local message = "Added " .. tostring(totalAcceleration) .. " threat to the main scheme"
+
+	if #threatSources > 0 then
+		message = message .. " (includes " .. table.concat(threatSources, " and ") .. ")"
+	end
+
+	message = message .. "."
+
+	displayMessage({message = message, messageType = messageTypes.info})
 
 	local functionName = "threatAdded_" .. currentScenario.key
 
@@ -337,11 +384,39 @@ function encounterCardsButtonClicked(player, value, id)
 	if(not currentScenario) then return end
 	
 	local heroCount = getHeroCount()
-	local hazardFromCards = Global.call("countCardIconsInPlay", {iconType="hazard"})
+	local hazardFromCards, hazardCardList = Global.call("countCardIconsInPlay", {iconType="hazard"})
 	local cardsToDeal = heroCount + hazardFromCards
 	Global.call("dealEncounterCardsToAllPlayers", {numberOfCards = cardsToDeal})
 
-	--TODO: post message about cards dealt (including sources)
+	local cardListString = nil
+
+	if(hazardFromCards > 0) then
+		cardListString = ""
+		if #hazardCardList == 1 then
+			cardListString = hazardCardList[1]
+		elseif #hazardCardList == 2 then
+			cardListString = hazardCardList[1] .. " and " .. hazardCardList[2]
+		elseif #hazardCardList > 2 then
+			for i = 1, #hazardCardList - 1 do
+				cardListString = cardListString .. hazardCardList[i] .. ", "
+			end
+			cardListString = cardListString .. "and " .. hazardCardList[#hazardCardList]
+		end
+	end
+
+	local message = cardsToDeal == 1 and 
+		"Dealt 1 encounter card" 
+		or "Dealt " .. tostring(cardsToDeal) .. " encounter cards"
+
+	if #hazardCardList == 1 then
+		message = message .. " (includes " .. tostring(hazardFromCards) .. " from the hazard icon on " .. cardListString .. ")"
+	elseif #hazardCardList > 1 then
+		message = message .. " (includes " .. tostring(hazardFromCards) .. " from hazard icons on " .. cardListString .. ")"
+	end
+
+	message = message .. "."
+
+	displayMessage({message = message, messageType = messageTypes.info})
 end
 
 function turnCounterClicked(player, value, id)

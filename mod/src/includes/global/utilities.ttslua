@@ -280,7 +280,7 @@ function deleteObjectsByGroup(params)
                 local itemsOnCard = getItemsOnCard({card = object})
 
                 for i, item in ipairs(itemsOnCard) do
-                    if(item.interactable and item.tag == "Tile") then                    
+                    if(item.interactable and item.tag == "Tile") then
                         item.destruct()
                     end
                 end
@@ -289,4 +289,10 @@ function deleteObjectsByGroup(params)
             object.destruct()
         end
     end
+end
+
+function stripCardSuffix(params)
+    local cardName = params.cardName or ""
+    local result = cardName:match("^(.*)%-") or cardName
+    return result:match("^%s*(.-)%s*$") or result
 end

@@ -26,6 +26,9 @@
       "g": 1,
       "b": 1
     },
+    "Tags": [
+      "token"
+    ],
     "LayoutGroupSortIndex": 0,
     "Value": 0,
     "Locked": true,
