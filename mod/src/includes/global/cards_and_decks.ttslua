@@ -240,9 +240,13 @@ end
 
 function isFaceUp(params)
     local object = params.object
+    local ignoreToggles = params.ignoreToggles or false
+
+    if(not ignoreToggles and not object.hide_when_face_down) then return true end
+
     local z = object.getRotation()["z"]
 
-    return z > 355 or z < 5 or not object.hide_when_face_down
+    return z > 355 or z < 5
 end
 
 function isFaceDown(params)

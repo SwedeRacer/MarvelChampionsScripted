@@ -23245,45 +23245,29 @@ PACK_39 = [[
   },
   {
     "name": "The Champion",
-    "code": "39003a",
+    "code": "39003",
     "type": "environment",
     "aspect": "encounter",
     "BackURL": "/card-faces/39003B.jpg",
     "FrontURL": "/card-faces/39003A.jpg",
     "text": "If there are at least 5[per_hero] ratings counters here, flip this environment <i>(without removing ratings counters)</i>.",
     "flavor": "\"In this corner, we have your ninety-nine time defending Mojoverse champion, the mighty MaGog!\"",
-    "traits": "Booing Crowd."
-  },
-  {
-    "name": "The Champion",
-    "code": "39003b",
-    "type": "environment",
-    "aspect": "encounter",
-    "BackURL": "/card-faces/39003A.jpg",
-    "FrontURL": "/card-faces/39003B.jpg",
-    "text": "Underdogs - <b>Forced Response</b>: After The Champion flips to this side, each player draws 1 card.\n<b>If there are at least 10[per_hero] ratings counters here, MaGog wins again and the players lose the game.</b>",
-    "traits": "Cheering Crowd."
+    "traits": "Booing Crowd.",
+    "counter": "general",
+    "counterName": "Ratings"
   },
   {
     "name": "The Challengers",
-    "code": "39004a",
+    "code": "39004",
     "type": "environment",
     "aspect": "encounter",
     "BackURL": "/card-faces/39004B.jpg",
     "FrontURL": "/card-faces/39004A.jpg",
     "text": "If there are at least 5[per_hero] ratings counters here, flip this environment <i>(without removing ratings counters)</i>.\n<i>(The players wow the crowd by placing ratings counters here.)</i>",
     "flavor": "\"And in this corner, hailing from the tiny, insignificant planet of Earth, we have our challengers!\" - Mojo",
-    "traits": "Booing Crowd."
-  },
-  {
-    "name": "The Challengers",
-    "code": "39004b",
-    "type": "environment",
-    "aspect": "encounter",
-    "BackURL": "/card-faces/39004A.jpg",
-    "FrontURL": "/card-faces/39004B.jpg",
-    "text": "Tag Team - <b>Forced Response</b>: After The Challengers flips to this side, search the encounter deck and discard pile for Surprise Contender and put it into play engaged with the first player. If it is already in play, give it a tough status card.\n<b>If there are at least 10[per_hero] ratings counters here, you wow the crowd and the players win the game.</b>",
-    "traits": "Cheering Crowd."
+    "traits": "Booing Crowd.",
+    "counter": "general",
+    "counterName": "Ratings"
   },
   {
     "name": "Jolt of Adrenaline",

@@ -354,7 +354,7 @@ function threatButtonClicked(player, value, id)
 		
 		local cardMessage = ""
 
-		if(#accelerationCardList == 1) then
+		if(accelerationFromCards == 1) then
 			cardMessage = "1 from the acceleration icon on " .. cardListString
 		else
 			cardMessage = tostring(accelerationFromCards) .. " from the acceleration icons on " .. cardListString

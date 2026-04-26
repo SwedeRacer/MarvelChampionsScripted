@@ -95,7 +95,7 @@ function onObjectEnterZone(zone, card)
         resizeCardOnEnterZone(card, zoneDef.rescaleOnEnterTo)
     end
 
-    if(zoneDef.repositionCards) then
+    if(zoneDef.repositionCards and not zone.hasTag("suppressReposition")) then
         positionCardOnEnterZone(card, zoneDef.zoneIndex)
     end
 
@@ -165,7 +165,7 @@ function onObjectLeaveZone(zone, card)
         resizeCardOnLeaveZone(card, cardData.type or "")
     end
 
-    if(zoneDef.repositionCards) then
+    if(zoneDef.repositionCards and not zone.hasTag("suppressReposition")) then
         repositionCardsInZone({
             zone = zone
         })
@@ -284,6 +284,29 @@ function onPlayerAction(player, action, targets)
                 player.pingTable(pingPosition)
             end
         end
+    end
+
+    if (action == Player.Action.FlipOver) then
+        if (#targets > 1) then
+            return true
+        end
+        local card = targets[1]
+
+        if (not isCard(card)) then
+            return true
+        end
+
+        local zones = card.getZones()
+
+        for _, zone in ipairs(zones) do
+            zone.addTag("suppressReposition")
+        end
+
+        Wait.frames(function()
+            for _, zone in ipairs(zones) do
+                zone.removeTag("suppressReposition")
+            end
+        end, 60)
     end
 
     return true

@@ -279,16 +279,16 @@ scenarios["wreckingCrew"] =
     },
     zones={
         sideScheme={
-            supressCreation = true
+            suppressCreation = true
         },
         attachment={
-            supressCreation = true
+            suppressCreation = true
         },
         environment={
-            supressCreation = true
+            suppressCreation = true
         },
         encounterDeck={
-            supressCreation = true
+            suppressCreation = true
         }
     }
 }

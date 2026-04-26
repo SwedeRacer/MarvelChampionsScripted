@@ -1,7 +1,9 @@
 scenarios["spiral"] =
 {
     name="Spiral",
+    fullyScripted = true,
     tileImageUrl="https://steamusercontent-a.akamaihd.net/ugc/2292958473528765604/FDFCD5C252498E09082C204894EC5834E1B8B584/",
+    preselectModularEncounterSets = false,
     villains={
         spiral={
             name="Spiral",
@@ -65,8 +67,19 @@ scenarios["spiral"] =
             }
         }
     },
-    modularSets={}
+        modularSets={
+        crime = "exclude",
+        fantasy = "exclude",
+        horror = "exclude",
+        sciFi = "exclude",
+        sitcom = "exclude",
+        western = "exclude"
+    }
 }
+
+function getEncounterSetControlPanel_spiral()
+    return getEncounterSetControlPanel_mojo()
+end
 
 function prepareScenario_spiral()
   buildGenreQueue()

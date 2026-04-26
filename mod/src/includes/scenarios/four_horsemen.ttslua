@@ -156,7 +156,7 @@ scenarios["fourHorsemen"] =
             height = 1
         },
         attachment = {
-            supressCreation = true
+            suppressCreation = true
         },
         encounterDeck = {
             position = {49.25, 1.00, 15.75},

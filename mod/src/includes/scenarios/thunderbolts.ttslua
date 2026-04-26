@@ -101,8 +101,9 @@ scenarios["thunderbolts"] =
 }
 
 function getEncounterSetControlPanel_thunderbolts()
-    local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
-    local heroCount = heroManager.call("getHeroCount")
+    -- local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
+    -- local heroCount = heroManager.call("getHeroCount")
+    local heroCount = getHeroCount()
     local encounterSetControlPanel = {
         tag = "Panel",
         attributes = {

@@ -78,6 +78,7 @@ function getNewZoneCardPosition(params)
    if(cardNumber == nil) then return nil end
 
    if(params.forNextCard) then cardNumber = cardNumber + 1 end
+   if(params.offset) then cardNumber = cardNumber + params.offset end
 
    return getZoneCardPosition({zoneDef = zoneDef, cardNumber = cardNumber})
  end
@@ -183,4 +184,18 @@ function getZoneDefinitionsByType(params)
    if(not layoutManager) then return nil end
 
    return layoutManager.call("getZoneDefinitionsByType", params)
+end
+
+function suppressRepositionInZone(params)
+   local layoutManager = getObjectFromGUID(GUID_LAYOUT_MANAGER)
+   if(not layoutManager) then return nil end
+
+   local zoneDef = getZoneDefinition(params)
+   local zone = getObjectFromGUID(zoneDef.guid)
+
+   zone.addTag("suppressReposition")
+
+   Wait.frames(function()
+      zone.removeTag("suppressReposition")
+   end, 60)
 end
