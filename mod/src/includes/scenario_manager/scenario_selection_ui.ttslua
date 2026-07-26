@@ -75,41 +75,43 @@ function getEncounterSetButtons(guid)
 
     for i, encounterSet in ipairs(orderedList) do
         local encounterKey = encounterSet.key
-        local setInScenario = scenarioSets[encounterKey] or "no"
-        local setIsSelected = selectedSets[encounterKey] ~= nil and "true" or "false"
+        local setInScenario = string.lower(tostring(scenarioSets[encounterKey] or "no"))
+        local setIsSelected = (setInScenario == "recommended" or setInScenario == "required") and "true" or "false"
         local textColor = textColorDefault
 
-        if(setInScenario == "required") then
-            textColor = textColorRequired
-        elseif(setInScenario == "recommended") then
-            textColor = textColorRecommended
-        end
+        if(setInScenario ~= "exclude") then
+            if(setInScenario == "required") then
+                textColor = textColorRequired
+            elseif(setInScenario == "recommended") then
+                textColor = textColorRecommended
+            end
 
-        local label = encounterSet.label or encounterSet.name
-        local fontSize = 15
+            local label = encounterSet.label or encounterSet.name
+            local fontSize = 15
 
-        local encounterSetButton = {
-            tag = "Panel",
-            attributes = {
-                padding = "10 0 0 0"
-            },
-            children = {{
-                tag = "Toggle",
-                value = label,
+            local encounterSetButton = {
+                tag = "Panel",
                 attributes = {
-                    id = encounterKey,
-                    onValueChanged = guid .. "/modularEncounterSetToggleChanged",
-                    height = tostring(encounterSetButtonHeight),
-                    width = tostring(encounterSetButtonWidth),
-                    fontSize = tostring(fontSize),
-                    textColor = textColor,
-                    colors = "rgba(1,1,1,1)|rgba(1,1,1,1)|rgba(1,1,1,1)|rgba(1,1,1,1)",
-                    isOn = setIsSelected
-                }
-            }}
-        }
-        table.insert(encounterSetButtons, encounterSetButton)
-    end    
+                    padding = "10 0 0 0"
+                },
+                children = {{
+                    tag = "Toggle",
+                    value = label,
+                    attributes = {
+                        id = encounterKey,
+                        onValueChanged = guid .. "/modularEncounterSetToggleChanged",
+                        height = tostring(encounterSetButtonHeight),
+                        width = tostring(encounterSetButtonWidth),
+                        fontSize = tostring(fontSize),
+                        textColor = textColor,
+                        colors = "rgba(1,1,1,1)|rgba(1,1,1,1)|rgba(1,1,1,1)|rgba(1,1,1,1)",
+                        isOn = setIsSelected
+                    }
+                }}
+            }
+            table.insert(encounterSetButtons, encounterSetButton)
+        end
+    end
 
     return encounterSetButtons
 end
@@ -893,6 +895,7 @@ function clearSelectedModularEncounterSets()
 end
 
 function selectEncounterSet(encounterSetKey, isSelected)
+    log("selectEncounterSet: " .. encounterSetKey .. " isSelected: " .. tostring(isSelected))
     if(isSelected == nil) then
         isSelected = "True"
     end

@@ -240,9 +240,13 @@ end
 
 function isFaceUp(params)
     local object = params.object
+    local ignoreToggles = params.ignoreToggles or false
+
+    if(not ignoreToggles and not object.hide_when_face_down) then return true end
+
     local z = object.getRotation()["z"]
 
-    return z > 355 or z < 5 or not object.hide_when_face_down
+    return z > 355 or z < 5
 end
 
 function isFaceDown(params)
@@ -372,6 +376,8 @@ end
 
 function moveCardFromDeckById(params)
     local cardId = params.cardId
+    if(not cardId) then return false end
+
     local deckPosition = params.deckPosition
     local destinationPosition = Vector(params.destinationPosition)
     local destinationRotation = params.destinationRotation and Vector(params.destinationRotation) or Vector({0, 180, 0})
@@ -393,6 +399,7 @@ function moveCardFromDeckById(params)
 
     if(cardOrDeck.tag == "Deck") then
         local deck = cardOrDeck
+
         for i, cardInDeck in ipairs(deck.getObjects()) do
             local id = getCardId({
                 card = cardInDeck
@@ -408,15 +415,11 @@ function moveCardFromDeckById(params)
     end
 
     if(not card) then
-        local id = getCardId({
-            card = cardOrDeck
-        })
-
-        if (id == cardId) then
-            card = cardOrDeck
-        end
+        local id = getCardId({card = cardOrDeck})
+ 
+        if (id == cardId) then card = cardOrDeck end
     end
-
+    
     if(not card) then return false end
 
     moveCard({
@@ -478,6 +481,8 @@ end
 
 function moveCardFromEncounterDeckById(params)
     local cardId = params.cardId
+    if(not cardId) then return false end
+
     local searchInDiscard = params.searchInDiscard or false
     local flipCard = params.flipCard or false
     local destination = calculateDestination(params)
@@ -1459,46 +1464,31 @@ function importDeck(params)
     local deckId = params.deckId
     local callbackFunction = params.callbackFunction
     local callbackTarget = params.callbackTarget
+    local deckInfos = {}
 
     -- Try private deck URL first
     WebRequest.get(MARVEL_CDB_PRIVATE_DECK_URL .. deckId, function(res)
-        local deckInfo = nil
-
         if res.is_done and not res.is_error then
             if not string.find(res.text, "<!DOCTYPE html>") then
-                deckInfo = JSON.decode(res.text)
+                table.insert(deckInfos, JSON.decode(res.text))
             end
-        end
-
-        -- If private deck succeeded, use it
-        if deckInfo ~= nil then
-            callbackTarget.call(callbackFunction, {
-                deckInfo = deckInfo
-            })
-            return
         end
 
         -- Private deck failed, try public deck URL
         WebRequest.get(MARVEL_CDB_PUBLIC_DECK_URL .. deckId, function(res2)
-            local deckInfo2 = nil
-
             if res2.is_done and not res2.is_error then
                 if not string.find(res2.text, "<!DOCTYPE html>") then
-                    deckInfo2 = JSON.decode(res2.text)
+                    table.insert(deckInfos, JSON.decode(res2.text))
                 end
             end
 
-            -- If public deck succeeded, use it
-            if deckInfo2 ~= nil then
-                callbackTarget.call(callbackFunction, {
-                    deckInfo = deckInfo2
-                })
-                return
+            if(#deckInfos == 0) then
+                broadcastToAll("Deck " .. deckId .. " not found.\nMake sure the \"Share your decks\" checkbox is checked in your MarvelCDB account page!", {1, 0.27, 0})
             end
 
-            -- Both failed, show error
-            broadcastToAll("Deck " .. deckId .. " not found.\nMake sure the \"Share your decks\" checkbox is checked in your MarvelCDB account page!", {1, 0.27, 0})
-            callbackTarget.call(callbackFunction, { deckInfo = nil })
+            callbackTarget.call(callbackFunction, {
+                deckInfos = deckInfos
+            })
         end)
     end)
 end
@@ -1533,7 +1523,7 @@ function countCardIconsInPlay(params)
     local iconType = params.iconType
     local count = 0
     local allObjects = getAllObjects()
-    local deckPositions = getDeckPositions()
+    local deckPositions = getDeckPositions(true, true)
     local cardList = {}
 
     for _, object in pairs(allObjects) do

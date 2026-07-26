@@ -1,7 +1,9 @@
 scenarios["mojo"] =
 {
     name="Mojo",
+    fullyScripted = true,
     tileImageUrl="https://steamusercontent-a.akamaihd.net/ugc/2292958473528765513/0B1849865D7DC2D609879B9D02E723B0DDE60D7F/",
+    preselectModularEncounterSets = false,
     villains={
         mojo={
             name="Mojo",
@@ -30,7 +32,8 @@ scenarios["mojo"] =
                 stage1={
                     cardId="39025",
                     startingThreatPerPlayer=10,
-                    targetThreatPerPlayer=25
+                    targetThreatPerPlayer=25,
+                    flavorText="\"So, you think you cancel me?\" Mojo sneers. \"I'm in charge around here. You'll do what I say or you'll be fired... into the sun! Come to think of it, that would make for a great finale!\""
                 }
             }
         }
@@ -57,87 +60,242 @@ scenarios["mojo"] =
             }
         }
     },
-    modularSets={},
+    modularSets={
+      crime = "exclude",
+      fantasy = "exclude",
+      horror = "exclude",
+      sciFi = "exclude",
+      sitcom = "exclude",
+      western = "exclude"
+    },
     extras={
         wheelOfGenres={
             name="Wheel of Genres",
             guid="998f2b",
-            position={31.25, 0.96, 19.75},
+            position={18.25, 0.97, 22.45},
             rotation={0, 180, 0},
-            scale={3,1,3},
+            scale={3.05,1,3.05},
             locked=true
+        }
+    },
+    zones={
+        environment={
+            onEnterFunction="darkBeastDiscardSettingEnvironments"
         }
     }
 }
 
+function getEncounterSetControlPanel_mojo()
+  selectedScenario.mojoGenres = {
+    crime = {
+      name = "Crime",
+      modularSetKey = "crime",
+      environmentCardId = "39035",
+      available = true
+    },
+    fantasy = {
+      name = "Fantasy",
+      modularSetKey = "fantasy",
+      environmentCardId = "39041",
+      available = true
+    },
+    horror = {
+      name = "Horror",
+      modularSetKey = "horror",
+      environmentCardId = "39047",
+      available = true
+    },
+    sciFi = {
+      name = "Sci-Fi",
+      modularSetKey = "sciFi",
+      environmentCardId = "39053",
+      available = true
+    },
+    sitcom = {
+      name = "Sitcom",
+      modularSetKey = "sitcom",
+      environmentCardId = "39060",
+      available = true
+    },
+    western = {
+      name = "Western",
+      modularSetKey = "western",
+      environmentCardId = "39066",
+      available = true
+    }
+  }
+
+  local guid = self.getGUID()
+  local genreToggles = {}
+  local genreMessage = ""
+  local controlPanelHeight = ""
+
+  if(selectedScenario.key == "magog") then
+    genreMessage = "This scenario will include one of these genre encounter sets, selected randomly. Uncheck any sets that you want to exclude from this selection."
+    controlPanelHeight = "70"
+  elseif(selectedScenario.key == "spiral") then
+    genreMessage = "This scenario will include three of these genre encounter sets, selected randomly. Uncheck any sets that you want to exclude from this selection. (If you leave fewer than three sets checked, the checked sets will be used, and the remainder will be randomly selected from the unchecked sets.)"
+    controlPanelHeight = "85"
+  elseif(selectedScenario.key == "mojo") then
+    local heroCount = getHeroCount()
+    local numbers = {"two", "three", "four", "five"}
+    local numberText = numbers[heroCount]
+    genreMessage = "This scenario will include " .. numberText .. " of these genre encounter sets, selected randomly. Uncheck any sets that you want to exclude from this selection. (If you leave fewer than " .. numberText .. " sets checked, the checked sets will be used, and the remainder will be randomly selected from the unchecked sets.)"
+    controlPanelHeight = "85"
+  end
+
+  for key, genre in pairs(selectedScenario.mojoGenres) do
+    table.insert(genreToggles, {
+      tag = "Toggle",
+      value = genre.name,
+      attributes = {
+          id = "genre_" .. genre.modularSetKey,
+          onValueChanged = guid .. "/mojoToggleGenre",
+          height = "15",
+          width = "200",
+          fontSize = "15",
+          textColor = "rgba(1,1,1,1)",
+          colors = "rgba(1,1,1,1)|rgba(1,1,1,1)|rgba(1,1,1,1)|rgba(1,1,1,1)",
+          isOn = true
+      }
+    })
+  end
+
+  local encounterSetControlPanel = {
+      tag = "Panel",
+      attributes = {
+        preferredHeight = controlPanelHeight
+      },
+      children = {
+          {
+            tag = "VerticalLayout",
+            attributes = {
+              rectAlignment = "UpperLeft",
+              childAlignment = "UpperLeft",
+              childForceExpandHeight = "false",
+              spacing = "16",
+              contentSizeFitter = "vertical"
+            },
+            children = {
+              {
+                tag = "Text",
+                attributes = {
+                  rectAlignment = "UpperLeft",
+                  alignment = "UpperLeft",
+                  color = "rgba(1,1,1,1)"
+                },
+                value = genreMessage,
+              },
+              {
+                tag = "HorizontalLayout",
+                attributes = {
+                  rectAlignment = "UpperLeft",
+                  childAlignment = "UpperLeft",
+                  childForceExpandWidth = "false",
+                  spacing = "10"
+                },
+                children = genreToggles
+              }
+            },
+          }
+      }
+  }
+
+  return encounterSetControlPanel
+end
+
 function prepareScenario_mojo()
-  buildGenreQueue()
+  mojoBuildGenreQueue()
   currentScenario.genreIndex = 0
 end
 
 function finalizeSetup_mojo()
-  addNextGenre()
+  addNextGenre({shuffleIntoEncounterDeck=true})
 end
 
-function buildGenreQueue()
+function mojoBuildGenreQueue()
   local genreQueue = {}
+  local genresNeeded = 0
 
-  table.insert(genreQueue, {genreSetKey="crime", environmentCardId="39035"})
-  table.insert(genreQueue, {genreSetKey="fantasy", environmentCardId="39041"})
-  table.insert(genreQueue, {genreSetKey="horror", environmentCardId="39047"})
-  table.insert(genreQueue, {genreSetKey="sciFi", environmentCardId="39053"})
-  table.insert(genreQueue, {genreSetKey="sitcom", environmentCardId="39060"})
-  table.insert(genreQueue, {genreSetKey="western", environmentCardId="39066"})
+  if(currentScenario.key == "magog") then
+    genresNeeded = 1
+  elseif(currentScenario.key == "spiral") then
+    genresNeeded = 3
+  elseif(currentScenario.key == "mojo") then
+    local heroCount = getHeroCount()
+    genresNeeded = heroCount + 1
+  end
+
+  for key, genre in pairs(currentScenario.mojoGenres) do
+    if(genre.available) then
+      table.insert(genreQueue, genre.modularSetKey)
+    end
+  end
+
+  if(#genreQueue < genresNeeded) then
+    local unavailableGenres = {}
+
+    for key, genre in pairs(currentScenario.mojoGenres) do
+      if(not genre.available) then
+        table.insert(unavailableGenres, genre.modularSetKey)
+      end
+    end
+
+    unavailableGenres = Global.call("shuffleTable", {table = unavailableGenres})
+
+    for _, genreKey in ipairs(unavailableGenres) do
+      if(#genreQueue >= genresNeeded) then
+        break
+      end
+
+      table.insert(genreQueue, genreKey)
+    end
+  end
 
   genreQueue = Global.call("shuffleTable", {table = genreQueue})
 
   currentScenario.genreQueue = genreQueue
 end
 
-function addNextGenre()
+function addNextGenre(params)
   currentScenario.genreIndex = currentScenario.genreIndex + 1
-  local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
-  local heroCount = heroManager.call("getHeroCount")
+  local heroCount = getHeroCount()
 
   if(currentScenario.genreIndex > (heroCount + 1)) then
-    broadcastToAll("There's nothing good on!", {1,1,1})
+    Global.call("displayMessage", {message="There's nothing good on! (All genres have been added to the encounter deck.)", messageType = Global.getVar("MESSAGE_TYPE_INFO")})
     return
   end
 
-  local genreEnvironmentCardId = currentScenario.genreQueue[currentScenario.genreIndex].environmentCardId
-  Global.call("spawnCard", {
+  local genreEnvironmentCardId = currentScenario.mojoGenres[currentScenario.genreQueue[currentScenario.genreIndex]].environmentCardId
+  
+  mojoDiscardCurrentGenreEnvironment()
+
+  local wheelOfGenres = getItemFromManifest({key="wheelOfGenres"})
+
+  local newGenreCard = Global.call("spawnCard", {
     cardId = genreEnvironmentCardId, 
-    position = {20.75, 2.00, 29.75},  --TODO: create a constant (or better yet, add functionality for moving cards to a specific zone)
+    position = Global.call("ensureMinimumYPosition", {position = wheelOfGenres.getPosition(), minimumY = 1.25}),
     scale = defaults.encounterDeck.scale,
     tags = {"group-scenario"}
   })
-end
 
-function onCardEnterZone_mojo(params)
-  placeGenreSetFromEnvironment(params.zone, params.card)
-end
-
-function placeGenreSetFromEnvironment(zone, card)
-  local zoneDef = Global.call("getZoneDefinition", {zone = zone})
-
-  if (not zoneDef) then return end
-  if (zoneDef.zoneIndex ~= "environment") then return end
-
-  local cardId = Global.call("getCardProperty", {card = card, property = "code"})
+  Wait.frames(function()
+    Global.call("moveCard", {card = newGenreCard, zoneIndex = "environment"})
+  end, 10)
 
   local genreSetKey = ""
 
-  for _, genre in ipairs(currentScenario.genreQueue) do
-    if(genre.environmentCardId == cardId) then
-      genreSetKey = genre.genreSetKey
+  for _, genre in pairs(currentScenario.mojoGenres) do
+    if(genre.environmentCardId == genreEnvironmentCardId) then
+      genreSetKey = genre.modularSetKey
       break
     end
   end
 
   if(genreSetKey == "") then return end
 
-  for key, _ in pairs(currentScenario.modularSets) do
-    if(key == genreSetKey) then
+  for key, status in pairs(currentScenario.modularSets) do
+    if(key == genreSetKey and status ~= "exclude") then
       return
     end
   end
@@ -149,23 +307,64 @@ function placeGenreSetFromEnvironment(zone, card)
 
   newGenreSet = deepCopy(newGenreSet)
 
-  newGenreSet.cards[cardId] = nil
+  newGenreSet.cards[genreEnvironmentCardId] = nil
 
   local encounterDeckPos = Vector(getEncounterDeckPosition())
-  local spawnPosition = encounterDeckPos + Vector(0, 1, 0)
+  local spawnPosition = encounterDeckPos + Vector(0, 3, 0)
 
-  Global.call("spawnDeck", {
+  local genreDeck = Global.call("spawnDeck", {
     cards = newGenreSet.cards, 
     position = spawnPosition, 
     scale = defaults.encounterDeck.scale,
     cardTags = {"group-scenario"}
   })
 
-  Wait.frames(function() 
-    Global.call("shuffleDeck", {deckPosition = encounterDeckPos})
-    broadcastToAll(newGenreSet.name.." encounter set added to encounter deck.", {1,1,1})
-  end,
-  30)
+  if(params.shuffleIntoEncounterDeck) then
+    Wait.frames(function()
+      Global.call("shuffleDeck", {deckPosition = encounterDeckPos})
+    end,
+    60)
+  else
+    Wait.frames(function() 
+      genreDeck.shuffle()
+    end,
+    10)
+  end
+
+  Global.call("displayMessage", {message=newGenreSet.name.." encounter set added to encounter deck.", messageType = Global.getVar("MESSAGE_TYPE_INFO")})
 
   saveData()
+end
+
+function mojoToggleGenre(player, value, id)
+  local genreKey = string.gsub(id, "genre_", "")
+
+  for key, genre in pairs(selectedScenario.mojoGenres) do
+    if(genre.modularSetKey == genreKey) then
+      selectedScenario.mojoGenres[key].available = value == "True"
+      break
+    end
+  end
+
+  Global.UI.setAttribute(id, "isOn", value)
+end
+
+function mojoDiscardCurrentGenreEnvironment()
+  local zoneDef = Global.call("getZoneDefinition", {zoneIndex = "environment"})
+  local zone = getObjectFromGUID(zoneDef.guid)
+  local zoneItems = zone.getObjects()
+  
+  for i, v in ipairs(zoneItems) do
+    if(v.tag == "Card") then
+      local vCardData = Global.call("getCardData", {card = v})
+      if(not vCardData) then return end
+
+      local vCardId = vCardData.code
+      local vTraits = vCardData.traits or ""
+
+      if (string.find(vTraits, "Setting.", 1, true)) then
+        Global.call("discardEncounterCard", {discardFromPosition = v.getPosition()})
+      end
+    end
+  end
 end

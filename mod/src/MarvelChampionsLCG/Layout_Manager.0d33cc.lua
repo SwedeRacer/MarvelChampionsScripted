@@ -78,7 +78,7 @@ end
 function createZone(params)
     local zoneDef = params.zoneDef
 
-    if(zoneDef.supressCreation) then
+    if(zoneDef.suppressCreation) then
         return nil
     end
 

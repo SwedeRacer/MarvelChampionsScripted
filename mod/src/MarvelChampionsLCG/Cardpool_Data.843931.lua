@@ -4098,7 +4098,9 @@ PACK_16 = [[
     "text": "<i>Charge Up</i> - <b>Special:</b> Place 1 barrage counter here. Then, if there are 4 or more barrage counters here, deal 2 indirect damage to each player and remove all barrage counters from here.",
     "flavor": "<b><i>The Brotherhood of Badoon's ship is charging its cannons for a devastating attack against the heroes on the ground below.</i></b>",
     "isUnique": true,
-    "traits": "Aerial. Vehicle."
+    "traits": "Aerial. Vehicle.",
+    "counter": "general",
+    "counterName": "Barrage"
   },
   {
     "name": "Drang's Spear",
@@ -8953,7 +8955,9 @@ PACK_21 = [[
     "FrontURL": "/card-faces/21100A.jpg",
     "text": "<b>When Revealed:</b> Discard each other Avengers Tower from play.\n<b>Forced Response:</b> After damage is placed here, if there is at least 9[per player] damage here, the players lose the game.",
     "traits": "Damaged.",
-    "backText": "The unique rule does not apply to Avengers Tower.\n<b>Forced Response:</b> After damage is placed here, if there is at least 9[per_hero] damage here, remove all of it. Then flip Avenger's Tower over."
+    "backText": "The unique rule does not apply to Avengers Tower.\n<b>Forced Response:</b> After damage is placed here, if there is at least 9[per_hero] damage here, remove all of it. Then flip Avenger's Tower over.",
+    "counter": "health",
+    "counterName": "Damage"
   },
   {
     "name": "Focused Defense",
@@ -23245,45 +23249,29 @@ PACK_39 = [[
   },
   {
     "name": "The Champion",
-    "code": "39003a",
+    "code": "39003",
     "type": "environment",
     "aspect": "encounter",
     "BackURL": "/card-faces/39003B.jpg",
     "FrontURL": "/card-faces/39003A.jpg",
     "text": "If there are at least 5[per_hero] ratings counters here, flip this environment <i>(without removing ratings counters)</i>.",
     "flavor": "\"In this corner, we have your ninety-nine time defending Mojoverse champion, the mighty MaGog!\"",
-    "traits": "Booing Crowd."
-  },
-  {
-    "name": "The Champion",
-    "code": "39003b",
-    "type": "environment",
-    "aspect": "encounter",
-    "BackURL": "/card-faces/39003A.jpg",
-    "FrontURL": "/card-faces/39003B.jpg",
-    "text": "Underdogs - <b>Forced Response</b>: After The Champion flips to this side, each player draws 1 card.\n<b>If there are at least 10[per_hero] ratings counters here, MaGog wins again and the players lose the game.</b>",
-    "traits": "Cheering Crowd."
+    "traits": "Booing Crowd.",
+    "counter": "general",
+    "counterName": "Ratings"
   },
   {
     "name": "The Challengers",
-    "code": "39004a",
+    "code": "39004",
     "type": "environment",
     "aspect": "encounter",
     "BackURL": "/card-faces/39004B.jpg",
     "FrontURL": "/card-faces/39004A.jpg",
     "text": "If there are at least 5[per_hero] ratings counters here, flip this environment <i>(without removing ratings counters)</i>.\n<i>(The players wow the crowd by placing ratings counters here.)</i>",
     "flavor": "\"And in this corner, hailing from the tiny, insignificant planet of Earth, we have our challengers!\" - Mojo",
-    "traits": "Booing Crowd."
-  },
-  {
-    "name": "The Challengers",
-    "code": "39004b",
-    "type": "environment",
-    "aspect": "encounter",
-    "BackURL": "/card-faces/39004A.jpg",
-    "FrontURL": "/card-faces/39004B.jpg",
-    "text": "Tag Team - <b>Forced Response</b>: After The Challengers flips to this side, search the encounter deck and discard pile for Surprise Contender and put it into play engaged with the first player. If it is already in play, give it a tough status card.\n<b>If there are at least 10[per_hero] ratings counters here, you wow the crowd and the players win the game.</b>",
-    "traits": "Cheering Crowd."
+    "traits": "Booing Crowd.",
+    "counter": "general",
+    "counterName": "Ratings"
   },
   {
     "name": "Jolt of Adrenaline",
@@ -23379,7 +23367,10 @@ PACK_39 = [[
     "traits": "Escaped. Mystic.",
     "scheme": 1,
     "attackStar": true,
-    "stage": 1
+    "stage": 1,
+    "counter": "general",
+    "counterName": "Teleport",
+    "counterValue": 0
   },
   {
     "name": "Spiral",
@@ -23413,7 +23404,10 @@ PACK_39 = [[
     "traits": "Escaped. Mystic.",
     "scheme": 2,
     "attackStar": true,
-    "stage": 2
+    "stage": 2,
+    "counter": "general",
+    "counterName": "Teleport",
+    "counterValue": 0
   },
   {
     "name": "Spiral",
@@ -23431,7 +23425,10 @@ PACK_39 = [[
     "scheme": 2,
     "attackStar": true,
     "schemeStar": true,
-    "stage": 2
+    "stage": 2,
+    "counter": "general",
+    "counterName": "Teleport",
+    "counterValue": 0
   },
   {
     "name": "Spiral",
@@ -23447,7 +23444,10 @@ PACK_39 = [[
     "traits": "Escaped. Mystic.",
     "scheme": 2,
     "attackStar": true,
-    "stage": 3
+    "stage": 3,
+    "counter": "general",
+    "counterName": "Teleport",
+    "counterValue": 0
   },
   {
     "name": "Spiral",
@@ -23464,7 +23464,10 @@ PACK_39 = [[
     "attack": 3,
     "scheme": 2,
     "attackStar": true,
-    "stage": 3
+    "stage": 3,
+    "counter": "general",
+    "counterName": "Teleport",
+    "counterValue": 0
   },
   {
     "name": "Across the Mojoverse",

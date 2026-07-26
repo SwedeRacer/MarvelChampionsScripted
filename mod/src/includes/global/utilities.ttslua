@@ -104,10 +104,11 @@ end
 function calculateDestination(params)
     local zoneIndex = params.zoneIndex
     local minimumY = params.minimumY or 3
+    local zoneOffset = params.zoneOffset or 0
     local destination = {}
  
     if(zoneIndex) then
-       destination.position = ensureMinimumYPosition({position = getNewZoneCardPosition({zoneIndex = zoneIndex, forNextCard = true}), minimumY = minimumY})
+       destination.position = ensureMinimumYPosition({position = getNewZoneCardPosition({zoneIndex = zoneIndex, forNextCard = true, offset = zoneOffset}), minimumY = minimumY})
        destination.rotation = params.destinationRotation or (zoneIndex == "sideScheme" and {0,90,0} or {0,180,0})
     else
        destination.position = ensureMinimumYPosition({position = params.destinationPosition, minimumY = minimumY})
@@ -296,3 +297,155 @@ function stripCardSuffix(params)
     local result = cardName:match("^(.*)%-") or cardName
     return result:match("^%s*(.-)%s*$") or result
 end
+
+local displayDialogSelection = nil
+local displayDialogCallbackNames = {}
+
+local function escapeDialogXml(value)
+    local text = tostring(value or "")
+    text = string.gsub(text, "&", "&amp;")
+    text = string.gsub(text, "<", "&lt;")
+    text = string.gsub(text, ">", "&gt;")
+    text = string.gsub(text, '"', "&quot;")
+    text = string.gsub(text, "'", "&apos;")
+    return text
+end
+
+local function getDialogVisibilityColor(showTo)
+    local color = string.lower(tostring(showTo or ""))
+
+    if color == "green" then return PLAYER_COLOR_GREEN end
+    if color == "blue" then return PLAYER_COLOR_BLUE end
+    if color == "red" then return PLAYER_COLOR_RED end
+    if color == "yellow" then return PLAYER_COLOR_YELLOW end
+
+    return nil
+end
+
+local function getSeatedDialogVisibilityColor(showTo)
+    local visibilityColor = getDialogVisibilityColor(showTo)
+
+    if not visibilityColor then
+        return nil
+    end
+
+    if Player[visibilityColor] and Player[visibilityColor].seated then
+        return visibilityColor
+    end
+
+    return nil
+end
+
+local function clearDisplayDialogCallbacks()
+    for _, callbackName in ipairs(displayDialogCallbackNames) do
+        _G[callbackName] = nil
+    end
+
+    displayDialogCallbackNames = {}
+end
+
+function displayDialog(params)
+    local message = params.message or ""
+    local choices = params.choices or {}
+    local visibilityColor = getSeatedDialogVisibilityColor(params.showTo)
+    local callbackTarget = params.callbackTarget
+    local callbackFunction = params.callbackFunction
+    local visibilityAttribute = visibilityColor and (' visibility="' .. visibilityColor .. '"') or ""
+    local buttons = {}
+
+    displayDialogSelection = nil
+    clearDisplayDialogCallbacks()
+
+    for index, choice in ipairs(choices) do
+        local choiceText = tostring(choice.label)
+        local callbackName = "displayDialogChoice_" .. tostring(index) .. "_" .. tostring(math.random(100000, 999999))
+
+        _G[callbackName] = function(player, value, id)
+            displayDialogSelection = choiceText
+            Global.UI.setXml("")
+            clearDisplayDialogCallbacks()
+            
+            local callbackParams = {
+                player = player,
+                value = value,
+                id = id,
+                choiceKey = choice.key
+            }
+
+            callbackTarget.call(callbackFunction, callbackParams)
+        end
+
+        table.insert(displayDialogCallbackNames, callbackName)
+
+        local button = {
+            tag="Button",
+            value=escapeDialogXml(choiceText),
+            attributes={
+                onClick=callbackName,
+                height="55",
+                width="180",
+                preferredHeight="55",
+                preferredWidth="180",
+                flexibleHeight="0",
+                flexibleWidth="0",
+                fontSize="22",
+                textColor="rgb(1,1,1)",
+                color="rgb(0,0,0)",
+                id=choice.key
+            }
+        }
+
+        table.insert(buttons, button)
+    end
+
+    local dialog = {{
+        tag="Panel",
+        attributes={
+            id="displayDialogRoot",
+            width="760",
+            height="220",
+            rectAlignment="MiddleCenter",
+            color="rgb(0,0,0)"
+        },
+        children={
+            {
+                tag="VerticalLayout",
+                attributes={
+                    spacing="18",
+                    padding="24 24 24 24",
+                    childAlignment="MiddleCenter",
+                    childForceExpandWidth="true",
+                    childForceExpandHeight="false"
+                },
+                children={
+                    {
+                        tag="Text",
+                        value=escapeDialogXml(message),
+                        attributes={
+                            alignment="MiddleCenter",
+                            fontSize="28",
+                            color="rgb(1,1,1)",
+                            preferredHeight="80",
+                            flexibleHeight="0"
+                        }
+                    },
+                    {
+                        tag="HorizontalLayout",
+                        attributes={
+                            spacing="12",
+                            childAlignment="MiddleCenter",
+                            childForceExpandWidth="false",
+                            childForceExpandHeight="false",
+                            preferredHeight="60",
+                            flexibleHeight="0"
+                        },
+                        children=buttons
+                    }
+                }
+            }
+        }
+    }}
+
+    Global.UI.setXmlTable(dialog)
+end
+

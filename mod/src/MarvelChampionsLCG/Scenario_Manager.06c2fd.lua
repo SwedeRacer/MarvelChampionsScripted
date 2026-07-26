@@ -521,6 +521,7 @@ function setUpZones()
 
     local customZones = currentScenario.customZones or {}
     for key, zoneDef in pairs(customZones) do
+        zoneDef.group = "scenario"
         Global.call("createZone", {zoneDef = zoneDef})
     end
 end
@@ -1130,6 +1131,7 @@ function placeVillainCard(params)
     local scale = params.scale or defaults.villainDeck.scale
     local flipped = false
     local locked = true
+    local counterValue = params.counterValue
 
     if (params.flipped ~= nil) then
         flipped = params.flipped
@@ -1162,7 +1164,8 @@ function placeVillainCard(params)
     end, 30)
 
     Global.call("addConfiguredCounterToCard", {
-        card = villainCard
+        card = villainCard,
+        counterValue = counterValue
     })
 
     return villainCard
@@ -1720,8 +1723,20 @@ function placeVillainStage(villain, stage, heroCount)
     local villainScale = villain.deckScale or defaults.villainDeck.scale
 
     local stageNumber = string.sub(stage.key, -1)
+    local counterValue = nil
+    local flipped = stage.flipCard or false
 
-    if (stageNumber ~= "1" and stageNumber ~= "a") then
+    if (stageNumber ~= "1" and stageNumber ~= "A") then
+        local currentVillainCard = Global.call("getCardAtPosition", {position = villainPosition})
+        local counter = nil
+        
+        if(currentVillainCard) then
+            counter = Global.call("getCounterFromCard", {card = currentVillainCard, counterClass = "configured"})
+            if(currentVillainCard.is_face_down) then flipped = true end
+        end
+
+        if (counter ~= nil) then counterValue = counter.call("getValue") end
+
         Global.call("deleteCardAtPosition", {
             position = villainPosition
         })
@@ -1731,8 +1746,6 @@ function placeVillainStage(villain, stage, heroCount)
     if (stage.locked ~= nil) then
         locked = stage.locked
     end
-
-    local flipped = stage.flipCard or false
 
     if (stage.assetId ~= nil) then
         spawnAsset({
@@ -1752,17 +1765,18 @@ function placeVillainStage(villain, stage, heroCount)
             rotation = villainRotation,
             scale = villainScale,
             flipped = flipped,
-            locked = locked
+            locked = locked,
+            counterValue = counterValue
         })
     end
 
     local hitPoints = (stage.hitPoints or 0) + ((stage.hitPointsPerPlayer or 0) * heroCount)
     local villainHpCounter = getObjectFromGUID(villain.hpCounter.guid)
-
     Wait.frames(function()
         villainHpCounter.call("setValue", {
             value = hitPoints
         })
+
         configureSecondaryVillainButton(villainHpCounter, villain.hpCounter.secondaryButton)
         configureAdvanceVillainButton(villainHpCounter, stage.showAdvanceButton)
     end, 20)
@@ -1854,7 +1868,7 @@ function placeSchemeStage(schemeKey, stage, heroCount)
 
     local stageNumber = string.sub(stage.key, -1)
 
-    if (stageNumber ~= "1" and stageNumber ~= "a") then
+    if (stageNumber ~= "1" and stageNumber ~= "A") then
         Global.call("deleteCardAtPosition", {
             position = schemePosition
         })
@@ -2084,6 +2098,22 @@ function getSelectedSetCount()
     end
 
     return count
+end
+
+function findVillainCard()
+    local villainKey = currentScenario.activeVillainKey
+
+    if(not villainKey) then
+        for k, v in pairs(currentScenario.villains) do
+            villainKey = k
+        end
+    end
+
+    local villain = currentScenario.villains[villainKey]
+    local villainStage = villain.stages["stage" .. tostring(villain.currentStageNumber)]
+    local villainCardId = villainStage.cardId
+
+    return Global.call("findCard", {cardId = villainCardId})
 end
 
 require('!/scenario_manager/scenario_selection_ui')

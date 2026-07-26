@@ -1,22 +1,28 @@
 scenarios["magog"] =
 {
-    name="Magog",
+    name="MaGog",
+    fullyScripted = true,
     tileImageUrl="https://steamusercontent-a.akamaihd.net/ugc/2294085177750683604/AE1B97BB22EE7A1937AC56C601D264AD81B35F18/",
+    preselectModularEncounterSets = false,
     villains={
         magog={
             name="Magog",
             hpCounter={
                 imageUrl="https://steamusercontent-a.akamaihd.net/ugc/2294085177750683604/AE1B97BB22EE7A1937AC56C601D264AD81B35F18/",
+                primaryButtonLabel = "RESET",
+                primaryButtonClickFunction = "magogResetVillain"
             },
             stages={
                 stageA={
                     cardId="39001",
-                    hitPointsPerPlayer=10
+                    hitPointsPerPlayer=10,
+                    showAdvanceButton=true
                 },
                 stageB={
                     cardId="39001",
                     flipCard=true,
-                    hitPointsPerPlayer=10
+                    hitPointsPerPlayer=10,
+                    showAdvanceButton=true
                 }
             }
         }
@@ -28,41 +34,23 @@ scenarios["magog"] =
                     cardId="39002",
                     startingThreatPerPlayer=1,
                     targetThreatPerPlayer=6,
-                    accelerationPerPlayer=2
+                    accelerationPerPlayer=2,
+                    flavorText="Teleported into a bizarre arena, you must fight for the audience's entertainment... and your lives!"
                 }
+            },
+            threatCounter={
+                showAdvanceButton=true,
+                primaryButtonLabel = "RESET",
+                primaryButtonClickFunction = "magogResetScheme"
             }
-        }
-    },
-    cards={
-        champion={
-            cardId="39003",
-            position={15.75, 1.00, 29.25},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER"))
-        },
-        challengers={
-            cardId="39004",
-            position={18.75, 0.97, 29.25},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER"))
-        }
-    },            
-    counters={
-        championRatings={
-            type="general",
-            position={14.50, 1.10, 30.80},
-            scale={0.50, 1.00, 0.50},
-            locked=true
-        },
-        challengerRatings={
-            type="general",
-            position={19.50, 1.10, 30.80},
-            scale={0.50, 1.00, 0.50},
-            locked=true
         }
     },
     decks={
         encounterDeck={
             name="Magog's Encounter Deck",
             cards={
+                ["39003"] = 1,
+                ["39004"] = 1,
                 ["39005"] = 1,
                 ["39006"] = 1,
                 ["39007"] = 1,
@@ -72,11 +60,101 @@ scenarios["magog"] =
                 ["39011"] = 1
             }
         }
+    },
+    modularSets={
+        crime = "exclude",
+        fantasy = "exclude",
+        horror = "exclude",
+        sciFi = "exclude",
+        sitcom = "exclude",
+        western = "exclude"
     }
 }
 
+function getEncounterSetControlPanel_magog()
+    return getEncounterSetControlPanel_mojo()
+end
+
 function prepareScenario_magog()
-  buildGenreQueue()
-  local genreSetKey = currentScenario.genreQueue[1].genreSetKey
+  mojoBuildGenreQueue()
+  local genreSetKey = currentScenario.genreQueue[1]
   addRemoveSelectedSet({encounterSetKey = genreSetKey})
+end
+
+function setUpSchemeStage_magog_main(params)
+    Global.call("moveCardFromEncounterDeckById", {cardId = "39003", searchInDiscard = true, zoneIndex = "environment", settings = {hideWhenFaceDown = false}})
+    Global.call("moveCardFromEncounterDeckById", {cardId = "39004", searchInDiscard = true, zoneIndex = "environment", zoneOffset = 1, settings = {hideWhenFaceDown = false}})
+end
+
+function magogResetVillain()
+    local villainHpCounter = getObjectFromGUID(currentScenario.villains.magog.hpCounter.guid)
+
+    villainHpCounter.call("setValue", {value = 10})
+
+    local heroCount = getHeroCount()
+    local mode = getMode()
+    local multiplier = mode == "expert" and 2 or 3
+    local ratingsIncrease = heroCount * multiplier
+    magogIncrementRatings("challengers", ratingsIncrease)
+
+    Global.call("dealEncounterCardsToAllPlayers", {cardsPerPlayer = 1})
+    Global.call("displayMessage", {message = "The crowd cheers as MaGog stumbles! The heroes gain " .. ratingsIncrease .. " ratings counters.", messageType = Global.getVar("MESSAGE_TYPE_INFO")})
+end
+
+function magogResetScheme()
+    local threatCounter = getObjectFromGUID(currentScenario.schemes.main.threatCounter.guid)
+    threatCounter.call("setValue", {value = 0})
+
+    local heroCount = getHeroCount()
+    local ratingsIncrease = 2 * heroCount
+    magogIncrementRatings("champion", ratingsIncrease)
+
+    Global.call("displayMessage", {message = "The crowd demands the heroes' blood! MaGog gains " .. ratingsIncrease .. " ratings counters.", messageType = Global.getVar("MESSAGE_TYPE_INFO")})
+end
+
+function magogIncrementRatings(target, increase)
+    local cardId = target == "challengers" and "39004" or "39003"
+    local card = Global.call("findCard", {cardId = cardId})
+    local counter = Global.call("getCounterFromCard", {card = card, counterClass = "configured"})
+    local newValue = counter.call("adjustValue", {adjustment = increase})
+    local heroCount = getHeroCount()
+    local flipThreshold = heroCount * 5
+    local endThreshold = heroCount * 10
+
+    if(newValue >= flipThreshold) then
+        if(Global.call("isFaceUp", {object = card, ignoreToggles = true})) then
+            Global.call("suppressRepositionInZone", {zoneIndex = "environment"})
+            card.flip()
+            Global.call("displayMessage", {message = "The crowd goes crazy for the " .. target .. "!", messageType = Global.getVar("MESSAGE_TYPE_INFO")})
+
+            if(target == "challengers") then
+                local surpriseContenderCardId = "39007"
+
+                if(Global.call("cardIsInPlay", {cardId = cardId})) then
+                else
+                    local breakinAndTakinCard = Global.call(
+                        "moveCardFromEncounterDeckById", 
+                        {
+                            cardId = surpriseContenderCardId, 
+                            searchInDiscard = true,
+                            zoneIndex = "sideScheme"
+                        })
+                end
+            else
+                Global.call("displayMessage", {message = "Everybody loves an underdog! Each player draws a card.", messageType = Global.getVar("MESSAGE_TYPE_INFO")})
+            end
+        end
+    end
+
+    if(newValue >= endThreshold) then
+        local endMessage
+
+        if(target == "challengers") then
+            endMessage = "The challengers have won over the crowd! The heroes win!"
+        else
+            endMessage = "MaGog has won over the crowd! The heroes lose!"
+        end
+
+        Global.call("displayMessage", {message = endMessage, messageType = Global.getVar("MESSAGE_TYPE_ALERT")})
+    end
 end

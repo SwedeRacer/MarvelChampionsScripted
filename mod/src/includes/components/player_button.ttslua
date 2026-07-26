@@ -350,16 +350,54 @@ function setDeckId(player, value, id)
     importDeckId = value
 end
 
+local duplicateIdDecks = nil
+
 function importDeckCallback(params)
-    if(not params.deckInfo) then
-        hideHeroUI(true)
-        return
+    local deckInfos = params.deckInfos
+    local deckInfo = nil
+    local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
+
+    if(not deckInfos or #deckInfos == 0) then
+    
+    elseif(#deckInfos == 1) then
+        deckInfo = deckInfos[1]
+    else
+        local heroNames = {}
+        duplicateIdDecks = {}
+
+        for _, deckInfo in pairs(deckInfos) do
+            local heroIdentityId = deckInfo.hero_code
+            local heroKey = heroManager.call("findHeroKeyByIdentityId", {identityId = heroIdentityId})
+            local hero = heroManager.call("getHeroByHeroKey", {heroKey=heroKey})
+
+            deckInfo.heroName = hero and hero.name or "Unknown Hero"
+
+            duplicateIdDecks[heroKey] = deckInfo
+
+            table.insert(heroNames, {label = deckInfo.heroName, key = heroKey})
+        end
+
+        Global.call("displayDialog", {
+            message = "There are two decks with ID " .. importDeckId .. ". Which one did you want?",
+            choices = heroNames,
+            showTo = positionColor,
+            callbackTarget = self,
+            callbackFunction = "selectHeroWithDuplicateID"
+        })
     end
 
-    hideHeroUI(false)
+    hideHeroUI(deckInfo == nil)
     
+    if(not deckInfo) then return end
+
+    heroManager.call("placeHeroWithImportedDeck", {deckInfo = deckInfo, positionColor=positionColor})
+end
+
+function selectHeroWithDuplicateID(params)
+    local heroKey = params.choiceKey
     local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
-    heroManager.call("placeHeroWithImportedDeck", {deckInfo = params.deckInfo, positionColor=positionColor})
+    heroManager.call("placeHeroWithImportedDeck", {deckInfo = duplicateIdDecks[heroKey], positionColor=positionColor})
+    duplicateIdDecks = nil
 end
 
 function cancel()

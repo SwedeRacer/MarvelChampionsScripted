@@ -85,10 +85,6 @@ scenarios["modok"] =
         sideScheme = {
             position = {7.25, 1.00, 9.00},
             scale = {7.00, 1.00, 20.00},
-            firstCardPosition = {7.25, 0.98, 16.75},
-            horizontalGap = 7,
-            verticalGap = 5,
-            layoutDirection = "vertical",
             width = 1,
             height = 4
         },

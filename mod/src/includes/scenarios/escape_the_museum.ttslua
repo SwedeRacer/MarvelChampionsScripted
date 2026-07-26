@@ -11,11 +11,11 @@ scenarios["escapeMuseum"] =
             stages={
                 stageA={
                     cardId="16080",
-                    hitPointsPerPlayer=13
+                    hitPointsPerPlayer=8
                 },
                 stageB={
                     cardId="16081",
-                    hitPointsPerPlayer=18
+                    hitPointsPerPlayer=10
                 }
             }
         }
