@@ -280,6 +280,10 @@ function getHeroByPlayerColor(params)
  return selectedHeroes[params.playerColor]
 end
 
+function getHeroByHeroKey(params)
+  return heroes[params.heroKey]
+end 
+
 function getPlayerDeckPositions(params)
   local includeDeck = true
   local includeDiscard = true

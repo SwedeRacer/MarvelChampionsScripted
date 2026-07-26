@@ -207,7 +207,7 @@ function ultronDiscardPlayerCardsAsDrones(params)
         playerColor = playerColor
     })
     local deckPosition = Vector(playmat.call("getPlayerDeckPosition"))
-    local tempDestination = Vector({deckPosition[1], deckPosition[2] + 3, deckPosition[3]})
+    local tempDestination = Vector({deckPosition[1], deckPosition[2] + 2, deckPosition[3]})
     local zoneDelay = droneCount * 100
 
     playmat.call("disableZones", {delay = zoneDelay})

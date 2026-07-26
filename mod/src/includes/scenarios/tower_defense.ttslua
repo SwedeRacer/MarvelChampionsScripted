@@ -93,14 +93,6 @@ scenarios["towerDefense"] =
             position={19.25, 3.00, 15.75},
             scale=Vector(Global.getVar("CARD_SCALE_PLAYER"))
         }
-    },            
-    counters={
-        damage={
-            type="general",
-            position={14.70, 1.10, 30.90},
-            scale={0.50, 1.00, 0.50},
-            locked=true
-        }
     },
     decks={
         encounterDeck={

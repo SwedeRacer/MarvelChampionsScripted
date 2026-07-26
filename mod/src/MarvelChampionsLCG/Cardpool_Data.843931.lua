@@ -4098,7 +4098,9 @@ PACK_16 = [[
     "text": "<i>Charge Up</i> - <b>Special:</b> Place 1 barrage counter here. Then, if there are 4 or more barrage counters here, deal 2 indirect damage to each player and remove all barrage counters from here.",
     "flavor": "<b><i>The Brotherhood of Badoon's ship is charging its cannons for a devastating attack against the heroes on the ground below.</i></b>",
     "isUnique": true,
-    "traits": "Aerial. Vehicle."
+    "traits": "Aerial. Vehicle.",
+    "counter": "general",
+    "counterName": "Barrage"
   },
   {
     "name": "Drang's Spear",
@@ -8953,7 +8955,9 @@ PACK_21 = [[
     "FrontURL": "/card-faces/21100A.jpg",
     "text": "<b>When Revealed:</b> Discard each other Avengers Tower from play.\n<b>Forced Response:</b> After damage is placed here, if there is at least 9[per player] damage here, the players lose the game.",
     "traits": "Damaged.",
-    "backText": "The unique rule does not apply to Avengers Tower.\n<b>Forced Response:</b> After damage is placed here, if there is at least 9[per_hero] damage here, remove all of it. Then flip Avenger's Tower over."
+    "backText": "The unique rule does not apply to Avengers Tower.\n<b>Forced Response:</b> After damage is placed here, if there is at least 9[per_hero] damage here, remove all of it. Then flip Avenger's Tower over.",
+    "counter": "health",
+    "counterName": "Damage"
   },
   {
     "name": "Focused Defense",
@@ -23363,7 +23367,10 @@ PACK_39 = [[
     "traits": "Escaped. Mystic.",
     "scheme": 1,
     "attackStar": true,
-    "stage": 1
+    "stage": 1,
+    "counter": "general",
+    "counterName": "Teleport",
+    "counterValue": 0
   },
   {
     "name": "Spiral",
@@ -23397,7 +23404,10 @@ PACK_39 = [[
     "traits": "Escaped. Mystic.",
     "scheme": 2,
     "attackStar": true,
-    "stage": 2
+    "stage": 2,
+    "counter": "general",
+    "counterName": "Teleport",
+    "counterValue": 0
   },
   {
     "name": "Spiral",
@@ -23415,7 +23425,10 @@ PACK_39 = [[
     "scheme": 2,
     "attackStar": true,
     "schemeStar": true,
-    "stage": 2
+    "stage": 2,
+    "counter": "general",
+    "counterName": "Teleport",
+    "counterValue": 0
   },
   {
     "name": "Spiral",
@@ -23431,7 +23444,10 @@ PACK_39 = [[
     "traits": "Escaped. Mystic.",
     "scheme": 2,
     "attackStar": true,
-    "stage": 3
+    "stage": 3,
+    "counter": "general",
+    "counterName": "Teleport",
+    "counterValue": 0
   },
   {
     "name": "Spiral",
@@ -23448,7 +23464,10 @@ PACK_39 = [[
     "attack": 3,
     "scheme": 2,
     "attackStar": true,
-    "stage": 3
+    "stage": 3,
+    "counter": "general",
+    "counterName": "Teleport",
+    "counterValue": 0
   },
   {
     "name": "Across the Mojoverse",

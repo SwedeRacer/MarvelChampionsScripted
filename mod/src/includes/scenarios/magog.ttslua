@@ -76,18 +76,14 @@ function getEncounterSetControlPanel_magog()
 end
 
 function prepareScenario_magog()
-  buildGenreQueue()
+  mojoBuildGenreQueue()
   local genreSetKey = currentScenario.genreQueue[1]
   addRemoveSelectedSet({encounterSetKey = genreSetKey})
 end
 
 function setUpSchemeStage_magog_main(params)
     Global.call("moveCardFromEncounterDeckById", {cardId = "39003", searchInDiscard = true, zoneIndex = "environment", settings = {hideWhenFaceDown = false}})
-
---    Wait.frames(function()
-        Global.call("moveCardFromEncounterDeckById", {cardId = "39004", searchInDiscard = true, zoneIndex = "environment", zoneOffset = 1, settings = {hideWhenFaceDown = false}})
---    end,
---    120)
+    Global.call("moveCardFromEncounterDeckById", {cardId = "39004", searchInDiscard = true, zoneIndex = "environment", zoneOffset = 1, settings = {hideWhenFaceDown = false}})
 end
 
 function magogResetVillain()
@@ -130,6 +126,23 @@ function magogIncrementRatings(target, increase)
             Global.call("suppressRepositionInZone", {zoneIndex = "environment"})
             card.flip()
             Global.call("displayMessage", {message = "The crowd goes crazy for the " .. target .. "!", messageType = Global.getVar("MESSAGE_TYPE_INFO")})
+
+            if(target == "challengers") then
+                local surpriseContenderCardId = "39007"
+
+                if(Global.call("cardIsInPlay", {cardId = cardId})) then
+                else
+                    local breakinAndTakinCard = Global.call(
+                        "moveCardFromEncounterDeckById", 
+                        {
+                            cardId = surpriseContenderCardId, 
+                            searchInDiscard = true,
+                            zoneIndex = "sideScheme"
+                        })
+                end
+            else
+                Global.call("displayMessage", {message = "Everybody loves an underdog! Each player draws a card.", messageType = Global.getVar("MESSAGE_TYPE_INFO")})
+            end
         end
     end
 

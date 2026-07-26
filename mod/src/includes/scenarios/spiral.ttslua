@@ -35,46 +35,53 @@ scenarios["spiral"] =
                 stage1={
                     cardId="39015",
                     startingThreatPerPlayer=1,
-                    targetThreatPerPlayer=15
+                    targetThreatPerPlayer=15,
+                    flavorText="If you want to return home, you'll need the help of the teleporting sorceress, Spiral. But she will need some convincing."
                 }
             }
         }
     },
-    cards={
-        searchForSpiral={
-            cardId="39016",
-            position={7.25, 0.97, 16.75},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER")),
-            landscape=true
-        }
-    },            
     decks={
         encounterDeck={
             name="Spiral's Encounter Deck",
             cards={
+                ["39016"] = 1,
+                ["39017"] = 1,
                 ["39018"] = 2,
                 ["39019"] = 2,
                 ["39020"] = 1,
                 ["39021"] = 1
             }
-        },
-        showDeck={
-            name="Show Deck",
-            position={15.75, 0.97, 22.25},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER")),
-            cards={
-                ["39017"] = 1
-            }
         }
     },
-        modularSets={
+    modularSets={
         crime = "exclude",
         fantasy = "exclude",
         horror = "exclude",
         sciFi = "exclude",
         sitcom = "exclude",
         western = "exclude"
-    }
+    },
+    extras={
+        showDeck={
+            name="Show Deck",
+            guid="6ea5af",
+            position={14.25, 0.96, 14.75},
+            rotation={0, 180, 0},
+            scale={4.45,1,4.45},
+            locked=true
+        }
+    },
+    zones={
+        sideScheme = {
+            position = {7.25, 1.00, 9},
+            scale = {7.00, 1.00, 20.00},
+            width = 1,
+            height = 4
+        }
+    },
+    searchForSpiralCardId = "39016",
+    corneredCardId = "39017"
 }
 
 function getEncounterSetControlPanel_spiral()
@@ -82,25 +89,123 @@ function getEncounterSetControlPanel_spiral()
 end
 
 function prepareScenario_spiral()
-  buildGenreQueue()
-  local firstGenreSetKey = currentScenario.genreQueue[2].genreSetKey
-  local firstGenreEnvironmentCardId = currentScenario.genreQueue[2].environmentCardId
-  local encounterSetManager = getObjectFromGUID(Global.getVar("GUID_MODULAR_SET_MANAGER"))
-  local firstGenreSet = encounterSetManager.call("getModularSet", {modularSetKey = firstGenreSetKey})
+    mojoBuildGenreQueue()
 
-  currentScenario.cards.firstGenreEnvironment ={
-    cardId=firstGenreEnvironmentCardId,
-    position={15.75, 1.25, 29.75},
-    scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER"))
-  }
+    local encounterSetManager = getObjectFromGUID(Global.getVar("GUID_MODULAR_SET_MANAGER"))
+    currentScenario.showDeck = {}
 
-  local secondGenreEnvironmentCardId = currentScenario.genreQueue[3].environmentCardId
-  local thirdGenreEnvironmentCardId = currentScenario.genreQueue[4].environmentCardId
-  
-  currentScenario.decks.showDeck.cards[secondGenreEnvironmentCardId]=1
-  currentScenario.decks.showDeck.cards[thirdGenreEnvironmentCardId]=1
+    for i=1,3 do
+        local genre = currentScenario.mojoGenres[currentScenario.genreQueue[i]]
+        local genreSet = encounterSetManager.call("getModularSet", {modularSetKey = genre.modularSetKey})
+        
+        for cardId, count in pairs(genreSet.cards) do
+            if(cardId ~= genre.environmentCardId) then
+                currentScenario.decks.encounterDeck.cards[cardId] = count
+            end
+        end
+
+        table.insert(currentScenario.showDeck, genre.environmentCardId)
+    end
+
 end
 
-function onCardEnterZone_spiral(params)
-  placeGenreSetFromEnvironment(params.zone, params.card)
+function setUpSchemeStage_spiral_main(params)
+    local showDeck = getItemFromManifest({key="showDeck"})
+    local showDeckPosition = showDeck.getPosition()
+
+    Global.call("moveCardFromEncounterDeckById", {cardId = currentScenario.searchForSpiralCardId, searchInDiscard = true, zoneIndex = "sideScheme"})
+    Global.call("moveCardFromEncounterDeckById", {cardId = currentScenario.corneredCardId, searchInDiscard = true, destinationPosition = showDeckPosition, flipCard = false})
+
+    local corneredCard = Global.call("findCard", {cardId = currentScenario.corneredCardId})
+
+    Wait.condition(
+        function()
+            Wait.frames(function()
+                if(not corneredCard.isDestroyed()) then corneredCard.destruct() end
+
+                spiralDrawShowCard()
+                
+                table.insert(currentScenario.showDeck, currentScenario.corneredCardId)
+                currentScenario.showDeck = Global.call("shuffleTable", {table = currentScenario.showDeck})
+            end,
+            10)
+        end,
+        function()
+            return corneredCard.isDestroyed() or corneredCard.resting
+        end,
+        4)
+end
+
+function spiralDrawShowCard()
+    local currentShowCardId = currentScenario.currentShowCardId
+    local newShowCardId = currentScenario.showDeck[1]
+
+    if(currentShowCardId) then
+        local currentShowCard = Global.call("findCard", {cardId = currentShowCardId})
+        if(currentShowCard) then currentShowCard.destruct() end
+    end
+
+    local searchForSpiralCard = Global.call("findCard", {cardId = currentScenario.searchForSpiralCardId})
+    if(searchForSpiralCard) then 
+        local threatCounter = Global.call("getCounterFromCard", {card = searchForSpiralCard, counterClass = "standard"})
+        if(threatCounter) then
+            local heroCount = getHeroCount()
+            threatCounter.call("setValue", {value = heroCount * 3})
+        end
+    end
+
+    local showDeck = getItemFromManifest({key="showDeck"})
+
+    local newShowCard = Global.call("spawnCard", {
+        cardId = newShowCardId,
+        position = Global.call("ensureMinimumYPosition", {position = showDeck.getPosition(), minimumY = 1.25}),
+        scale = Global.getTable("CARD_SCALE_ENCOUNTER"),
+        flipped = false,
+        tags = {"group-scenario"}
+    })
+
+    local delay = 10
+
+    table.remove(currentScenario.showDeck, 1)
+
+    if(newShowCardId == currentScenario.corneredCardId) then
+        delay = 40
+        local spiralCard = findVillainCard()
+
+        if(spiralCard) then
+            if(not spiralCard.is_face_down) then spiralCard.flip() end
+            local counter = Global.call("getCounterFromCard", {card = spiralCard, counterClass = "configured"})
+            if(counter) then counter.call("setValue", {value = 0}) end
+        end
+
+        Global.call("displayMessage", {message = "Spiral has been cornered!", messageType = Global.getVar("MESSAGE_TYPE_INFO")})
+
+        Wait.frames(function()
+            newShowCard.destruct()
+
+            newShowCardId = currentScenario.showDeck[1]
+    
+            newShowCard = Global.call("spawnCard", {
+                cardId = newShowCardId,
+                position = Global.call("ensureMinimumYPosition", {position = showDeck.getPosition(), minimumY = 1.25}),
+                scale = Global.getTable("CARD_SCALE_ENCOUNTER"),
+                flipped = false,
+                tags = {"group-scenario"}
+            })
+
+            table.remove(currentScenario.showDeck, 1)
+            table.insert(currentScenario.showDeck, currentShowCardId)
+            table.insert(currentScenario.showDeck, currentScenario.corneredCardId) -- add cornered back to the bottom of the show deck 
+            
+            currentScenario.showDeck = Global.call("shuffleTable", {table = currentScenario.showDeck})
+        end, 30)
+    else
+        table.insert(currentScenario.showDeck, currentShowCardId)
+    end
+
+    Wait.frames(function()
+        Global.call("moveCard", {card = newShowCard, zoneIndex = "environment"})
+        currentScenario.currentShowCardId = newShowCardId
+        saveData()
+    end, delay)
 end

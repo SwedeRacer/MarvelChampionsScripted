@@ -80,16 +80,16 @@ scenarios["thunderbolts"] =
         }
     },    
     modularSets={
-        gravitationalPull="recommended",
-        hardSound="recommended",
-        paleLittleSpider="recommended",
-        powerOfTheAtom="recommended",
-        supersonic="recommended",
-        theLeaper="recommended",
-        extremeRisk="recommended",
-        growingStrong="recommended",
-        whiteout="recommended",
-        techno="recommended"
+        gravitationalPull="exclude",
+        hardSound="exclude",
+        paleLittleSpider="exclude",
+        powerOfTheAtom="exclude",
+        supersonic="exclude",
+        theLeaper="exclude",
+        extremeRisk="exclude",
+        growingStrong="exclude",
+        whiteout="exclude",
+        techno="exclude"
     },
     notes={
         minions={
@@ -101,23 +101,170 @@ scenarios["thunderbolts"] =
 }
 
 function getEncounterSetControlPanel_thunderbolts()
-    -- local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
-    -- local heroCount = heroManager.call("getHeroCount")
+    selectedScenario.thunderboltEncounterSets = {
+        extremeRisk = {
+            name = "Extreme Risk (Joystick)",
+            modularSetKey = "extremeRisk",
+            minionCardId = "51039",
+            selected = false
+        },
+        gravitationalPull = {
+            name = "Gravitational Pull (Moonstone)",
+            modularSetKey = "gravitationalPull",
+            minionCardId = "50139",
+            selected = false
+        },
+        growingStrong = {
+            name = "Growing Strong (Atlas)",
+            modularSetKey = "growingStrong",
+            minionCardId = "52035",
+            selected = false
+        },
+        hardSound = {
+            name = "Hard Sound (Songbird)",
+            modularSetKey = "hardSound",
+            minionCardId = "50143",
+            selected = false
+        },
+        theLeaper = {
+            name = "The Leaper (Batroc)",
+            modularSetKey = "theLeaper",
+            minionCardId = "50161",
+            selected = false
+        },
+        paleLittleSpider = {
+            name = "Pale Little Spider (Black Widow)",
+            modularSetKey = "paleLittleSpider",
+            minionCardId = "50148",
+            selected = false
+        },
+        powerOfTheAtom = {
+            name = "Power of the Atom (Radioactive Man)",
+            modularSetKey = "powerOfTheAtom",
+            minionCardId = "50152",
+            selected = false
+        },
+        supersonic = {
+            name = "Supersonic (Mach-IV)",
+            modularSetKey = "supersonic",
+            minionCardId = "50156",
+            selected = false
+        },
+        techno = {
+            name = "Techno (Fixer)",
+            modularSetKey = "techno",
+            minionCardId = "53038",
+            selected = false
+        },
+        whiteout = {
+            name = "Whiteout (Blizzard)",
+            modularSetKey = "whiteout",
+            minionCardId = "54034",
+            selected = false
+        }
+    }
+
     local heroCount = getHeroCount()
-    local encounterSetControlPanel = {
+    local numbers = {"two", "three", "four", "five"}
+    local numberText = numbers[heroCount]
+
+    local guid = self.getGUID()
+    local thunderboltToggles = {}
+
+    for key, thunderbolt in pairs(selectedScenario.thunderboltEncounterSets) do
+        table.insert(thunderboltToggles, {
+        tag = "Toggle",
+        value = thunderbolt.name,
+        attributes = {
+            id = thunderbolt.modularSetKey,
+            onValueChanged = guid .. "/modularEncounterSetToggleChanged",
+            height = "30",
+            width = "275",
+            fontSize = "15",
+            textColor = "rgba(1,1,1,1)",
+            colors = "rgba(1,1,1,1)|rgba(1,1,1,1)|rgba(1,1,1,1)|rgba(1,1,1,1)",
+            isOn = false
+        }
+        })
+    end
+
+    table.insert(thunderboltToggles, {
         tag = "Panel",
         attributes = {
-            
-        },
+            id="emptyCell",
+            preferredHeight = "8",
+            flexibleHeight = "0"
+        }
+    })
+
+    table.insert(thunderboltToggles, {
+        tag = "Button",
+        value = "Random Selection",
+        attributes = {
+            id="randomSelectionButton",
+            onClick=guid .. "/thunderboltsRandomSelectionClicked",
+            height="30",
+            width="275",
+            fontSize="15",
+            textColor="rgba(1,1,1,1)",
+            color="rgba(0.2,0.2,0.2,1)"
+        }
+    })
+
+    local encounterSetControlPanel = {
+        tag = "Panel",
         children = {
             {
-                tag = "Text",
-                value = "Select at least " .. (heroCount + 1) .. " Thunderbolt modular encounter sets (highlighted in yellow).",
+                tag = "VerticalLayout",
                 attributes = {
                     rectAlignment = "UpperLeft",
-                    alignment = "UpperLeft",
-                    color = "rgba(1,1,1,1)"
-                }
+                    childAlignment = "UpperLeft",
+                    childForceExpandHeight = "false",
+                    spacing = "16",
+                    contentSizeFitter = "vertical"
+                },
+                children = {
+                    {
+                        tag = "Text",
+                        value = "Select at least " .. numberText .. " Thunderbolt modular encounter sets.",
+                        attributes = {
+                            rectAlignment = "UpperLeft",
+                            alignment = "UpperLeft",
+                            color = "rgba(1,1,1,1)"
+                        }
+                    },
+                    {
+                        tag = "HorizontalLayout",
+                        attributes = {
+                            childAlignment = "MiddleCenter",
+                            childForceExpandHeight = "false",
+                            childForceExpandWidth = "false",
+                            spacing = "0"
+                        },
+                        children = {
+                            {
+                                tag = "GridLayout",
+                                attributes = {
+                                    width = "855",
+                                    spacing = "15 5",
+                                    cellSize = "275 30",
+                                    startAxis = "Vertical",
+                                    constraint = "FixedRowCount",
+                                    constraintCount = "4"
+                                },
+                                children = thunderboltToggles
+                            }
+                        }
+                    },
+                    {
+                        tag = "Panel",
+                        attributes = {
+                            id="bottomSpacer",
+                            preferredHeight = "8",
+                            flexibleHeight = "0"
+                        }
+                    }
+                },
             }
         }
     }
@@ -125,28 +272,49 @@ function getEncounterSetControlPanel_thunderbolts()
     return encounterSetControlPanel
 end
 
-function modularSetsAreValid_thunderbolts(params)
-    local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
-    local heroCount = heroManager.call("getHeroCount")
+function thunderboltsRandomSelectionClicked(player, value, id)
+    local heroCount = getHeroCount()
     local minimumThunderboltEncounterSets = heroCount + 1
 
-    local selectedModularSets = getSelectedSets() or {}
-    local thunderBoltScenarioCount = 0
-
-    for key, value in pairs(selectedModularSets) do
-        if(currentScenario.modularSets[key] ~= nil) then
-            thunderBoltScenarioCount = thunderBoltScenarioCount + 1
-        end
+    local thunderboltKeys = {}
+    for key, thunderbolt in pairs(selectedScenario.thunderboltEncounterSets) do
+        table.insert(thunderboltKeys, thunderbolt.modularSetKey)
     end
 
-    local modularSetsAreValid = thunderBoltScenarioCount >= minimumThunderboltEncounterSets
+    thunderboltKeys = Global.call("shuffleTable", {table = thunderboltKeys})
 
-    if(params and params.postMessage and not modularSetsAreValid) then
-      broadcastToAll("Please select at least " .. minimumThunderboltEncounterSets .. " Thunderbolt encounter sets.", {1,1,1})
+    local setsToSelect = math.min(minimumThunderboltEncounterSets, #thunderboltKeys)
+    local selectedLookup = {}
+    for i = 1, setsToSelect do
+        selectedLookup[thunderboltKeys[i]] = true
     end
-  
-    return modularSetsAreValid
+
+    for key, thunderbolt in pairs(selectedScenario.thunderboltEncounterSets) do
+        modularEncounterSetToggleChanged(player, selectedLookup[thunderbolt.modularSetKey] == true and "True" or "False", thunderbolt.modularSetKey)
+    end
 end
+
+-- function modularSetsAreValid_thunderbolts(params)
+--     local heroCount = getHeroCount()
+--     local minimumThunderboltEncounterSets = heroCount + 1
+
+--     local selectedModularSets = getSelectedSets() or {}
+--     local thunderBoltScenarioCount = 0
+
+--     for key, value in pairs(selectedModularSets) do
+--         if(selectedScenario.modularSets[key] ~= nil) then
+--             thunderBoltScenarioCount = thunderBoltScenarioCount + 1
+--         end
+--     end
+
+--     local modularSetsAreValid = thunderBoltScenarioCount >= minimumThunderboltEncounterSets
+
+--     if(params and params.postMessage and not modularSetsAreValid) then
+--       broadcastToAll("Please select at least " .. minimumThunderboltEncounterSets .. " Thunderbolt encounter sets.", {1,1,1})
+--     end
+  
+--     return modularSetsAreValid
+-- end
 
 function setUpSchemeStage_thunderbolts_main(params)
     setupThunderboltMinions()

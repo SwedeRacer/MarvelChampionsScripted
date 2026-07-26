@@ -1,19 +1,19 @@
 {
   "Object": {
-    "GUID": "998f2b",
+    "GUID": "6ea5af",
     "Name": "Custom_Tile",
     "Transform": {
-      "posX": 106.80291,
-      "posY": 2.22113538,
-      "posZ": -15.8030825,
+      "posX": 70.25,
+      "posY": -9.690033,
+      "posZ": 15.750001,
       "rotX": 0,
-      "rotY": 180,
+      "rotY": 0 ,
       "rotZ": 0,
       "scaleX": 4.45,
       "scaleY": 1,
       "scaleZ": 4.45
     },
-    "Nickname": "Wheel of Genres",
+    "Nickname": "Spiral Show Deck",
     "Description": "",
     "GMNotes": "",
     "AltLookAngle": {
@@ -22,9 +22,9 @@
       "z": 0
     },
     "ColorDiffuse": {
-      "r": 1,
-      "g": 1,
-      "b": 1
+      "r": 0.249981582,
+      "g": 0.249981582,
+      "b": 0.249981582
     },
     "LayoutGroupSortIndex": 0,
     "Value": 0,
@@ -41,7 +41,7 @@
     "HideWhenFaceDown": false,
     "Hands": false,
     "CustomImage": {
-      "ImageURL": "https://d2xdqryaauvaie.cloudfront.net/assets/wheel-of-genres.png",
+      "ImageURL": "https://d2xdqryaauvaie.cloudfront.net/assets/spiral-show-deck.png",
       "ImageSecondaryURL": "",
       "ImageScalar": 1,
       "WidthScale": 0,
@@ -52,7 +52,7 @@
         "Stretch": true
       }
     },
-    "LuaScript": "#include ./Wheel_of_Genres.998f2b.lua",
+    "LuaScript": "#include ./SpiralShowDeck.6ea5af.lua",
     "LuaScriptState": "",
     "XmlUI": ""
   },

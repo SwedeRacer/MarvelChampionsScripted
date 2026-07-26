@@ -32,7 +32,8 @@ scenarios["mojo"] =
                 stage1={
                     cardId="39025",
                     startingThreatPerPlayer=10,
-                    targetThreatPerPlayer=25
+                    targetThreatPerPlayer=25,
+                    flavorText="\"So, you think you cancel me?\" Mojo sneers. \"I'm in charge around here. You'll do what I say or you'll be fired... into the sun! Come to think of it, that would make for a great finale!\""
                 }
             }
         }
@@ -71,10 +72,15 @@ scenarios["mojo"] =
         wheelOfGenres={
             name="Wheel of Genres",
             guid="998f2b",
-            position={31.25, 0.96, 19.75},
+            position={18.25, 0.97, 22.45},
             rotation={0, 180, 0},
-            scale={3,1,3},
+            scale={3.05,1,3.05},
             locked=true
+        }
+    },
+    zones={
+        environment={
+            onEnterFunction="darkBeastDiscardSettingEnvironments"
         }
     }
 }
@@ -119,10 +125,6 @@ function getEncounterSetControlPanel_mojo()
     }
   }
 
-  for key, genre in pairs(selectedScenario.mojoGenres) do
-    Global.UI.hide(genre.modularSetKey)
-  end
-
   local guid = self.getGUID()
   local genreToggles = {}
   local genreMessage = ""
@@ -132,13 +134,14 @@ function getEncounterSetControlPanel_mojo()
     genreMessage = "This scenario will include one of these genre encounter sets, selected randomly. Uncheck any sets that you want to exclude from this selection."
     controlPanelHeight = "70"
   elseif(selectedScenario.key == "spiral") then
-    genreMessage = "This scenario will include three of these genre encounter sets, selected randomly. Uncheck any sets that you want to exclude from this selection. You can also select genre sets below to ensure that they are used."
-    controlPanelHeight = "120"
+    genreMessage = "This scenario will include three of these genre encounter sets, selected randomly. Uncheck any sets that you want to exclude from this selection. (If you leave fewer than three sets checked, the checked sets will be used, and the remainder will be randomly selected from the unchecked sets.)"
+    controlPanelHeight = "85"
   elseif(selectedScenario.key == "mojo") then
     local heroCount = getHeroCount()
     local numbers = {"two", "three", "four", "five"}
-    genreMessage = "This scenario will include " .. numbers[heroCount] .. " of these genre encounter sets, selected randomly. Uncheck any sets that you want to exclude from this selection. You can also select genre sets below to ensure that they are used."
-    controlPanelHeight = "120"
+    local numberText = numbers[heroCount]
+    genreMessage = "This scenario will include " .. numberText .. " of these genre encounter sets, selected randomly. Uncheck any sets that you want to exclude from this selection. (If you leave fewer than " .. numberText .. " sets checked, the checked sets will be used, and the remainder will be randomly selected from the unchecked sets.)"
+    controlPanelHeight = "85"
   end
 
   for key, genre in pairs(selectedScenario.mojoGenres) do
@@ -202,15 +205,15 @@ function getEncounterSetControlPanel_mojo()
 end
 
 function prepareScenario_mojo()
-  buildGenreQueue()
+  mojoBuildGenreQueue()
   currentScenario.genreIndex = 0
 end
 
 function finalizeSetup_mojo()
-  --addNextGenre()
+  addNextGenre({shuffleIntoEncounterDeck=true})
 end
 
-function buildGenreQueue()
+function mojoBuildGenreQueue()
   local genreQueue = {}
   local genresNeeded = 0
 
@@ -254,32 +257,83 @@ function buildGenreQueue()
   currentScenario.genreQueue = genreQueue
 end
 
-function addNextGenre()
+function addNextGenre(params)
   currentScenario.genreIndex = currentScenario.genreIndex + 1
-  local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
-  local heroCount = heroManager.call("getHeroCount")
+  local heroCount = getHeroCount()
 
   if(currentScenario.genreIndex > (heroCount + 1)) then
-    broadcastToAll("There's nothing good on!", {1,1,1})
+    Global.call("displayMessage", {message="There's nothing good on! (All genres have been added to the encounter deck.)", messageType = Global.getVar("MESSAGE_TYPE_INFO")})
     return
-  end
-
-  if(currentScenario.genreQueue == nil) then
-    log("Error: genre queue is nil.")
   end
 
   local genreEnvironmentCardId = currentScenario.mojoGenres[currentScenario.genreQueue[currentScenario.genreIndex]].environmentCardId
   
-  Global.call("spawnCard", {
+  mojoDiscardCurrentGenreEnvironment()
+
+  local wheelOfGenres = getItemFromManifest({key="wheelOfGenres"})
+
+  local newGenreCard = Global.call("spawnCard", {
     cardId = genreEnvironmentCardId, 
-    position = {20.75, 2.00, 29.75},  --TODO: create a constant (or better yet, add functionality for moving cards to a specific zone)
+    position = Global.call("ensureMinimumYPosition", {position = wheelOfGenres.getPosition(), minimumY = 1.25}),
     scale = defaults.encounterDeck.scale,
     tags = {"group-scenario"}
   })
-end
 
-function onCardEnterZone_mojo(params)
-  placeGenreSetFromEnvironment(params.zone, params.card)
+  Wait.frames(function()
+    Global.call("moveCard", {card = newGenreCard, zoneIndex = "environment"})
+  end, 10)
+
+  local genreSetKey = ""
+
+  for _, genre in pairs(currentScenario.mojoGenres) do
+    if(genre.environmentCardId == genreEnvironmentCardId) then
+      genreSetKey = genre.modularSetKey
+      break
+    end
+  end
+
+  if(genreSetKey == "") then return end
+
+  for key, status in pairs(currentScenario.modularSets) do
+    if(key == genreSetKey and status ~= "exclude") then
+      return
+    end
+  end
+
+  currentScenario.modularSets[genreSetKey] = "required"
+
+  local encounterSetManager = getObjectFromGUID(Global.getVar("GUID_MODULAR_SET_MANAGER"))
+  local newGenreSet = encounterSetManager.call("getModularSet", {modularSetKey = genreSetKey})
+
+  newGenreSet = deepCopy(newGenreSet)
+
+  newGenreSet.cards[genreEnvironmentCardId] = nil
+
+  local encounterDeckPos = Vector(getEncounterDeckPosition())
+  local spawnPosition = encounterDeckPos + Vector(0, 3, 0)
+
+  local genreDeck = Global.call("spawnDeck", {
+    cards = newGenreSet.cards, 
+    position = spawnPosition, 
+    scale = defaults.encounterDeck.scale,
+    cardTags = {"group-scenario"}
+  })
+
+  if(params.shuffleIntoEncounterDeck) then
+    Wait.frames(function()
+      Global.call("shuffleDeck", {deckPosition = encounterDeckPos})
+    end,
+    60)
+  else
+    Wait.frames(function() 
+      genreDeck.shuffle()
+    end,
+    10)
+  end
+
+  Global.call("displayMessage", {message=newGenreSet.name.." encounter set added to encounter deck.", messageType = Global.getVar("MESSAGE_TYPE_INFO")})
+
+  saveData()
 end
 
 function mojoToggleGenre(player, value, id)
@@ -295,55 +349,22 @@ function mojoToggleGenre(player, value, id)
   Global.UI.setAttribute(id, "isOn", value)
 end
 
-function placeGenreSetFromEnvironment(zone, card)
-  local zoneDef = Global.call("getZoneDefinition", {zone = zone})
+function mojoDiscardCurrentGenreEnvironment()
+  local zoneDef = Global.call("getZoneDefinition", {zoneIndex = "environment"})
+  local zone = getObjectFromGUID(zoneDef.guid)
+  local zoneItems = zone.getObjects()
+  
+  for i, v in ipairs(zoneItems) do
+    if(v.tag == "Card") then
+      local vCardData = Global.call("getCardData", {card = v})
+      if(not vCardData) then return end
 
-  if (not zoneDef) then return end
-  if (zoneDef.zoneIndex ~= "environment") then return end
+      local vCardId = vCardData.code
+      local vTraits = vCardData.traits or ""
 
-  local cardId = Global.call("getCardProperty", {card = card, property = "code"})
-
-  local genreSetKey = ""
-
-  for _, genre in pairs(currentScenario.mojoGenres) do
-    if(genre.environmentCardId == cardId) then
-      genreSetKey = genre.modularSetKey
-      break
+      if (string.find(vTraits, "Setting.", 1, true)) then
+        Global.call("discardEncounterCard", {discardFromPosition = v.getPosition()})
+      end
     end
   end
-
-  if(genreSetKey == "") then return end
-
-  for key, _ in pairs(currentScenario.modularSets) do
-    if(key == genreSetKey) then
-      return
-    end
-  end
-
-  currentScenario.modularSets[genreSetKey] = "required"
-
-  local encounterSetManager = getObjectFromGUID(Global.getVar("GUID_MODULAR_SET_MANAGER"))
-  local newGenreSet = encounterSetManager.call("getModularSet", {modularSetKey = genreSetKey})
-
-  newGenreSet = deepCopy(newGenreSet)
-
-  newGenreSet.cards[cardId] = nil
-
-  local encounterDeckPos = Vector(getEncounterDeckPosition())
-  local spawnPosition = encounterDeckPos + Vector(0, 1, 0)
-
-  Global.call("spawnDeck", {
-    cards = newGenreSet.cards, 
-    position = spawnPosition, 
-    scale = defaults.encounterDeck.scale,
-    cardTags = {"group-scenario"}
-  })
-
-  Wait.frames(function() 
-    Global.call("shuffleDeck", {deckPosition = encounterDeckPos})
-    broadcastToAll(newGenreSet.name.." encounter set added to encounter deck.", {1,1,1})
-  end,
-  30)
-
-  saveData()
 end

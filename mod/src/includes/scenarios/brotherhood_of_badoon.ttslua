@@ -53,14 +53,6 @@ scenarios["badoon"] =
             position={0, 1.00, 1.25},
             scale=Vector(Global.getVar("CARD_SCALE_PLAYER"))
         }
-    },            
-    counters={
-        barrage={
-            type="general",
-            position={15.26, 1.06, 26.74},
-            scale={0.50, 1.00, 0.50},
-            locked=true
-        }
     },
     decks={
         encounterDeck={

@@ -180,7 +180,6 @@ function spawnCard(params)
 
     -- Default face up
     local rotation = {x, y, z}
-
     local card = getCardFromCardPool(cardId, artVariant)
 
     if (card.duplicate_of ~= nil) then

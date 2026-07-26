@@ -895,6 +895,7 @@ function clearSelectedModularEncounterSets()
 end
 
 function selectEncounterSet(encounterSetKey, isSelected)
+    log("selectEncounterSet: " .. encounterSetKey .. " isSelected: " .. tostring(isSelected))
     if(isSelected == nil) then
         isSelected = "True"
     end

@@ -149,7 +149,6 @@ function darkBeastDiscardSettingEnvironments(params)
 
           if (vCardId ~= cardId and string.find(vTraits, "Setting.", 1, true)) then
             Global.call("discardEncounterCard", {discardFromPosition = v.getPosition()})
-            --Global.call("discardCard", {card = v})
           end
         end
       end
