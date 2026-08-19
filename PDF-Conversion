@@ -1,0 +1,124 @@
+RA NGE
+Range in Subversion is measured in meters.
+Whenever a Range is given, that is the maximum
+range an ability can be used at.
+Sometimes an ability requires touching a target. This
+is given as Range Touch (or T). To use a T range ability,
+you must be adjacent to a target (i.e. within 1 meter).
+Occasionally, some abilities also have a minimum
+Range—in this case their Range is given as a band
+between two numbers (e.g. a weapon that can't be
+used at distances shorter than 10m and can be used
+up to 200 meters will be written as 10–
+200m).
+Starting a
+Cinematic
+INITIAT IVE /ACT ION OR DER
+Each character has an initiative score (see "Initiative"
+on pg 97), which dictates the order in which
+characters take their Turns in Cinematics. Cinematics
+occur in descending order of initiative. On a tie, the
+PCs go first. If multiple PCs or NPCs have the same
+initiative score, they decide among themselves.
+SUR PRISE ROU ND
+If a character initiates the Cinematic before the
+other side is ready, they get one Round to act
+before unaware characters can act. By default,
+only characters preparing for imminent action can
+act in the Surprise Round. Characters who are not
+prepared for action but aware of the character
+(such as their allies or other characters that are
+aware and paying attention to them) may spend
+1 Grit to act in the Surprise Round. Other characters
+may choose to spend 3 Grit to act in the Surprise
+Round. The instigating character goes first, after
+which all other participants in the Surprise Round
+act in initiative order.
+ACTIONS
+There are four types of actions characters can make:
+Main Actions, Backup Actions, Free Actions, and
+Interrupt Actions. On a character’s Turn, they may
+take one Main Action and one Backup Action, or two
+Backup Actions.
+Main Actions
+Main Actions are the things characters do that are
+essential to winning the Cinematic. Any actions that
+directly affect a Progress Track or inflict damage
+are Main Actions. Some actions which don’t directly
+affect progress may still be Main Actions because
+they are so potent.
+AT TU NE
+Sacred magic users use prayers and other mental
+practices to prevent their magic from destroying
+their mental well-being. See Casting Sacred Magic
+(pg 66) for more details.
+DISTRACT
+You use whatever you have on hand to distract or
+degrade the opponent’s performance. This could
+be laying down suppressive fire with a machine gun,
+drawing attention away by running, or throwing
+your voice. Choose a skill and describe what you’re
+doing to distract or disorient. Roll your chosen skill
+vs Vigilance of a target within 30m. On a Success, the
+target takes a -2 on actions on their next Turn.
+USE A SKILL
+The player uses a skill to accomplish a task or make
+progress towards a goal, deal damage, or cause an effect.
+USE A PARA DIGM ABILITY
+Many paradigm abilities, as specified in their
+descriptions, require a Main Action to use.
+HARMONIZE
+Casting all but the simplest arcane spells requires
+time gathering the correct types of mana. See
+Casting Arcane Magic (pg 62) for more details.
+HOLD ACT ION
+You may take the hold action to specify a condition
+to take a Main Action under. If that condition occurs
+before your next Turn, you may immediately take
+a Main Action, interrupting the current Turn for your
+Main Action.
+MAJOR MOVE
+You make an effort to move as fast as you can, or
+focus on the terrain to close or open the distance to
+another target.
+A character can increase their Speed by one
+(up to their maximum Speed, by default one). If
+a character or vehicle has the Acceleration quality
+(pg 113), they may instead increase Speed by their
+Acceleration value.
+If a character is already at their top Speed, they may
+make a Piloting or Physicality Test (as appropriate)
+against a TN equal to their current Speed+8.
+On a Success the character or their vehicle (as
+appropriate) take 1 irresistible Health damage and
+increase their top Speed until the end of the Round
+by one.
+When a character takes the Major Move action, they
+may also take Minor Move as a Free Action.
+Major Move has special rules in chase scenes, see
+Chases (pg 55).
+CHANGE THE RULE S
+A character may use a Main Action to attempt
+to add a new Progress Track to the Cinematic,
+representing an alternative method of resolving
+the Cinematic (for example, a character might
+want to attempt to run away by initiating a chase,
+hide, or convince an opponent to join their side).
+Make a relevant opposed Test as specified by the
+rules appropriate for that Progress Track (e.g.
+Stealth vs Observation for sneaking, Physicality
+vs Physicality for a chase) or determined by the
+GM. On a Success, you create a Progress Track
+appropriate to the situation, which may either
+provide a new route to end the scene or establish
+an obstacle that the other side must circumvent
+before continuing their original goal.
+Backup Actions
+A Backup Action is an action that isn’t timeconsuming
+or complicated enough to be
+a Main Action, but is still tactically important to
+a Cinematic. Characters can use one Backup Action
+on their Turn. Backup Actions don’t advance
+Progress Tracks or reduce Health, but they often
+give ancillary bonuses or penalties that may make
+winning easier.

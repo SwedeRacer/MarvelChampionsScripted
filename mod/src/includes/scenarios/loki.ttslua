@@ -79,7 +79,7 @@ scenarios["loki"] =
         },
         infinityStones={
             name="Infinity Stones",
-            position={-15.25, 1.25, 30.25},
+            position={-15.25, 1, 30.25},
             scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER")),
             cards={
                 ["21130"]=1,
@@ -89,6 +89,13 @@ scenarios["loki"] =
                 ["21134"]=1,
                 ["21135"]=1
             }
+        }
+    },
+    text={
+        infinityStones={
+            position={-15.25, 1, 36},
+            text="Infinity\nStones",
+            fontSize=60
         }
     },
     modularSets={

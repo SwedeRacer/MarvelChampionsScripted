@@ -17,7 +17,7 @@ function mapCardData(cardData)
     local card = {}
 
     for k,v in pairs(cardData) do
-        if(k~="FrontURL" and k~="FrontURL_mutant" and k~="FrontURL_shield" and k~="BackURL" and k~="flavor" and k~="text" and k~="backText" and k~="steady" and k~="stalwart" and k~="toughness") then
+        if(k~="FrontURL" and k~="FrontURL_mutant" and k~="FrontURL_shield" and k~="FrontURL_defender" and k~="BackURL" and k~="flavor" and k~="text" and k~="backText" and k~="steady" and k~="stalwart" and k~="toughness") then
             if(k=="code") then
                 card[k] = string.sub(tostring(v), 1, 5)
             else
@@ -114,6 +114,12 @@ function buildCardPool(packId)
                 local shieldCardAsset = Decker.Asset(baseUrl .. cardData.FrontURL_shield, baseUrl .. cardData.BackURL)
                 local shieldCard = Decker.Card(shieldCardAsset, 1, 1, { guid=random_guid(), name=cardName, sideways=sideways, tags=tags, GMNotes=gmNotes })
                 cardpool[cardData.code.."_shield"] = shieldCard
+            end
+
+            if(cardData.FrontURL_defender) then
+                local defenderCardAsset = Decker.Asset(baseUrl .. cardData.FrontURL_defender, baseUrl .. cardData.BackURL)
+                local defenderCard = Decker.Card(defenderCardAsset, 1, 1, { guid=random_guid(), name=cardName, sideways=sideways, tags=tags, GMNotes=gmNotes })
+                cardpool[cardData.code.."_defender"] = defenderCard
             end
         else
             cardpool[cardData.code] = {duplicate_of = cardData.duplicate_of}

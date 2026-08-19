@@ -63,6 +63,13 @@ scenarios["redSkull"] =
             }
         }
     },
+    text={
+        sideSchemes={
+            position={-19.25, 1.10, 36},
+            text="Side\nSchemes",
+            fontSize=60
+        }
+    },
     modularSets={
         hydraAssault="recommended",
         hydraPatrol="recommended"
@@ -110,7 +117,7 @@ function redSkullSetUpSchemeStage1()
     local encounterDeck = Global.call("getEncounterDeck")
     local cards = encounterDeck.getObjects()
     local sideSchemeCardIds = {}
-    local sideSchemeDeckPosition = {-19.25, 1.10, 30.75}
+    local sideSchemeDeckPosition = {-19.25, 1.10, 30.25}
     local labelPosition = Vector(sideSchemeDeckPosition) + Vector({0, 0, 5.25})
     
     function createSideSchemeDeckCoroutine()
@@ -131,7 +138,7 @@ function redSkullSetUpSchemeStage1()
                 {
                     cardId = cardId, 
                     searchInDiscard = false,
-                    destinationPosition = {-19.25, 1.10, 30.75},
+                    destinationPosition = sideSchemeDeckPosition,
                     flipCard = true
                 })
 
@@ -147,19 +154,6 @@ function redSkullSetUpSchemeStage1()
         Global.call("nameDeck", {
             deckPosition = sideSchemeDeckPosition,
             name = "Side Schemes"
-        })
-
-        spawnObject({
-            type = "3DText",
-            position = labelPosition,
-            rotation = {90, 0, 0},
-            callback_function = function(spawned_object)
-                spawned_object.TextTool.setValue("Side\nSchemes")
-                spawned_object.TextTool.setFontSize(60)
-                spawned_object.TextTool.setFontColor({1, 1, 1})
-                spawned_object.interactable = false
-                spawned_object.addTag("group-scenario")
-            end
         })
 
         local sideSchemeDeck = Global.call("getDeckOrCardAtPosition", {position = sideSchemeDeckPosition})

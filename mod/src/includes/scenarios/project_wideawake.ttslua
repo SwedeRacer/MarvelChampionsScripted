@@ -66,6 +66,13 @@ scenarios["projectWideawake"] =
             }
         }
     },
+    text={
+        captiveAllies={
+            position={-15.25, 1.25, 34.25},
+            text="Captive\nAllies",
+            fontSize=60
+        }
+    },
     modularSets={
         zeroTolerance="required",
         sentinels="recommended"

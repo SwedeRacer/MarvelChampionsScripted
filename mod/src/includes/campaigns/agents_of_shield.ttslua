@@ -1,5 +1,6 @@
 campaigns[9] = {
     name="Agents of S.H.I.E.L.D.",
+    key="agentsOfShield",
     thumbnailUrl="https://steamusercontent-a.akamaihd.net/ugc/16941724884055868600/CBC30ED45FF773A8F3ADB914BA8AB2FF8555F72D/",
     imageUrl="",
     text={
@@ -70,7 +71,7 @@ campaigns[9] = {
             title="Executive Board and A.I.M. Interference",
             text="Copy these cards when starting each new scenario, or they will be deleted when the scenario is cleared.",
             position={-96.25, 0.56, -11.75}
-        }        
+        }
     },
     assets={
         shieldEnvelope={
@@ -86,6 +87,6 @@ campaigns[9] = {
             scale={2.00, 1.00, 2.00},
             rotation={0, 180, 0},
             locked=true
-        }        
+        }
     }
 }

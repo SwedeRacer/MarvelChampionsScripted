@@ -351,7 +351,7 @@ function showReleaseNotesUI()
             {
                 tag = "Image",
                 attributes = {
-                    image = "https://d2xdqryaauvaie.cloudfront.net/assets/release-notes-20260726.png",
+                    image = "https://d2xdqryaauvaie.cloudfront.net/assets/release-notes-20260804.png",
                     rectAlignment = "MiddleCenter",
                     raycastTarget = "true",
                     height = "500",

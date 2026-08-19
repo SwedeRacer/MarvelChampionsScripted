@@ -2,31 +2,8 @@ local data = {}
 
 function onload(saved_data)
 	self.interactable = false
-
-    loadSavedData(saved_data)
  
     setUpUI()
-end
-
-function loadSavedData(saved_data)
-    if saved_data ~= "" then
-       local loaded_data = JSON.decode(saved_data)
-       data = loaded_data
-    end
-end
- 
-function setValue(key, value)
-    data[key] = value
-    local saved_data = JSON.encode(data)
-    self.script_state = saved_data
-end
- 
-function getValue(key, default)
-    if data[key] == nil then
-       return default
-    end
- 
-    return data[key]
 end
 
 function setUpUI()

@@ -96,5 +96,14 @@ scenarios["venomgoblin"] =
     modularSets={
         symbioticStrength="required",
         goblinGear="recommended"
+    },
+    extras={
+        glider={
+            name="Venom Goblin",
+            guid="9749eb",
+            position={18.75, 1.15, 23.73},
+            rotation={0, 0, 0},
+            scale={1,1,1}
+        }
     }
 }

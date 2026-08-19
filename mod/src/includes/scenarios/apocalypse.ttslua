@@ -144,7 +144,8 @@ function placeApocalypsePrelate()
     position = {0, 1, 0}, 
     scale = defaults.encounterDeck.scale, 
     name = prelate.name, 
-    flipped = true
+    flipped = true,
+    tags = {"group-scenario"}
   })
 
   currentScenario.prelateIndex = currentScenario.prelateIndex + 1

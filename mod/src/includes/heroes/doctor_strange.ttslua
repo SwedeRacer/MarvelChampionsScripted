@@ -8,6 +8,11 @@ heroes["doctorStrange"] = {
     teams = "avengers",
     decks = {
         hero = {
+            ["09032"] = 1,
+            ["09033"] = 1,
+            ["09034"] = 1,
+            ["09035"] = 1,
+            ["09036"] = 1,
             ["09002"] = 1,
             ["09003"] = 2,
             ["09004"] = 2,
@@ -53,17 +58,26 @@ heroes["doctorStrange"] = {
             ["09031"] = 1
         }
     },
-    extras = {
-        invocationDeck = {
-            type="deck",
-            offset = {-4.94, 3, -4.66},
-            cards = {
-                ["09032"] = 1,
-                ["09033"] = 1,
-                ["09034"] = 1,
-                ["09035"] = 1,
-                ["09036"] = 1
-            }
-        }
-    }
+	cards = {
+		crimsonBands = {
+			cardId = "09032",
+			offset = {-4.94, 2, 4.66},
+		},
+		imagesOfIkonn = {
+			cardId = "09033",
+			offset = {-4.94, 2, 4.66},
+		},
+		sevenRings = {
+			cardId = "09034",
+			offset = {-4.94, 2, 4.66},
+		},
+		vaporsOfValtorr = {
+			cardId = "09035",
+			offset = {-4.94, 2, 4.66},
+		},
+		windsOfWatoomb = {
+			cardId = "09036",
+			offset = {-4.94, 2, 4.66},
+		}
+	}
 }

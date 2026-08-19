@@ -1,0 +1,110 @@
+scenarios["artMuseumHeist"] = {
+    name = "Art Museum Heist",
+    fullyScripted = true,
+    tileImageUrl = "https://steamusercontent-a.akamaihd.net/ugc/2035118913124026079/1346FDBB47BCA704CFA9E914755A9AAF6B1CD5A3/",
+    villains = {},
+    schemes = {
+        main = {
+            stages = {
+                stage1 = {
+                    cardId = "60121",
+                    startingThreatPerPlayer = 1,
+                    targetThreatPerPlayer = 9
+                }
+            }
+        }
+    },
+    decks = {
+        encounterDeck = {
+            name = "Art Museum Heist Encounter Deck",
+            cards = {
+                ["60122"] = 1,
+                ["60123"] = 1,
+                ["60124"] = 1,
+                ["60125"] = 1,
+                ["60126"] = 2,
+                ["60127"] = 2
+            }
+        }
+    },
+    modularSets = {
+        cops = "recommended",
+        owl = "recommended"
+    }
+}
+
+function getEncounterSetControlPanel_artMuseumHeist()
+    return fearNoEvilGetEncounterSetPanel()
+end
+
+function prepareScenario_artMuseumHeist()
+    fearNoEvilPrepareScenario()
+end
+
+function setUpSchemeStage_artMuseumHeist_main(params)
+    local artAttachments = {{
+        cardId = "60122",
+        statusToAssign = "confused"
+    }, {
+        cardId = "60123"
+    }, {
+        cardId = "60124",
+        statusToAssign = "tough"
+    }, {
+        cardId = "60125",
+        statusToAssign = "stunned"
+    }}
+
+    artAttachments = Global.call("shuffleTable", {
+        table = artAttachments
+    })
+    local attachment = artAttachments[1]
+
+    Global.call("moveCardFromEncounterDeckById", {
+        cardId = attachment.cardId,
+        searchInDiscard = true,
+        zoneIndex = "attachment"
+    })
+
+    if (attachment.statusToAssign) then
+        local currentVillain = currentScenario.villains[1]
+
+        for _, villain in pairs(currentScenario.villains) do
+            currentVillain = villain
+        end
+
+        Global.call("addStatusToVillain", {
+            villain = currentVillain,
+            statusType = attachment.statusToAssign
+        })
+    end
+end
+
+function setUpVillainStage_artMuseumHeist(params)
+    fearNoEvilSetupVillainStage(params)
+end
+
+function calculateThreatToAdd_artMuseumHeist()
+    local attachmentZoneDef = Global.call("getZoneDefinition", {
+        zoneIndex = "attachment"
+    })
+
+    local attachmentZone = getObjectFromGUID(attachmentZoneDef.guid)
+    local attachments = attachmentZone.getObjects()
+    local artCount = 0
+
+    for _, attachment in pairs(attachments) do
+        if (attachment.tag == "Card") then
+            local cardData = Global.call("getCardData", {
+                card = attachment
+            })
+
+            local traits = cardData and cardData.traits or ""
+            if (string.find(traits, "Art.", 1, true)) then
+                artCount = artCount + 1
+            end
+        end
+    end
+
+    return artCount + 1
+end

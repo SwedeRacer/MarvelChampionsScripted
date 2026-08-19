@@ -1,0 +1,39 @@
+scenarios["protectionRacket"] = {
+    name = "Protection Racket",
+    fullyScripted = true,
+    tileImageUrl = "https://steamusercontent-a.akamaihd.net/ugc/2035118913124026079/1346FDBB47BCA704CFA9E914755A9AAF6B1CD5A3/",
+    villains = {},
+    schemes = {
+        main = {
+            stages = {
+                stage1 = {
+                    cardId = "60121",
+                    startingThreatPerPlayer = 1,
+                    targetThreatPerPlayer = 9
+                }
+            }
+        }
+    },
+    decks = {
+        encounterDeck = {
+            name = "Protection Racket Encounter Deck",
+            cards = {
+                ["60139"] = 1,
+                ["60140"] = 1,
+                ["60141"] = 2
+            }
+        }
+    },
+    modularSets = {
+        disasters = "recommended",
+        tracksuitMafia = "recommended"
+    }
+}
+
+function getEncounterSetControlPanel_protectionRacket()
+    return fearNoEvilGetEncounterSetPanel()
+end
+
+function prepareScenario_protectionRacket()
+    fearNoEvilPrepareScenario()
+end

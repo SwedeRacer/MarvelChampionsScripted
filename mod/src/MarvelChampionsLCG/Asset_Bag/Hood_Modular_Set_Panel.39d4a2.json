@@ -9,9 +9,9 @@
       "rotX": -2.48305714e-8,
       "rotY": 180.005219,
       "rotZ": -3.445957e-8,
-      "scaleX": 6,
+      "scaleX": 4.45,
       "scaleY": 1,
-      "scaleZ": 6
+      "scaleZ": 4.45
     },
     "Nickname": "Hood Modular Set Panel",
     "Description": "",
@@ -26,6 +26,9 @@
       "g": 1,
       "b": 1
     },
+    "Tags": [
+      "hood-modular-set-panel"
+    ],
     "LayoutGroupSortIndex": 0,
     "Value": 0,
     "Locked": false,
@@ -41,7 +44,7 @@
     "HideWhenFaceDown": false,
     "Hands": false,
     "CustomImage": {
-      "ImageURL": "https://steamusercontent-a.akamaihd.net/ugc/2495635039458047004/2537FC8BDB12EB7AC2285CD95F2F0C1643781ABF/",
+      "ImageURL": "https://steamusercontent-a.akamaihd.net/ugc/14822628607470425024/73B7292A52C7A10303932620044BBEDF0CA26B6B/",
       "ImageSecondaryURL": "",
       "ImageScalar": 1,
       "WidthScale": 0,

@@ -1,0 +1,116 @@
+scenarios["stopThePresses"] = {
+    name = "Stop the Presses",
+    fullyScripted = true,
+    tileImageUrl = "https://steamusercontent-a.akamaihd.net/ugc/2035118913124026079/1346FDBB47BCA704CFA9E914755A9AAF6B1CD5A3/",
+    villains = {},
+    schemes = {
+        main = {
+            stages = {
+                stage1 = {
+                    cardId = "60151",
+                    startingThreatPerPlayer = 1,
+                    targetThreatPerPlayer = 9
+                }
+            }
+        }
+    },
+    decks = {
+        encounterDeck = {
+            name = "Stop the Presses Encounter Deck",
+            cards = {
+                ["60152"] = 1,
+                ["60153"] = 1,
+                ["60154"] = 1,
+                ["60155"] = 1,
+                ["60156"] = 1,
+                ["60157"] = 1,
+                ["60158"] = 2
+            }
+        }
+    },
+    modularSets = {
+        tombstone = "recommended",
+        tracksuitMafia = "recommended"
+    }
+}
+
+function getEncounterSetControlPanel_stopThePresses()
+    return fearNoEvilGetEncounterSetPanel()
+end
+
+function prepareScenario_stopThePresses()
+    fearNoEvilPrepareScenario()
+end
+
+function setUpSchemeStage_stopThePresses_main(params)
+    local dailyBugleCardId = "60152"
+    Global.call("moveCardFromEncounterDeckById", {
+        cardId = dailyBugleCardId,
+        searchInDiscard = true,
+        zoneIndex = "environment"
+    })
+
+    local dailyBugleSupports = {"60153", "60154", "60155", "60156"}
+
+    dailyBugleSupports = Global.call("shuffleTable", {
+        table = dailyBugleSupports
+    })
+
+    local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
+    local players = heroManager.call("getPlayersInPlayerOrder")
+
+    function dealDailyBugleSupportsCoroutine()
+        -- Randomly deal Daily Bugle supports to players.
+        for i, player in ipairs(players) do
+            local supportCardId = dailyBugleSupports[i]
+            local playmatPosition = heroManager.call("getPlaymatPosition", {
+                playerColor = player.playerColor
+            })
+
+            Global.call("moveCardFromEncounterDeckById", {
+                cardId = supportCardId,
+                searchInDiscard = true,
+                destinationPosition = Vector(playmatPosition)
+            })
+
+            for i = 1, 10 do
+                coroutine.yield(0)
+            end
+        end
+
+        -- Delete any remaining Daily Bugle supports from the encounter deck.
+        local encounterDeck = Global.call("getEncounterDeck")
+        local encounterCards = encounterDeck.getObjects()
+        local cardGuidsToDelete = {}
+
+        for _, card in ipairs(encounterCards) do
+            local cardData = Global.call("getCardData", {
+                card = card
+            })
+
+            local traits = cardData.traits or ""
+            if (string.find(traits, "Daily Bugle.", 1, true)) then
+                table.insert(cardGuidsToDelete, card.guid)
+            end
+        end
+
+        for _, cardGuid in ipairs(cardGuidsToDelete) do
+            local card = encounterDeck.takeObject({
+                guid = cardGuid
+            })
+            if (card) then
+                card.destruct()
+            end
+        end
+
+        return 1
+    end
+
+    Wait.frames(function()
+        startLuaCoroutine(self, "dealDailyBugleSupportsCoroutine")
+    end, 10)
+end
+
+function setUpVillainStage_artMuseumHeist(params)
+    fearNoEvilSetupVillainStage(params)
+end

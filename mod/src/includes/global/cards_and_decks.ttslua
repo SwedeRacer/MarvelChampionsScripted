@@ -19,7 +19,7 @@ function dealEncounterCardsToAllPlayers(params)
     local heroManager = getObjectFromGUID(GUID_HERO_MANAGER)
     local allPlayers = heroManager.call("getPlayersInPlayerOrder")
 
-    if(numberOfCards == nil) then
+    if (numberOfCards == nil) then
         numberOfCards = cardsPerPlayer * #allPlayers
     end
 
@@ -35,7 +35,7 @@ function dealEncounterCardsToAllPlayers(params)
 
             playerIndex = playerIndex + 1
 
-            if(playerIndex > #allPlayers) then
+            if (playerIndex > #allPlayers) then
                 playerIndex = 1
             end
 
@@ -69,16 +69,17 @@ function dealEncounterCardToPlayer(params)
     local dealToRotation = faceUp and {0, 180, 0} or {0, 180, 180}
     local encounterDeckPosition = Vector(scenarioManager.call('getEncounterDeckPosition'))
 
-    local deckOrCard = getDeckOrCardAtPosition({position = encounterDeckPosition})
+    local deckOrCard = getDeckOrCardAtPosition({
+        position = encounterDeckPosition
+    })
 
-    --If there is no encounter deck, refresh the deck and try again
+    -- If there is no encounter deck, refresh the deck and try again
     if not deckOrCard then
         refreshEncounterDeck()
 
         Wait.frames(function()
             dealEncounterCardToPlayer(params)
-        end, 
-        30)
+        end, 30)
 
         return
     end
@@ -99,7 +100,7 @@ function dealEncounterCardToPlayer(params)
         destinationRotation = dealToRotation
     })
 
-    if(refreshNeeded) then
+    if (refreshNeeded) then
         Wait.frames(function()
             refreshEncounterDeck()
         end, 10)
@@ -111,21 +112,22 @@ function drawBoostcard()
     local encounterDeckPosition = Vector(scenarioManager.call('getEncounterDeckPosition'))
     local drawToPosition = Vector(scenarioManager.call('getBoostDrawPosition'))
     local drawToRotation = {0, 180, 180}
-    
-    local deckOrCard = getDeckOrCardAtPosition({position = encounterDeckPosition})
 
-    --If there is no encounter deck, refresh the deck and try again
+    local deckOrCard = getDeckOrCardAtPosition({
+        position = encounterDeckPosition
+    })
+
+    -- If there is no encounter deck, refresh the deck and try again
     if not deckOrCard then
         refreshEncounterDeck()
 
         Wait.frames(function()
             drawBoostcard()
-        end, 
-        30)
+        end, 30)
 
         return
     end
-    
+
     local card
     local refreshNeeded = false
 
@@ -135,14 +137,14 @@ function drawBoostcard()
         card = deckOrCard
         refreshNeeded = true
     end
-    
+
     moveCard({
         card = card,
         destinationPosition = drawToPosition,
         destinationRotation = drawToRotation
     })
 
-    if(refreshNeeded) then
+    if (refreshNeeded) then
         Wait.frames(function()
             refreshEncounterDeck()
         end, 10)
@@ -152,18 +154,26 @@ end
 function discardEncounterCard(params)
     local card = params.card or nil
     local discardFromPosition = params.discardFromPosition
-    local stagingPosition = ensureMinimumYPosition({position = discardFromPosition, minimumY = 2.0})
+    local stagingPosition = ensureMinimumYPosition({
+        position = discardFromPosition,
+        minimumY = 2.0
+    })
     local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
-    local encounterDiscardPosition = ensureMinimumYPosition({position = Vector(scenarioManager.call('getEncounterDiscardPosition')), minimumY = 2.0})
+    local encounterDiscardPosition = ensureMinimumYPosition({
+        position = Vector(scenarioManager.call('getEncounterDiscardPosition')),
+        minimumY = 2.0
+    })
 
-    if(not card) then
+    if (not card) then
         local deckOrCard = getDeckOrCardAtPosition({
             position = discardFromPosition
         })
 
-        if(not deckOrCard) then return end
-    
-        if(deckOrCard.tag == "Deck") then
+        if (not deckOrCard) then
+            return
+        end
+
+        if (deckOrCard.tag == "Deck") then
             card = deckOrCard.takeObject()
         else
             card = deckOrCard
@@ -199,10 +209,14 @@ end
 
 function refreshEncounterDeck()
     local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
-    local encounterDeckPosition = Vector(scenarioManager.call('getEncounterDeckPosition')) + Vector(0,1.5,0)
+    local encounterDeckPosition = Vector(scenarioManager.call('getEncounterDeckPosition')) + Vector(0, 1.5, 0)
     local encounterDiscardPosition = Vector(scenarioManager.call('getEncounterDiscardPosition'))
 
-    refreshDeck({deckPosition = encounterDeckPosition, discardPosition = encounterDiscardPosition, deckType = "encounter"})
+    refreshDeck({
+        deckPosition = encounterDeckPosition,
+        discardPosition = encounterDiscardPosition,
+        deckType = "encounter"
+    })
 
     displayMessage({
         message = "Reshuffled the encounter deck.",
@@ -231,7 +245,7 @@ function shuffleDeck(params)
         position = deckPosition
     })
 
-    if(deck) then
+    if (deck) then
         deck.shuffle()
     else
         log("deck not found at position {" .. deckPosition.x .. "," .. deckPosition.y .. "," .. deckPosition.z .. "}")
@@ -242,7 +256,9 @@ function isFaceUp(params)
     local object = params.object
     local ignoreToggles = params.ignoreToggles or false
 
-    if(not ignoreToggles and not object.hide_when_face_down) then return true end
+    if (not ignoreToggles and not object.hide_when_face_down) then
+        return true
+    end
 
     local z = object.getRotation()["z"]
 
@@ -251,7 +267,9 @@ end
 
 function isFaceDown(params)
     local object = params.object
-    if(not object.hide_when_face_down) then return false end
+    if (not object.hide_when_face_down) then
+        return false
+    end
 
     local z = object.getRotation()["z"]
 
@@ -259,10 +277,14 @@ function isFaceDown(params)
 end
 
 function deleteCardAtPosition(params)
-    local card = getCardAtPosition({position = params.position})
+    local card = getCardAtPosition({
+        position = params.position
+    })
 
-    if(card) then
-        removeCountersFromCard({card = card})
+    if (card) then
+        removeCountersFromCard({
+            card = card
+        })
         card.destroy()
     end
 end
@@ -272,8 +294,12 @@ function moveDeck(params)
     local destinationPosition = params.destinationPosition
     local destinationRotation = params.destinationRotation
 
-    local deckOrCard = getDeckOrCardAtPosition({position = originPosition})
-    if (not deckOrCard) then return end
+    local deckOrCard = getDeckOrCardAtPosition({
+        position = originPosition
+    })
+    if (not deckOrCard) then
+        return
+    end
 
     deckOrCard.setPositionSmooth(destinationPosition, false, false)
 
@@ -332,7 +358,7 @@ function moveCard(params)
     local raiseHeight = params.raiseHeight or 3.0
     local moveFast = params.moveFast or false
     local faceUpOnRaise = params.faceUpOnRaise or false
-    
+
     card.setLock(false)
 
     local originalPosition = card.getPosition()
@@ -347,7 +373,7 @@ function moveCard(params)
 
     local originalRotation = card.getRotation()
 
-    if(faceUpOnRaise) then
+    if (faceUpOnRaise) then
         card.setRotation({originalRotation.x, originalRotation.y, 0})
     end
 
@@ -357,11 +383,10 @@ function moveCard(params)
     card.setRotationSmooth(destination.rotation, false, moveFast)
 end
 
-function moveCardFromDeck(params)
-end
-
 function moveCardFromPosition(params)
-    local card = getCardAtPosition({position = params.origin})
+    local card = getCardAtPosition({
+        position = params.origin
+    })
 
     if (not card) then
         return nil
@@ -376,7 +401,9 @@ end
 
 function moveCardFromDeckById(params)
     local cardId = params.cardId
-    if(not cardId) then return false end
+    if (not cardId) then
+        return false
+    end
 
     local deckPosition = params.deckPosition
     local destinationPosition = Vector(params.destinationPosition)
@@ -391,13 +418,17 @@ function moveCardFromDeckById(params)
         destinationRotation["z"] = 180
     end
 
-    local cardOrDeck = getDeckOrCardAtPosition({position = deckPosition})
+    local cardOrDeck = getDeckOrCardAtPosition({
+        position = deckPosition
+    })
 
-    if(not cardOrDeck) then return false end
+    if (not cardOrDeck) then
+        return false
+    end
 
     local card
 
-    if(cardOrDeck.tag == "Deck") then
+    if (cardOrDeck.tag == "Deck") then
         local deck = cardOrDeck
 
         for i, cardInDeck in ipairs(deck.getObjects()) do
@@ -414,13 +445,95 @@ function moveCardFromDeckById(params)
         end
     end
 
-    if(not card) then
-        local id = getCardId({card = cardOrDeck})
- 
-        if (id == cardId) then card = cardOrDeck end
+    if (not card) then
+        local id = getCardId({
+            card = cardOrDeck
+        })
+
+        if (id == cardId) then
+            card = cardOrDeck
+        end
     end
-    
-    if(not card) then return false end
+
+    if (not card) then
+        return false
+    end
+
+    moveCard({
+        card = card,
+        destinationPosition = destinationPosition,
+        destinationRotation = destinationRotation
+    })
+
+    if (destinationScale) then
+        card.setScale(destinationScale)
+    end
+
+    if (settings.hideWhenFaceDown ~= nil) then
+        card.hide_when_face_down = settings.hideWhenFaceDown
+    end
+
+    for key, value in pairs(values) do
+        setCardValue({
+            cardGuid = card.getGUID(),
+            property = key,
+            value = value
+        })
+    end
+
+    for key, tag in pairs(tags) do
+        card.addTag(tag)
+    end
+
+    return true
+end
+
+function moveCardFromDeckByGuid(params)
+    local cardGuid = params.cardGuid
+    if (not cardGuid) then
+        return false
+    end
+
+    local deckPosition = params.deckPosition
+    local destinationPosition = Vector(params.destinationPosition)
+    local destinationRotation = params.destinationRotation and Vector(params.destinationRotation) or Vector({0, 180, 0})
+    local destinationScale = params.destinationScale and Vector(params.destinationScale) or nil
+    local flipCard = params.flipCard or false
+    local settings = params.settings or {}
+    local values = params.values or {}
+    local tags = params.tags or {}
+
+    if (flipCard) then
+        destinationRotation["z"] = 180
+    end
+
+    local cardOrDeck = getDeckOrCardAtPosition({
+        position = deckPosition
+    })
+
+    if (not cardOrDeck) then
+        return false
+    end
+
+    local card
+
+    if (cardOrDeck.tag == "Deck") then
+        local deck = cardOrDeck
+
+        card = deck.takeObject({
+            guid = cardGuid
+        })
+    end
+
+    if (not card) then
+        if (cardOrDeck.getGUID() == cardGuid) then
+            card = cardOrDeck
+        end
+    end
+
+    if (not card) then
+        return false
+    end
 
     moveCard({
         card = card,
@@ -455,7 +568,7 @@ function spawnCardAndMoveFromEncounterDeckById(params)
     local cardId = params.cardId
     local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
     local encounterDeckPosition = Vector(scenarioManager.call('getEncounterDeckPosition'))
-    
+
     local card = spawnCard({
         cardId = cardId,
         position = encounterDeckPosition,
@@ -466,22 +579,20 @@ function spawnCardAndMoveFromEncounterDeckById(params)
 
     params.searchInDiscard = true
 
-    Wait.condition(
-        function() 
-            Wait.frames(function()
-                moveCardFromEncounterDeckById(params)
-            end,
-            60)
-        end,
-        function()
-            return card.isDestroyed() or card.resting
-        end,
-        10)
+    Wait.condition(function()
+        Wait.frames(function()
+            moveCardFromEncounterDeckById(params)
+        end, 60)
+    end, function()
+        return card.isDestroyed() or card.resting
+    end, 10)
 end
 
 function moveCardFromEncounterDeckById(params)
     local cardId = params.cardId
-    if(not cardId) then return false end
+    if (not cardId) then
+        return false
+    end
 
     local searchInDiscard = params.searchInDiscard or false
     local flipCard = params.flipCard or false
@@ -516,7 +627,9 @@ end
 
 function placeSetupCardsFromDeck(params)
     local deckPosition = params.deckPosition
-    local deck = getDeckAtPosition({position = deckPosition})
+    local deck = getDeckAtPosition({
+        position = deckPosition
+    })
 
     if not deck then
         log("No deck found at position " .. tostring(deckPosition))
@@ -524,17 +637,19 @@ function placeSetupCardsFromDeck(params)
     end
 
     for i, card in ipairs(deck.getObjects()) do
-        local cardData = getCardData({card = card})
+        local cardData = getCardData({
+            card = card
+        })
         if cardData.setup then
             local cardType = cardData.type
             local zoneIndex = nil
             local destinationPosition = nil
 
-            if(cardType == "environment") then
+            if (cardType == "environment") then
                 zoneIndex = "environment"
-            elseif(cardType == "side_scheme") then
+            elseif (cardType == "side_scheme") then
                 zoneIndex = "sideScheme"
-            elseif(cardType == "attachment") then
+            elseif (cardType == "attachment") then
                 zoneIndex = "attachment"
             else
                 destinationPosition = {0, 1, 0}
@@ -576,7 +691,7 @@ function getItemsOnCard(params)
 
     for _, obj in ipairs(objList) do
         local object = obj.hit_object
-        if(object.hasTag("counter") or object.hasTag("token")) then
+        if (object.hasTag("counter") or object.hasTag("token")) then
             table.insert(items, object)
         end
     end
@@ -603,7 +718,7 @@ function getCardAtPosition(params)
 
     local objects = findInRadiusBy(position, 3, isCard, false)
 
-    if(#objects == 0) then
+    if (#objects == 0) then
         return nil
     end
 
@@ -616,7 +731,7 @@ function getDeckAtPosition(params)
 
     local objects = findInRadiusBy(position, 3, isDeck, false)
 
-    if(#objects == 0) then
+    if (#objects == 0) then
         return nil
     end
 
@@ -846,11 +961,9 @@ function discardFromEncounterDeck(params)
         end
 
         local function isSimpleEncounterDiscard(nextRequest)
-            return (nextRequest.cardsToDiscard or 0) == 1 and
-                nextRequest.searchFunction == nil and
-                (nextRequest.cardsToFind or 0) == 0 and
-                not nextRequest.stopWhenCardsFound and
-                nextRequest.callBackFunction == nil
+            return (nextRequest.cardsToDiscard or 0) == 1 and nextRequest.searchFunction == nil and
+                       (nextRequest.cardsToFind or 0) == 0 and not nextRequest.stopWhenCardsFound and
+                       nextRequest.callBackFunction == nil
         end
 
         local function countLeadingSimpleDiscards()
@@ -1013,9 +1126,8 @@ function discardFromEncounterDeck(params)
                     deckDepleted = getDeckOrCardAtExactPosition({
                         position = deckPosition
                     }) == nil
-                    stopDiscarding = deckDepleted or
-                        (stopWhenCardsFound and cardsFound >= cardsToFind) or
-                        (cardsToDiscard > 0 and cardsDiscarded >= cardsToDiscard)
+                    stopDiscarding = deckDepleted or (stopWhenCardsFound and cardsFound >= cardsToFind) or
+                                         (cardsToDiscard > 0 and cardsDiscarded >= cardsToDiscard)
 
                     if (not stopDiscarding) then
                         for i = 1, 40 do
@@ -1084,7 +1196,9 @@ function discardCardFromDeck(params)
         position = deckPosition
     })
 
-    if not deckOrCard then return nil end
+    if not deckOrCard then
+        return nil
+    end
 
     local card = nil
 
@@ -1121,9 +1235,11 @@ function cardIsInZone(params)
     end
 
     local zoneIndex = params.zoneIndex
-    local zoneDef = getZoneDefinition({zoneIndex = zoneIndex})
+    local zoneDef = getZoneDefinition({
+        zoneIndex = zoneIndex
+    })
     local zones = card.getZones()
-    
+
     for _, zone in pairs(zones) do
         if zone.getGUID() == zoneDef.guid then
             return true
@@ -1153,17 +1269,18 @@ end
 
 function discardPlayerCard(params)
     local card = params.card
-    local playerColor = params.playerColor or
-        getCardValue({
-            cardGuid = card.getGUID(),
-            property = "playerColor"
-        })
+    local playerColor = params.playerColor or getCardValue({
+        cardGuid = card.getGUID(),
+        property = "playerColor"
+    })
 
     local heroManager = getObjectFromGUID(GUID_HERO_MANAGER)
     local playmat = heroManager.call("getPlaymat", {
         playerColor = playerColor
     })
-    if(not playmat) then return end
+    if (not playmat) then
+        return
+    end
 
     local discardPosition = Vector(playmat.call("getPlayerDiscardPosition"))
 
@@ -1434,7 +1551,7 @@ end
 function refreshDeck(params)
     local deckPosition = params.deckPosition
     local discardPosition = params.discardPosition
-    
+
     local deck = getDeckOrCardAtPosition({
         position = discardPosition
     })
@@ -1482,8 +1599,10 @@ function importDeck(params)
                 end
             end
 
-            if(#deckInfos == 0) then
-                broadcastToAll("Deck " .. deckId .. " not found.\nMake sure the \"Share your decks\" checkbox is checked in your MarvelCDB account page!", {1, 0.27, 0})
+            if (#deckInfos == 0) then
+                broadcastToAll("Deck " .. deckId ..
+                                   " not found.\nMake sure the \"Share your decks\" checkbox is checked in your MarvelCDB account page!",
+                    {1, 0.27, 0})
             end
 
             callbackTarget.call(callbackFunction, {
@@ -1532,9 +1651,19 @@ function countCardIconsInPlay(params)
                 card = object
             })
 
-            if(not cardData) then goto continueIconCount end
-            if(cardData.type ~= "main_scheme" and not isFaceUp({object = object})) then goto continueIconCount end --Main schemes are "face down" when in play; all others should be face up
-            if(not objectIsOnTable({object = object})) then goto continueIconCount end
+            if (not cardData) then
+                goto continueIconCount
+            end
+            if (cardData.type ~= "main_scheme" and not isFaceUp({
+                object = object
+            })) then
+                goto continueIconCount
+            end -- Main schemes are "face down" when in play; all others should be face up
+            if (not objectIsOnTable({
+                object = object
+            })) then
+                goto continueIconCount
+            end
 
             for _, deckPosition in pairs(deckPositions) do
                 if objectIsAtPosition({
@@ -1547,8 +1676,10 @@ function countCardIconsInPlay(params)
 
             local iconCount = tonumber(cardData[iconType] or "0")
 
-            if(iconCount > 0) then
-                table.insert(cardList, stripCardSuffix({cardName = object.getName()}))
+            if (iconCount > 0) then
+                table.insert(cardList, stripCardSuffix({
+                    cardName = object.getName()
+                }))
             end
 
             count = count + iconCount
@@ -1565,16 +1696,19 @@ function getDeckPositions(includeDeck, includeDiscard)
     local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
     local heroManager = getObjectFromGUID(GUID_HERO_MANAGER)
 
-    if(not scenarioManager or not heroManager) then
+    if (not scenarioManager or not heroManager) then
         return deckPositions
     end
 
-    local heroDeckPositions = heroManager.call("getAllPlayerDeckPositions", {includeDeck = includeDeck, includeDiscard = includeDiscard}) or {}
+    local heroDeckPositions = heroManager.call("getAllPlayerDeckPositions", {
+        includeDeck = includeDeck,
+        includeDiscard = includeDiscard
+    }) or {}
 
-    if(includeDeck) then
+    if (includeDeck) then
         table.insert(deckPositions, Vector(scenarioManager.call('getEncounterDeckPosition')))
     end
-    if(includeDiscard) then
+    if (includeDiscard) then
         table.insert(deckPositions, Vector(scenarioManager.call('getEncounterDiscardPosition')))
     end
 
@@ -1592,7 +1726,10 @@ function dealMinionToAllPlayers(params)
 
     function dealMinionsCoroutine()
         for _, player in ipairs(players) do
-            Global.call("moveCardFromEncounterDeckById", {cardId = minionCardId, zoneIndex = "minion-" .. player.playerColor})
+            Global.call("moveCardFromEncounterDeckById", {
+                cardId = minionCardId,
+                zoneIndex = "minion-" .. player.playerColor
+            })
 
             for i = 1, 25 do
                 coroutine.yield(0)
@@ -1629,13 +1766,15 @@ end
 
 function discardCardOrDeck(params)
     local object = params.object
-    if(not object) then return end
+    if (not object) then
+        return
+    end
 
-    if(not object.getLock() and (object.hasTag("counter") or object.hasTag("token"))) then
+    if (not object.getLock() and (object.hasTag("counter") or object.hasTag("token"))) then
         object.destruct()
         return
     end
- 
+
     local objectType = object.tag
 
     local deckPositions = getDeckPositions(true, false)
@@ -1650,9 +1789,11 @@ function discardCardOrDeck(params)
         end
     end
 
-    if(objectType == "Deck") then
-        --If the object is a player deck, discard from that deck (refresh if needed))
-        local playerDeckColor = getPlayerColorFromDeck({deck = object})
+    if (objectType == "Deck") then
+        -- If the object is a player deck, discard from that deck (refresh if needed))
+        local playerDeckColor = getPlayerColorFromDeck({
+            deck = object
+        })
 
         if playerDeckColor then
             discardFromPlayerDeck({
@@ -1662,7 +1803,7 @@ function discardCardOrDeck(params)
             return
         end
 
-        --If the object is the encounter deck, discard from that deck (refresh if needed))
+        -- If the object is the encounter deck, discard from that deck (refresh if needed))
         local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
         local encounterDeckPosition = scenarioManager.call("getEncounterDeckPosition")
 
@@ -1676,43 +1817,57 @@ function discardCardOrDeck(params)
             return
         end
 
-        --Check the top card of the deck to determine where to discard
+        -- Check the top card of the deck to determine where to discard
         local card = object.takeObject()
-        local cardData = getCardData({card = card})
-        if(not cardData) then return end
+        local cardData = getCardData({
+            card = card
+        })
+        if (not cardData) then
+            return
+        end
 
-        if(cardData.aspect == "encounter") then
+        if (cardData.aspect == "encounter") then
             discardEncounterCard({
                 card = card
             })
         else
-            local cardPlayerColor = getCardPlayerColor({card = card})
-            if(cardPlayerColor) then
+            local cardPlayerColor = getCardPlayerColor({
+                card = card
+            })
+            if (cardPlayerColor) then
                 discardPlayerCard({
                     card = card,
                     playerColor = cardPlayerColor
                 })
                 return
             else
-                broadcastToAll("Could not determine which discard pile to discard to.", {1,0,0})
+                broadcastToAll("Could not determine which discard pile to discard to.", {1, 0, 0})
             end
         end
     end
 
-    if(objectType ~= "Card") then return end
+    if (objectType ~= "Card") then
+        return
+    end
 
-    local cardData = getCardData({card = object})
+    local cardData = getCardData({
+        card = object
+    })
 
-    if(cardData.type == "hero") then return end
+    if (cardData.type == "hero") then
+        return
+    end
 
-    --Don't discard locked cards
-    if object.getLock() then return end
+    -- Don't discard locked cards
+    if object.getLock() then
+        return
+    end
 
-    --If the card is in a player zone, discard to that player's discard pile
+    -- If the card is in a player zone, discard to that player's discard pile
     local zones = object.getZones()
 
     for _, zone in pairs(zones) do
-        if(zone.tag == "Hand") then
+        if (zone.tag == "Hand") then
             local playerColor = zone.getValue()
 
             object.use_hands = false
@@ -1723,7 +1878,7 @@ function discardCardOrDeck(params)
             })
 
             Wait.frames(function()
-                if(not object.isDestroyed()) then
+                if (not object.isDestroyed()) then
                     object.use_hands = true
                 end
             end, 20)
@@ -1731,10 +1886,14 @@ function discardCardOrDeck(params)
             return
         end
 
-        local zoneDef = getZoneDefinition({zoneGuid = zone.getGUID()})
+        local zoneDef = getZoneDefinition({
+            zoneGuid = zone.getGUID()
+        })
 
-        if(zoneDef and (zoneDef.zoneType == "heroExit")) then
-            removeCountersFromCard({card = object})
+        if (zoneDef and (zoneDef.zoneType == "heroExit")) then
+            removeCountersFromCard({
+                card = object
+            })
             discardPlayerCard({
                 card = object,
                 playerColor = zoneDef.playerColor
@@ -1743,18 +1902,22 @@ function discardCardOrDeck(params)
         end
     end
 
-    --If the card is an encounter card, discard to the encounter discard pile
-    if(cardData.aspect == "encounter") then
-        removeCountersFromCard({card = object})
+    -- If the card is an encounter card, discard to the encounter discard pile
+    if (cardData.aspect == "encounter") then
+        removeCountersFromCard({
+            card = object
+        })
         discardEncounterCard({
             discardFromPosition = object.getPosition()
         })
         return
     end
 
-    --If the card has a playerColor tag, discard to that player's discard pile
-    local cardPlayerColor = getCardPlayerColor({card = object})
-    if(cardPlayerColor) then
+    -- If the card has a playerColor tag, discard to that player's discard pile
+    local cardPlayerColor = getCardPlayerColor({
+        card = object
+    })
+    if (cardPlayerColor) then
         discardPlayerCard({
             card = object,
             playerColor = cardPlayerColor
@@ -1762,19 +1925,21 @@ function discardCardOrDeck(params)
         return
     end
 
-    --If the player is seated, discard to their discard pile
+    -- If the player is seated, discard to their discard pile
     local playerColor = params.playerColor
-    if(playerColor == "Red" or playerColor == "Blue" or playerColor == "Green" or playerColor == "Yellow") then
-        removeCountersFromCard({card = object})
+    if (playerColor == "Red" or playerColor == "Blue" or playerColor == "Green" or playerColor == "Yellow") then
+        removeCountersFromCard({
+            card = object
+        })
         discardPlayerCard({
             card = object,
             playerColor = playerColor
-        })    
+        })
         return
-    end    
+    end
 
-    --Otherwise, notify that a discard deck could not be identified
-    broadcastToAll("Could not determine which discard pile to discard to.", {1,0,0})
+    -- Otherwise, notify that a discard deck could not be identified
+    broadcastToAll("Could not determine which discard pile to discard to.", {1, 0, 0})
 end
 
 function getCardPlayerColor(params)
@@ -1790,28 +1955,36 @@ function getCardPlayerColor(params)
     return nil
 end
 
---Zone Manager pass-throughs
+-- Zone Manager pass-throughs
 
 function setCardValue(params)
     local layoutManager = getObjectFromGUID(GUID_LAYOUT_MANAGER)
-    if(not layoutManager) then return nil end
+    if (not layoutManager) then
+        return nil
+    end
     layoutManager.call("setCardValue", params)
 end
 
 function getCardValue(params)
     local layoutManager = getObjectFromGUID(GUID_LAYOUT_MANAGER)
-    if(not layoutManager) then return nil end
+    if (not layoutManager) then
+        return nil
+    end
     return layoutManager.call("getCardValue", params)
 end
 
 function getAllCardValues(params)
     local layoutManager = getObjectFromGUID(GUID_LAYOUT_MANAGER)
-    if(not layoutManager) then return nil end
+    if (not layoutManager) then
+        return nil
+    end
     return layoutManager.call("getAllCardValues", params)
 end
 
 function deleteCardFromRegistry(params)
     local layoutManager = getObjectFromGUID(GUID_LAYOUT_MANAGER)
-    if(not layoutManager) then return nil end
+    if (not layoutManager) then
+        return nil
+    end
     layoutManager.call("deleteCardFromRegistry", params)
 end

@@ -1,0 +1,444 @@
+scenarios["kingpin"] = {
+    name = "Kingpin",
+    fullyScripted = true,
+    tileImageUrl = cdnUrl .. "/selectors/scenarios/selector-kingpin.png",
+    villains = {
+        kingpin = {
+            name = "Kingpin",
+            hpCounter = {
+                imageUrl = cdnUrl .. "/tiles/kingpin-hp-counter.png"
+            },
+            stages = {
+                stage1 = {
+                    cardId = "60159",
+                    hitPointsPerPlayer = 14
+                },
+                stage2 = {
+                    cardId = "60160",
+                    hitPointsPerPlayer = 15
+                }
+            }
+        }
+    },
+    schemes = {
+        main = {
+            stages = {
+                stage1 = {
+                    cardId = "60161",
+                    startingThreat = 0,
+                    startingThreatPerPlayer = 3,
+                    targetThreatPerPlayer = 11
+                },
+                stage2 = {
+                    cardId = "60162",
+                    startingThreat = 0,
+                    targetThreatPerPlayer = 7,
+                    flavorText = "\"You so-called heroes have been a thorn in all of our sides for far too long. Together we will destroy you and rule this city!\" --Kingpin"
+                }
+            }
+        }
+    },
+    decks = {
+        encounterDeck = {
+            name = "Kingpin's Encounter Deck",
+            cards = {
+                ["60163"] = 1,
+                ["60164"] = 1,
+                ["60165"] = 1,
+                ["60166"] = 1,
+                ["60167"] = 1,
+                ["60168"] = 1,
+                ["60169"] = 1,
+                ["60170"] = 1,
+                ["60171"] = 1,
+                ["60172"] = 1,
+                ["60173"] = 1,
+                ["60174"] = 1,
+                ["60175"] = 3,
+                ["60176"] = 3
+            }
+        }
+    },
+    modularSets = {
+        bombScare = "recommended"
+    }
+}
+
+function fearNoEvilGetEncounterSetPanel()
+    local underlings = {{
+        key = "bullseye",
+        name = "Bullseye"
+    }, {
+        key = "electro",
+        name = "Electro"
+    }, {
+        key = "hammerhead",
+        name = "Hammerhead"
+    }, {
+        key = "purpleMan",
+        name = "Purple Man",
+        fileName = "purple-man"
+    }, {
+        key = "typhoidMary",
+        name = "Typhoid Mary",
+        fileName = "typhoid-mary"
+    }}
+
+    local guid = self.getGUID()
+    local underlingButtons = {}
+
+    for _, underling in pairs(underlings) do
+        log(cdnUrl .. "/selectors/scenarios/selector-" .. (underling.fileName or underling.key) .. ".png")
+        table.insert(underlingButtons, {
+            tag = "Panel",
+            value = underling.name,
+            attributes = {
+                id = underling.key,
+                onValueChanged = guid .. "/fearNoEvilUnderlingButtonClicked",
+                height = "85",
+                width = "170",
+                fontSize = "15",
+                textColor = "rgba(1,1,1,1)",
+                colors = "rgba(1,1,1,1)|rgba(1,1,1,1)|rgba(1,1,1,1)|rgba(1,1,1,1)"
+            },
+            children = {{
+                tag = "Image",
+                attributes = {
+                    image = cdnUrl .. "/selectors/scenarios/selector-" .. (underling.fileName or underling.key) .. ".png",
+                    height = "85",
+                    width = "170",
+                    preserveAspect = "true",
+                    rectAlignment = "MiddleCenter"
+                }
+            }}
+        })
+    end
+
+    local encounterSetControlPanel = {
+        tag = "Panel",
+        children = {{
+            tag = "VerticalLayout",
+            attributes = {
+                color="rgba(1,0,0,1)",
+                rectAlignment = "UpperLeft",
+                childAlignment = "UpperLeft",
+                childForceExpandHeight = "false",
+                spacing = "16",
+                contentSizeFitter = "vertical"
+            },
+            children = {{
+                tag = "Text",
+                value = "Select an underling villain.",
+                attributes = {
+                    rectAlignment = "UpperLeft",
+                    alignment = "UpperLeft",
+                    color = "rgba(1,1,1,1)"
+                }
+            }, {
+                tag = "HorizontalLayout",
+                attributes = {
+                    childAlignment = "MiddleCenter",
+                    childForceExpandHeight = "false",
+                    childForceExpandWidth = "false",
+                    spacing = "0"
+                },
+                children = {{
+                    tag = "HorizontalLayout",
+                    attributes = {
+                        color="rgba(0,1,0,1)",
+                        preferredHeight = "85",
+                        flexibleHeight = "1",
+                        width = "955",
+                        contentSizeFitter = "vertical",
+                        spacing = "5"
+                    },
+                    children = underlingButtons
+                }}
+            }, {
+                tag = "Panel",
+                attributes = {
+                    id = "bottomSpacer",
+                    preferredHeight = "8",
+                    flexibleHeight = "0"
+                }
+            }}
+        }}
+    }
+
+    return encounterSetControlPanel
+end
+
+function fearNoEvilPrepareScenario()
+    local villainKey = selectedScenario.underlingKey or "bullseye" -- "random"
+    local selectedVillain = fearNoEvilGetUnderling(villainKey)
+    local encounterDeck = currentScenario.decks.encounterDeck
+    local villainEncounterCards = selectedVillain.encounterCards
+
+    currentScenario.villains["bullseye"] = selectedVillain
+
+    for cardId, count in pairs(villainEncounterCards) do
+        encounterDeck.cards[cardId] = count
+    end
+end
+
+function fearNoEvilSetupVillainStage(params)
+    local villainKey = params.villainKey
+    local stage = params.stage
+    local stageNumber = string.sub(stage.key, -1)
+    local mode = getMode()
+
+    if (villainKey == "bullseye") then
+        local adamantiumSpineCardId = "60068"
+        local derangedBloodlustCardId = "60073"
+
+        if (stageNumber == "1") then
+            local encounterDeck = Global.call("getEncounterDeck")
+            local encounterCards = encounterDeck.getObjects()
+
+            for _, card in pairs(encounterCards) do
+                local cardData = Global.call("getCardData", {
+                    card = card
+                })
+                local cardId = cardData.code
+
+                if (cardId == adamantiumSpineCardId) then
+                    card = encounterDeck.takeObject({
+                        guid = card.guid
+                    })
+                    if (card) then
+                        card.destruct()
+                    end
+                    break
+                end
+            end
+        end
+        if (stageNumber == "2") then
+            if (mode == "standard") then
+                Global.call("spawnCardAndMoveFromEncounterDeckById", {
+                    cardId = adamantiumSpineCardId,
+                    zoneIndex = "attachment",
+                    settings = {
+                        hideWhenFaceDown = false
+                    }
+                })
+            else
+                Global.call("moveCardFromEncounterDeckById", {
+                    cardId = adamantiumSpineCardId,
+                    searchInDiscard = true,
+                    zoneIndex = "attachment",
+                    settings = {
+                        hideWhenFaceDown = false
+                    }
+                })
+            end
+        end
+        if (stageNumber == "3") then
+            Global.call("moveCardFromEncounterDeckById", {
+                cardId = derangedBloodlustCardId,
+                searchInDiscard = true,
+                zoneIndex = "sideScheme"
+            })
+        end
+    end
+end
+
+function fearNoEvilGetUnderling(key)
+    local underlings = {
+        bullseye = {
+            key = "bullseye",
+            name = "Bullseye",
+            hpCounter = {
+                imageUrl = cdnUrl .. "/selectors/scenarios/selector-bullseye.png"
+            },
+            stages = {
+                stage1 = {
+                    key = "stage1",
+                    cardId = "60065",
+                    hitPointsPerPlayer = 14
+                },
+                stage2 = {
+                    key = "stage2",
+                    cardId = "60066",
+                    hitPointsPerPlayer = 16
+                },
+                stage3 = {
+                    key = "stage3",
+                    cardId = "60067",
+                    hitPointsPerPlayer = 18
+                }
+            },
+            encounterCards = {
+                ["60068"] = 1,
+                ["60069"] = 1,
+                ["60070"] = 1,
+                ["60071"] = 3,
+                ["60072"] = 1,
+                ["60073"] = 1,
+                ["60074"] = 1,
+                ["60075"] = 2
+            }
+        },
+        electro = {
+            key = "electro",
+            name = "Electro",
+            hpCounter = {
+                imageUrl = cdnUrl .. "/selectors/scenarios/selector-electro.png"
+            },
+            stages = {
+                stage1 = {
+                    key = "stage1",
+                    cardId = "60076",
+                    hitPointsPerPlayer = 15
+                },
+                stage2 = {
+                    key = "stage2",
+                    cardId = "60077",
+                    hitPointsPerPlayer = 17
+                },
+                stage3 = {
+                    key = "stage3",
+                    cardId = "60078",
+                    hitPointsPerPlayer = 20
+                }
+            },
+            encounterCards = {
+                ["60079"] = 1,
+                ["60080"] = 1,
+                ["60081"] = 1,
+                ["60082"] = 2,
+                ["60083"] = 2,
+                ["60084"] = 2,
+                ["60085"] = 2
+            }
+        },
+        hammerhead = {
+            key = "hammerhead",
+            name = "Hammerhead",
+            hpCounter = {
+                imageUrl = cdnUrl .. "/selectors/scenarios/selector-hammerhead.png"
+            },
+            stages = {
+                stage1 = {
+                    key = "stage1",
+                    cardId = "60086",
+                    hitPointsPerPlayer = 14
+                },
+                stage2 = {
+                    key = "stage2",
+                    cardId = "60087",
+                    hitPointsPerPlayer = 15
+                },
+                stage3 = {
+                    key = "stage3",
+                    cardId = "60088",
+                    hitPointsPerPlayer = 16
+                }
+            },
+            encounterCards = {
+                ["60089"] = 1,
+                ["60090"] = 1,
+                ["60091"] = 1,
+                ["60092"] = 2,
+                ["60093"] = 2,
+                ["60094"] = 1,
+                ["60095"] = 1,
+                ["60096"] = 2
+            }
+        },
+        purpleMan = {
+            key = "purpleMan",
+            name = "Purple Man",
+            hpCounter = {
+                imageUrl = cdnUrl .. "/selectors/scenarios/selector-purple-man.png"
+            },
+            stages = {
+                stage1 = {
+                    key = "stage1",
+                    cardId = "60097",
+                    hitPointsPerPlayer = 13
+                },
+                stage2 = {
+                    key = "stage2",
+                    cardId = "60098",
+                    hitPointsPerPlayer = 15
+                },
+                stage3 = {
+                    key = "stage3",
+                    cardId = "60099",
+                    hitPointsPerPlayer = 17
+                }
+            },
+            encounterCards = {
+                ["60100"] = 1,
+                ["60101"] = 2,
+                ["60102"] = 1,
+                ["60103"] = 1,
+                ["60104"] = 1,
+                ["60105"] = 1,
+                ["60106"] = 1,
+                ["60107"] = 1,
+                ["60108"] = 1,
+                ["60109"] = 2
+            }
+        },
+        typhoidMary = {
+            key = "typhoidMary",
+            name = "Typhoid Mary",
+            hpCounter = {
+                imageUrl = cdnUrl .. "/selectors/scenarios/selector-typhoid-mary.png"
+            },
+            stages = {
+                stage1 = {
+                    key = "stage1",
+                    cardId = "60110",
+                    hitPointsPerPlayer = 13
+                },
+                stage2 = {
+                    key = "stage2",
+                    cardId = "60111",
+                    hitPointsPerPlayer = 15
+                }
+            },
+            encounterCards = {
+                ["60112"] = 1,
+                ["60113"] = 1,
+                ["60114"] = 1,
+                ["60115"] = 2,
+                ["60116"] = 1,
+                ["60117"] = 1,
+                ["60118"] = 2,
+                ["60119"] = 1,
+                ["60120"] = 3
+            }
+        }
+    }
+
+    if (key == "random") then
+        local underlingKeys = {}
+
+        for key, underling in pairs(underlings) do
+            table.insert(underlingKeys, key)
+        end
+
+        underlingKeys = Global.call("shuffleTable", {
+            table = underlingKeys
+        })
+
+        return underlings[underlingKeys[1]]
+    end
+
+    return underlings[key]
+end
+
+function fearNoEvilUnderlingButtonClicked(player, value, id)
+    local underling = fearNoEvilGetUnderling(id)
+
+    if (underling) then
+        selectedScenario.underlingKey = underling.key
+        selectedScenario.underlingName = underling.name
+        selectedScenario.underlingEncounterCards = underling.encounterCards
+        selectedScenario.underlingHpCounterImageUrl = underling.hpCounter.imageUrl
+
+        Global.call("updateScenarioControlPanel")
+    end
+end
