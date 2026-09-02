@@ -50,6 +50,7 @@ local defaults = {
     boostDrawPosition = Global.getTable("BOOST_POS")
 }
 
+local cdnUrl = Global.getVar("CDN_URL")
 local scenarios = {}
 local currentScenario = nil
 local allEncounterSets = {}
@@ -60,7 +61,7 @@ function onload(saved_data)
     local encounterSetManager = getObjectFromGUID(Global.getVar("GUID_MODULAR_SET_MANAGER"))
     allEncounterSets = encounterSetManager.call("getEncounterSets", {})
 
-    if(currentScenario ~= nil) then
+    if (currentScenario ~= nil) then
         showScenarioControlPanel()
     else
         local scenarioButton = getObjectFromGUID(Global.getVar("GUID_SCENARIO_BUTTON"))
@@ -209,11 +210,11 @@ function selectScenario(params)
     end
 
     local preselectModularSets = true
-    if(currentScenario.preselectModularEncounterSets ~= nil ) then
+    if (currentScenario.preselectModularEncounterSets ~= nil) then
         preselectModularSets = currentScenario.preselectModularEncounterSets
     end
 
-    if(preselectModularSets) then
+    if (preselectModularSets) then
         preSelectEncounterSets()
     end
 
@@ -384,12 +385,12 @@ end
 
 function setUpScenario()
     local skipValidation = currentScenario.skipValidation or false
-    
+
     if (not skipValidation and not confirmScenarioInputs(true)) then
         return
     end
 
-    if(not currentScenario.fullyScripted) then
+    if (not currentScenario.fullyScripted) then
         displayMessage({
             message = "This scenario is not fully scripted. You may need to perform some steps of setup and villain or theme advancement manually.",
             messageType = Global.getVar("MESSAGE_TYPE_ALERT")
@@ -433,7 +434,9 @@ function setUpScenario()
     -- )
 
     Wait.frames(function()
-        Global.call("placeSetupCardsFromDeck", {deckPosition = deckPosition})
+        Global.call("placeSetupCardsFromDeck", {
+            deckPosition = deckPosition
+        })
     end, 15)
 
     Wait.frames(function()
@@ -447,6 +450,7 @@ function setUpScenario()
     placeExtras()
     placeBlackHole()
     placeBoostPanel(currentScenario)
+    placeText(currentScenario)
 
     placeNotes()
 
@@ -457,6 +461,27 @@ function setUpScenario()
     Wait.frames(function()
         showScenarioControlPanel()
     end, 1)
+end
+
+function placeText(scenario)
+    if (scenario.text == nil) then
+        return
+    end
+
+    for _, text in pairs(scenario.text) do
+        spawnObject({
+            type = "3DText",
+            position = text.position,
+            rotation = text.rotation or {90, 0, 0},
+            callback_function = function(spawned_object)
+                spawned_object.TextTool.setValue(text.text)
+                spawned_object.TextTool.setFontSize(text.fontSize or 100)
+                spawned_object.TextTool.setFontColor(text.fontColor or {1, 1, 1})
+                spawned_object.interactable = false
+                spawned_object.addTag(groupTag)
+            end
+        })
+    end
 end
 
 function setInitialFirstPlayer()
@@ -509,12 +534,37 @@ function setUpZones()
         currentScenario.zones = {}
     end
 
-    Global.call("createZone", {zoneDef = Global.call("combineZoneDefinitions", {zoneDef = currentScenario.zones.sideScheme, defaultDef = defaults.zones.sideScheme})})
-    Global.call("createZone", {zoneDef = Global.call("combineZoneDefinitions", {zoneDef = currentScenario.zones.environment, defaultDef = defaults.zones.environment})})
-    Global.call("createZone", {zoneDef = Global.call("combineZoneDefinitions", {zoneDef = currentScenario.zones.attachment, defaultDef = defaults.zones.attachment})})
-    Global.call("createZone", {zoneDef = Global.call("combineZoneDefinitions", {zoneDef = currentScenario.zones.encounterDeck, defaultDef = defaults.zones.encounterDeck})})
-    local victoryDisplayZone = Global.call("createZone", {zoneDef = Global.call("combineZoneDefinitions", {zoneDef = currentScenario.zones.victoryDisplay, defaultDef = defaults.zones.victoryDisplay})})
-    
+    Global.call("createZone", {
+        zoneDef = Global.call("combineZoneDefinitions", {
+            zoneDef = currentScenario.zones.sideScheme,
+            defaultDef = defaults.zones.sideScheme
+        })
+    })
+    Global.call("createZone", {
+        zoneDef = Global.call("combineZoneDefinitions", {
+            zoneDef = currentScenario.zones.environment,
+            defaultDef = defaults.zones.environment
+        })
+    })
+    Global.call("createZone", {
+        zoneDef = Global.call("combineZoneDefinitions", {
+            zoneDef = currentScenario.zones.attachment,
+            defaultDef = defaults.zones.attachment
+        })
+    })
+    Global.call("createZone", {
+        zoneDef = Global.call("combineZoneDefinitions", {
+            zoneDef = currentScenario.zones.encounterDeck,
+            defaultDef = defaults.zones.encounterDeck
+        })
+    })
+    local victoryDisplayZone = Global.call("createZone", {
+        zoneDef = Global.call("combineZoneDefinitions", {
+            zoneDef = currentScenario.zones.victoryDisplay,
+            defaultDef = defaults.zones.victoryDisplay
+        })
+    })
+
     if (victoryDisplayZone) then
         createVictoryDisplayText()
     end
@@ -522,7 +572,9 @@ function setUpZones()
     local customZones = currentScenario.customZones or {}
     for key, zoneDef in pairs(customZones) do
         zoneDef.group = "scenario"
-        Global.call("createZone", {zoneDef = zoneDef})
+        Global.call("createZone", {
+            zoneDef = zoneDef
+        })
     end
 end
 
@@ -979,7 +1031,9 @@ end
 
 function addEncounterSetsToEncounterDeck(deck)
     local encounterSetManager = getObjectFromGUID(Global.getVar("GUID_MODULAR_SET_MANAGER"))
-    local encounterSetCards = encounterSetManager.call("getCardsFromSelectedSets", {encounterSets = currentScenario.selectedEncounterSets})
+    local encounterSetCards = encounterSetManager.call("getCardsFromSelectedSets", {
+        encounterSets = currentScenario.selectedEncounterSets
+    })
 
     for cardId, count in pairs(encounterSetCards) do
         deck.cards[cardId] = count
@@ -1131,6 +1185,7 @@ function placeVillainCard(params)
     local scale = params.scale or defaults.villainDeck.scale
     local flipped = false
     local locked = true
+    local hideWhenFaceDown = true
     local counterValue = params.counterValue
 
     if (params.flipped ~= nil) then
@@ -1141,14 +1196,19 @@ function placeVillainCard(params)
         locked = params.locked
     end
 
+    if (params.hideWhenFaceDown ~= nil) then
+        hideWhenFaceDown = params.hideWhenFaceDown
+    end
+
     local villainCard = Global.call("spawnCard", {
         cardId = params.cardId,
         position = params.position,
         rotation = params.rotation,
         scale = params.scale,
         name = params.name,
-        flipped = params.flipped,
-        locked = params.locked,
+        flipped = flipped,
+        locked = locked,
+        hideWhenFaceDown = hideWhenFaceDown,
         tags = {groupTag}
     })
 
@@ -1192,8 +1252,8 @@ function placeDeck(deck)
     local linkedCards = spawnedDeck.getGMNotes()
 
     if (linkedCards and string.len(linkedCards) > 0) then
-        local linkedCardPosition = {-12.75, 0.51, 42.75}
-        local labelPosition = Vector(linkedCardPosition) + Vector({0, 0, -2.25})
+        local linkedCardPosition = {-19.25, 1.00, 33.75}
+        local labelPosition = Vector(linkedCardPosition) + Vector({0, 0, -3.5})
 
         function moveLinkedCardCoroutine()
             for linkedCardId in string.gmatch(linkedCards, "([^,]+)") do
@@ -1532,15 +1592,19 @@ end
 function clearScenario()
     hideScenarioControlPanel()
 
-    Global.call("deleteZoneGroup", {group = "scenario"})
-    Global.call("deleteObjectsByGroup", {deleteGroup = "scenario"})
+    Global.call("deleteZoneGroup", {
+        group = "scenario"
+    })
+    Global.call("deleteObjectsByGroup", {
+        deleteGroup = "scenario"
+    })
     Global.setSnapPoints({})
 
     clearData()
 
     local firstPlayerToken = getObjectFromGUID(Global.getVar("FIRST_PLAYER_TOKEN_GUID"))
     local firstPlayerTokenPosition = Global.getTable("FIRST_PLAYER_TOKEN_POSITION")
-    if(firstPlayerToken) then
+    if (firstPlayerToken) then
         firstPlayerToken.setPositionSmooth(firstPlayerTokenPosition)
     end
 
@@ -1616,21 +1680,18 @@ end
 
 function spawnNemesis(params)
     local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
+    local deckPosition = params.position or {0, 1, 0}
     local hero = heroManager.call("getHeroByPlayerColor", {
         playerColor = params.playerColor
     })
 
     Global.call("spawnDeck", {
         cards = hero.decks.nemesis,
-        position = {0, 1, 0},
+        position = deckPosition,
         scale = Global.getTable("CARD_SCALE_ENCOUNTER"),
         cardTags = {groupTag}
     })
 end
-
-
-
-
 
 function deepCopy(obj, seen)
     if type(obj) ~= 'table' then
@@ -1727,15 +1788,24 @@ function placeVillainStage(villain, stage, heroCount)
     local flipped = stage.flipCard or false
 
     if (stageNumber ~= "1" and stageNumber ~= "A") then
-        local currentVillainCard = Global.call("getCardAtPosition", {position = villainPosition})
+        local currentVillainCard = Global.call("getCardAtPosition", {
+            position = villainPosition
+        })
         local counter = nil
-        
-        if(currentVillainCard) then
-            counter = Global.call("getCounterFromCard", {card = currentVillainCard, counterClass = "configured"})
-            if(currentVillainCard.is_face_down) then flipped = true end
+
+        if (currentVillainCard) then
+            counter = Global.call("getCounterFromCard", {
+                card = currentVillainCard,
+                counterClass = "configured"
+            })
+            if (currentVillainCard.is_face_down) then
+                flipped = true
+            end
         end
 
-        if (counter ~= nil) then counterValue = counter.call("getValue") end
+        if (counter ~= nil) then
+            counterValue = counter.call("getValue")
+        end
 
         Global.call("deleteCardAtPosition", {
             position = villainPosition
@@ -1754,6 +1824,7 @@ function placeVillainStage(villain, stage, heroCount)
             rotation = villainRotation,
             scale = villainScale,
             locked = locked,
+            tags = {"group-scenario"},
             callback = "configureVillainStage"
         })
     else
@@ -1880,7 +1951,7 @@ function placeSchemeStage(schemeKey, stage, heroCount)
         flipped = stage.flipCard == nil and true or stage.flipCard
     end
 
-    Global.call("spawnCard", {
+    local schemeCard = Global.call("spawnCard", {
         cardId = stage.cardId,
         position = schemePosition,
         scale = schemeScale,
@@ -1915,6 +1986,11 @@ function placeSchemeStage(schemeKey, stage, heroCount)
             value = targetThreat
         })
         configureThreatCounterPrimaryButton(schemeThreatCounter, stage.showAdvanceButton)
+
+        Global.call("addConfiguredCounterToCard", {
+            card = schemeCard,
+            baseOffset = {1.35, 1.04, -0.75}
+        })
     end, 20)
 end
 
@@ -1973,7 +2049,9 @@ function configureThreatCounterPrimaryButton(threatCounter, showAdvanceButton)
 end
 
 function onCardEnterZone(params)
-    if(not currentScenario) then return end
+    if (not currentScenario) then
+        return
+    end
 
     local functionName = "onCardEnterZone_" .. currentScenario.key
 
@@ -2002,39 +2080,50 @@ function getHpCounterForVillain(params)
 end
 
 function updateVictoryDisplayDetails()
-   local zoneDef = Global.call("getZoneDefinition", {zoneIndex = "victoryDisplay"})
-   if(not zoneDef) then return nil end
+    local zoneDef = Global.call("getZoneDefinition", {
+        zoneIndex = "victoryDisplay"
+    })
+    if (not zoneDef) then
+        return nil
+    end
 
-   local zone = getObjectFromGUID(zoneDef.guid)
-   if(not zone) then return nil end
- 
-   local items = zone.getObjects()
-   local cardCount = 0
-   local victoryPoints = 0
- 
-   for i, v in ipairs(items) do
-      if(v.tag == "Card") then 
-         cardCount = cardCount + 1
+    local zone = getObjectFromGUID(zoneDef.guid)
+    if (not zone) then
+        return nil
+    end
 
-         local cardData = Global.call("getCardData", {card = v})
-         victoryPoints = victoryPoints + (cardData.victory or 0)
-      end
-   end
- 
-   local victoryPointsReadout = getItemFromManifest({key = "victoryPointsReadout"})
-   local victoryDisplayItemCountReadout = getItemFromManifest({key = "victoryDisplayItemCountReadout"})
- 
-   victoryPointsReadout.TextTool.setValue("Victory Points: " .. victoryPoints)
-   victoryDisplayItemCountReadout.TextTool.setValue("Items: " .. cardCount)
+    local items = zone.getObjects()
+    local cardCount = 0
+    local victoryPoints = 0
+
+    for i, v in ipairs(items) do
+        if (v.tag == "Card") then
+            cardCount = cardCount + 1
+
+            local cardData = Global.call("getCardData", {
+                card = v
+            })
+            victoryPoints = victoryPoints + (cardData.victory or 0)
+        end
+    end
+
+    local victoryPointsReadout = getItemFromManifest({
+        key = "victoryPointsReadout"
+    })
+    local victoryDisplayItemCountReadout = getItemFromManifest({
+        key = "victoryDisplayItemCountReadout"
+    })
+
+    victoryPointsReadout.TextTool.setValue("Victory Points: " .. victoryPoints)
+    victoryDisplayItemCountReadout.TextTool.setValue("Items: " .. cardCount)
 end
-
 
 function preSelectEncounterSets()
     local selectedSets = {}
     local scenarioSets = currentScenario.modularSets or {}
     local encounterSetManager = getObjectFromGUID(Global.getVar("GUID_MODULAR_SET_MANAGER"))
 
-    for key,required in pairs(scenarioSets) do
+    for key, required in pairs(scenarioSets) do
         local set = encounterSetManager.call("getModularSet", {
             modularSetKey = key
         })
@@ -2057,12 +2146,12 @@ end
 function addRemoveSelectedSet(params)
     local key = params.encounterSetKey
 
-    if(not currentScenario.selectedEncounterSets) then
+    if (not currentScenario.selectedEncounterSets) then
         currentScenario.selectedEncounterSets = {}
     end
-    
+
     for k, v in pairs(currentScenario.selectedEncounterSets) do
-        if(k == key) then
+        if (k == key) then
             currentScenario.selectedEncounterSets[k] = nil
             return
         end
@@ -2082,7 +2171,7 @@ end
 function getSelectedSetKeys()
     local keys = {}
 
-    for k,v in pairs(currentScenario.selectedEncounterSets or {}) do
+    for k, v in pairs(currentScenario.selectedEncounterSets or {}) do
         keys[k] = v.required or "recommended"
     end
 
@@ -2093,7 +2182,7 @@ function getSelectedSetCount()
     local count = 0
     local selectedSets = currentScenario.selectedEncounterSets or {}
 
-    for k,v in pairs(selectedSets) do
+    for k, v in pairs(selectedSets) do
         count = count + 1
     end
 
@@ -2103,7 +2192,7 @@ end
 function findVillainCard()
     local villainKey = currentScenario.activeVillainKey
 
-    if(not villainKey) then
+    if (not villainKey) then
         for k, v in pairs(currentScenario.villains) do
             villainKey = k
         end
@@ -2113,12 +2202,13 @@ function findVillainCard()
     local villainStage = villain.stages["stage" .. tostring(villain.currentStageNumber)]
     local villainCardId = villainStage.cardId
 
-    return Global.call("findCard", {cardId = villainCardId})
+    return Global.call("findCard", {
+        cardId = villainCardId
+    })
 end
 
 require('!/scenario_manager/scenario_selection_ui')
 require('!/scenario_manager/scenario_control_panel')
-
 
 require('!/scenarios/rhino')
 require('!/scenarios/klaw')
@@ -2173,3 +2263,9 @@ require('!/scenarios/thunderbolts')
 require('!/scenarios/baron_zemo')
 require('!/scenarios/enchantress')
 require('!/scenarios/loki_god_of_lies')
+require('!/scenarios/art_museum_heist')
+require('!/scenarios/getaway')
+require('!/scenarios/protection_racket')
+require('!/scenarios/raft_breakout')
+require('!/scenarios/stop_the_presses')
+require('!/scenarios/kingpin')

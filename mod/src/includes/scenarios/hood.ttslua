@@ -76,38 +76,13 @@ scenarios["hood"] =
         encounterSetPlacer={
             name="",
             guid="39d4a2",
-            position={34.75, 0.96, 17.25},
+            position={18.25, 0.97, 22.45},
             rotation={0, 180, 0},
-            scale={6,1,6},
+            scale={3.1,1,3.1},
             locked=true
         }
     }
 }
-
-function customSetup_hood(params)
-  local setupStep = params.setupStep
-
-  if(setupStep == "modular-sets") then
-    createHoodModularSetButtons()
-
-    local modularSets = {}
-
-    modularSets["streetsOfMayhem"] = "recommended"
-    modularSets["brothersGrimm"] = "recommended"
-    modularSets["ransackedArmory"] = "recommended"
-    modularSets["stateOfEmergency"] = "recommended"
-    modularSets["beastyBoys"] = "recommended"
-    modularSets["misterHyde"] = "recommended"
-    modularSets["sinisterSyndicate"] = "recommended"
-    modularSets["crossfiresCrew"] = "recommended"
-    modularSets["wreckingCrew"] = "recommended"
-
-    local layoutManager = getObjectFromGUID(Global.getVar("GUID_LAYOUT_MANAGER"))
-    layoutManager.call("colorCodeModularSets", {sets = modularSets})
-  else
-    removeHoodModularSetButtons()
-  end
-end
 
 function prepareScenario_hood()
   local encounterSets = getSelectedSets()
@@ -232,7 +207,7 @@ function selectHoodEasyModularSets()
     selectEncounterSet("beastyBoys")
     selectEncounterSet("misterHyde")
     selectEncounterSet("sinisterSyndicate")
-end
+end 
 
 function selectHoodMediumModularSets()
     clearSelectedModularEncounterSets()
@@ -291,7 +266,7 @@ function addHoodEncounterSet()
   end
 
   if(#unusedSets == 0) then
-    broadcastToAll("All modular encounter sets have been used.", {1,1,1})
+    Global.call("displayMessage", {message = "All modular encounter sets have been used.", messageType = Global.getVar("MESSAGE_TYPE_INFO")})
     return 0
   end
 
@@ -304,6 +279,7 @@ function addHoodEncounterSet()
   local encounterSetManager = getObjectFromGUID(Global.getVar("GUID_MODULAR_SET_MANAGER"))
   encounterSetManager.call("addEncounterSetToDeck", {setKey = encounterSetKey})
 
-  broadcastToAll("A random modular encounter set has been added to encounter deck.", {1,1,1})
+  Global.call("displayMessage", {message = "A random modular encounter set has been added to the encounter deck.", messageType = Global.getVar("MESSAGE_TYPE_INFO")})
+
   return #unusedSets - 1
 end

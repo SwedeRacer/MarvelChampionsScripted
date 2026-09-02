@@ -1,83 +1,84 @@
-scenarios["escapeMuseum"] =
-{
-    name="Escape the Museum",
-    tileImageUrl="https://steamusercontent-a.akamaihd.net/ugc/1833526258727804015/5DDA85319568535B84FBD610334FB7C6F8BFCDF0/",
-    villains={
-        collector={
-            name="Collector",
-            hpCounter={
-                imageUrl="https://steamusercontent-a.akamaihd.net/ugc/1833526258727804015/5DDA85319568535B84FBD610334FB7C6F8BFCDF0/",
+scenarios["escapeMuseum"] = {
+    name = "Escape the Museum",
+    tileImageUrl = "https://steamusercontent-a.akamaihd.net/ugc/1833526258727804015/5DDA85319568535B84FBD610334FB7C6F8BFCDF0/",
+    villains = {
+        collector = {
+            name = "Collector",
+            hpCounter = {
+                imageUrl = "https://steamusercontent-a.akamaihd.net/ugc/1833526258727804015/5DDA85319568535B84FBD610334FB7C6F8BFCDF0/"
             },
-            stages={
-                stageA={
-                    cardId="16080",
-                    hitPointsPerPlayer=8
+            stages = {
+                stageA = {
+                    cardId = "16080",
+                    hitPointsPerPlayer = 8,
+                    locked = false
                 },
-                stageB={
-                    cardId="16081",
-                    hitPointsPerPlayer=10
+                stageB = {
+                    cardId = "16081",
+                    hitPointsPerPlayer = 10,
+                    locked = false
                 }
             }
         }
     },
-    schemes={
-        main={
-            stages={
-                stage1={
-                    cardId="16082",
-                    startingThreatPerPlayer=7,
-                    targetThreatPerPlayer=11
+    schemes = {
+        main = {
+            stages = {
+                stage1 = {
+                    cardId = "16082",
+                    startingThreatPerPlayer = 7,
+                    targetThreatPerPlayer = 11
                 },
-                stage2={
-                    cardId="16083",
-                    startingThreatPerPlayer=1,
-                    targetThreatPerPlayer=15
+                stage2 = {
+                    cardId = "16083",
+                    startingThreatPerPlayer = 1,
+                    targetThreatPerPlayer = 15
                 },
-                stage3={
-                    cardId="16084",
-                    startingThreatPerPlayer=8,
-                    targetThreatPerPlayer=12
+                stage3 = {
+                    cardId = "16084",
+                    startingThreatPerPlayer = 8,
+                    targetThreatPerPlayer = 12
                 }
             }
         }
     },
-    cards={
-        libraryLabyrinth={
-            cardId="16085",
-            position={15.75, 1.00, 29.25},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER"))
+    cards = {
+        libraryLabyrinth = {
+            cardId = "16085",
+            position = {15.75, 1.00, 29.25},
+            scale = Vector(Global.getVar("CARD_SCALE_ENCOUNTER"))
         },
-        milano={
-            cardId="16142",
-            position={-14.75, 1.0, 30.25},
-            scale=Vector(Global.getVar("CARD_SCALE_PLAYER"))
+        milano = {
+            cardId = "16142",
+            position = {-14.75, 1.0, 30.25},
+            scale = Vector(Global.getVar("CARD_SCALE_PLAYER"))
         }
-    },            
-    decks={
-        encounterDeck={
-            name="Collector's Encounter Deck",
-            cards={
-                ["16085"]=1,
-                ["16086"]=3,
-                ["16087"]=3
+    },
+    decks = {
+        encounterDeck = {
+            name = "Collector's Encounter Deck",
+            cards = {
+                ["16085"] = 1,
+                ["16086"] = 3,
+                ["16087"] = 3
             }
         },
-        shipCommand={
-            name="Ship Command",
-            position={-20.75, 1.1, 30.75},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER")),
-            cards={
-                ["16143"]=1,
-                ["16144"]=1,
-                ["16145"]=1,
-                ["16146"]=1,
-                ["16147"]=1,
-                ["16148"]=1
+        shipCommand = {
+            name = "Ship Command",
+            position = {-20.75, 1.1, 30.75},
+            scale = Vector(Global.getVar("CARD_SCALE_ENCOUNTER")),
+            cards = {
+                ["16143"] = 1,
+                ["16144"] = 1,
+                ["16145"] = 1,
+                ["16146"] = 1,
+                ["16147"] = 1,
+                ["16148"] = 1
             }
         }
     },
-    modularSets={
-        galacticArtifacts="required",
-        menagerieMedley="recommended"
+    modularSets = {
+        galacticArtifacts = "required",
+        menagerieMedley = "recommended"
     }
 }

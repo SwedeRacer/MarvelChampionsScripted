@@ -249,6 +249,7 @@ function lokiGodOfLiesPlaceFocusAttachment()
         cardId = intenseFocusCardId,
         position = newAttachmentPosition,
         scale = Global.getTable("CARD_SCALE_ENCOUNTER"),
+        tags = {"group-scenario"},
         flipped = false
     })
 
@@ -372,6 +373,10 @@ function lokiGodOfLiesShatterTheIllusion()
     Global.call("displayMessage", {
         message = "Dealing each hero a face-down encounter card.",
         messageType = Global.getVar("MESSAGE_TYPE_INFO")
+    })
+
+    shatterCounter.call("setValue", {
+        value = 0
     })
 end
 

@@ -1,0 +1,74 @@
+heroes["daredevil"] = {
+    name = "Daredevil",
+    identityCardId = "60001",
+    hitPoints = 10,
+    tileImageUrl = cdnUrl .. "/selectors/heroes/selector-daredevil.jpg",
+    playmatImageUrl = cdnUrl .. "/playmats/playmat-daredevil.png",
+    obligationCardId = "60032",
+    teams = "defenders",
+	artVariant = "defender",
+    decks = {
+        hero = {
+			["60002"]=1,
+			["60003"]=1,
+			["60004"]=1,
+			["60005"]=1,
+			["60006"]=1,
+			["60007"]=1,
+			["60008"]=2,
+			["60009"]=2,
+			["60010"]=2,
+			["60011"]=1,
+			["60012"]=1,
+			["60013"]=1,
+			["60014"]=1,
+			["60015"]=1,
+			["60016"]=1,
+			["60017"]=1,
+			["60018"]=1
+		},
+        starter = {
+			["60019"]=1,
+			["60020"]=1,
+			["60021"]=1,
+			["60022"]=1,
+			["60023"]=3,
+			["60024"]=1,
+			["60025"]=3,
+			["60026"]=3,
+			["60027"]=3,
+			["60028"]=3,
+			["60029"]=1,
+			["60030"]=3,
+			["60031"]=1
+        },
+        nemesis = {
+			["60033"] = 1,
+			["60034"] = 1,
+			["60035"] = 1,
+			["60036"] = 2
+        }
+    },
+	cards = {
+		tactility = {
+			cardId = "60002",
+			offset = {-4.94, 2, 4.66},
+		},
+		olfaction = {
+			cardId = "60003",
+			offset = {-4.94, 2, 4.66},
+		},
+		hearing = {
+			cardId = "60004",
+			offset = {-4.94, 2, 4.66},
+		},
+		radar = {
+			cardId = "60005",
+			offset = {-4.94, 2, 4.66},
+		},
+		taste = {
+			cardId = "60006",
+			offset = {-4.94, 2, 4.66},
+		}
+	}
+}

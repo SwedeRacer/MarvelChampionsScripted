@@ -160,9 +160,11 @@ end
 
 function configureEvidenceEnvelope(params)
     local envelope = params.spawnedObject
-    envelope.setPosition(params.position)
-    envelope.setLock(true)
-    envelope.addTag("group-scenario")
+    Wait.frames(function()
+        envelope.setPosition(params.position)
+        envelope.setLock(true)
+        envelope.call("setGroup", {group = "scenario"})
+    end, 2)
 end
 
 function baronZemoAttachBoardMemberToVillain(moleCardId)
@@ -181,7 +183,7 @@ function baronZemoAttachBoardMemberToVillain(moleCardId)
     local newCardPosition = Global.call("getNewZoneCardPosition", {zoneIndex = "attachment", forNextCard = true})
 
     moleCard.setPositionSmooth(newCardPosition, false, false)
-    moleCard.SetRotationSmooth({0, 180, 180}, false, false)
+    moleCard.setRotationSmooth({0, 180, 180}, false, false)
 end
 
 function baronZemoConvertSecretsToThreat(executiveBoard)

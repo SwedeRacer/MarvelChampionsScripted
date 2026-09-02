@@ -1,0 +1,77 @@
+campaigns[10] = {
+    name = "Fear No Evil",
+    thumbnailUrl = "https://d2xdqryaauvaie.cloudfront.net/campaigns/cover-art/fear-no-evil-small.png",
+    imageUrl = "",
+    text = {{
+        text = "Scenario Environments",
+        position = {-78.00, 0.50, 18.00},
+        color = {1, 1, 1},
+        fontSize = 88
+    }, {
+        text = "The Raft Minions",
+        position = {-85.00, 0.50, 6.00},
+        color = {1, 1, 1},
+        fontSize = 88
+    }, {
+        text = "Daily Bugle Supports",
+        position = {-71.00, 0.50, 6.00},
+        color = {1, 1, 1},
+        fontSize = 88
+    }, {
+        text = "Typhoid Mary Ally",
+        position = {-78.00, 0.50, -7.00},
+        color = {1, 1, 1},
+        fontSize = 88
+    }},
+    cards = {{
+        cardId = "60210",
+        position = {-78.00, 0.51, -12.00},
+        scale = Global.getTable("CARD_SCALE_PLAYER")
+    }},
+    decks = {{
+        name = "Scenario Environments",
+        position = {-78.00, 0.54, 12.00},
+        scale = Global.getTable("CARD_SCALE_ENCOUNTER"),
+        cards = {
+            ["60205"] = 1,
+            ["60206"] = 1,
+            ["60207"] = 1,
+            ["60208"] = 1,
+            ["60209"] = 1
+        }
+    }, {
+        name = "The Raft Minions",
+        position = {-85.00, 0.54, 0.00},
+        scale = Global.getTable("CARD_SCALE_ENCOUNTER"),
+        flipped = true,
+        cards = {
+            ["60144"] = 1,
+            ["60145"] = 1,
+            ["60146"] = 1,
+            ["60147"] = 1,
+            ["60148"] = 1,
+            ["60149"] = 1
+        }
+    }, {
+        name = "Daily Bugle Supports",
+        position = {-71.00, 0.54, 0.00},
+        scale = Global.getTable("CARD_SCALE_ENCOUNTER"),
+        flipped = true,
+        cards = {
+            ["60153"] = 1,
+            ["60154"] = 1,
+            ["60155"] = 1,
+            ["60156"] = 1
+        }
+    }},
+    pdfs = {{
+        url = "https://d2xdqryaauvaie.cloudfront.net/campaigns/rules/campaign-rules-fear-no-evil.pdf",
+        position = {-78.00, 0.50, 30.00},
+        scale = {4, 1.00, 4}
+    }},
+    logs = {{
+        guid = "68a750",
+        position = {-78.00, 0.59, -28.25},
+        scale = {4.30, 1.00, 4.30}
+    }}
+}

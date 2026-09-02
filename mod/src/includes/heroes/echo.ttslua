@@ -1,0 +1,46 @@
+heroes["echo"] = {
+    name = "Echo",
+    identityCardId = "60037",
+    hitPoints = 9,
+    tileImageUrl = cdnUrl .. "/selectors/heroes/selector-echo.jpg",
+    playmatImageUrl = cdnUrl .. "/playmats/playmat-echo.png",
+    obligationCardId = "60060",
+    teams = "defenders",
+    artVariant = "defender",
+    decks = {
+        hero = {
+            ["60039"] = 1,
+            ["60040a"] = 2,
+            ["60040b"] = 2,
+            ["60040c"] = 2,
+            ["60041"] = 2,
+            ["60042"] = 1,
+            ["60043"] = 1,
+            ["60044"] = 1,
+            ["60045"] = 1,
+            ["60046"] = 1,
+            ["60047"] = 1
+        },
+        starter = {
+            ["60038"] = 1,
+            ["60048"] = 3,
+            ["60049"] = 3,
+            ["60050"] = 3,
+            ["60051"] = 3,
+            ["60052"] = 3,
+            ["60053"] = 1,
+            ["60054"] = 3,
+            ["60055"] = 1,
+            ["60056"] = 1,
+            ["60057"] = 1,
+            ["60058"] = 1,
+            ["60059"] = 1
+        },
+        nemesis = {
+            ["60061"] = 1,
+            ["60062"] = 1,
+            ["60063"] = 2,
+            ["60064"] = 1
+        }
+    }
+}

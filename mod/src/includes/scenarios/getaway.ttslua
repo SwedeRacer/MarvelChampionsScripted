@@ -1,0 +1,74 @@
+scenarios["getaway"] = {
+    name = "The Getaway",
+    fullyScripted = true,
+    tileImageUrl = cdnUrl .. "/selectors/scenarios/selector-getaway.png",
+    villains = {},
+    schemes = {
+        main = {
+            stages = {
+                stage1 = {
+                    cardId = "60128",
+                    startingThreatPerPlayer = 2,
+                    accelerationPerPlayer = 2,
+                    targetThreatPerPlayer = 9
+                }
+            }
+        }
+    },
+    decks = {
+        encounterDeck = {
+            name = "The Getaway Encounter Deck",
+            cards = {
+                ["60129"] = 1,
+                ["60130"] = 1,
+                ["60131"] = 1,
+                ["60132"] = 2,
+                ["60133"] = 2
+            }
+        }
+    },
+    modularSets = {
+        cops = "recommended",
+        drive = "recommended"
+    }
+}
+
+function getEncounterSetControlPanel_getaway()
+    return fearNoEvilGetEncounterSetPanel()
+end
+
+function prepareScenario_getaway()
+    fearNoEvilPrepareScenario()
+end
+
+function setUpSchemeStage_getaway_main(params)
+    local mainSchemeCardId = "60128"
+    local outFrontCardId = "60129"
+    local mode = getMode()
+
+    Global.call("moveCardFromEncounterDeckById", {
+        cardId = outFrontCardId,
+        searchInDiscard = true,
+        zoneIndex = "attachment"
+    })
+
+    if (mode == "expert") then
+        Wait.frames(function()
+            local mainSchemeCard = Global.call("findCard", {
+                cardId = mainSchemeCardId
+            })
+            local speedCounter = Global.call("getCounterFromCard", {
+                card = mainSchemeCard,
+                counterClass = "configured"
+            })
+
+            speedCounter.call("setValue", {
+                value = 2
+            })
+        end, 60)
+    end
+end
+
+function setUpVillainStage_getaway(params)
+    fearNoEvilSetupVillainStage(params)
+end

@@ -27,12 +27,18 @@ function getValue(key, default)
     return data[key]
 end
 
+function setGroup(params)
+    setValue("group", params.group)
+    self.addTag("group-" .. params.group)
+    local group = getValue("group", nil)
+end
+
 function setUpUI()
     local ui = 
     {
         {
             tag="Panel",
-            attributes={            
+            attributes={
                 height="400",
                 width="310",
                 color="rgba(0,0,0,0)",
@@ -76,7 +82,7 @@ function setUpUI()
         }
     }
  
-    self.UI.setXmlTable(ui)   
+    self.UI.setXmlTable(ui)
 end
 
 function revealMoleClicked(player, value, id)
@@ -107,11 +113,14 @@ function revealMoleClicked(player, value, id)
     evidenceDeckList[mole.motiveCardId] = 1
     evidenceDeckList[mole.opportunityCardId] = 1
 
+    local group = getValue("group", "campaign")
+
     local evidenceDeck = Global.call("spawnDeck", {
         cards = evidenceDeckList, 
         position = evidenceStartPosition, 
         scale = Global.getTable("CARD_SCALE_ENCOUNTER"), 
-        flipped = true})
+        flipped = true,
+        cardTags = {"group-" .. group}})
 
     Wait.condition(
         function()

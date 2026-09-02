@@ -53,6 +53,13 @@ scenarios["morlockSiege"] =
             scale=Vector(Global.getVar("CARD_SCALE_PLAYER"))
         }
     },
+    text={
+        morlocks={
+            position={-15.25, 1.25, 33.5},
+            text="Morlocks",
+            fontSize=60
+        }
+    },
     modularSets={
         militaryGrade="recommended",
         mutantSlayers="recommended"

@@ -41,7 +41,7 @@
     "HideWhenFaceDown": false,
     "Hands": false,
     "CustomImage": {
-      "ImageURL": "https://steamusercontent-a.akamaihd.net/ugc/1796397839025803063/B0402C065B7B42EF81C597CEE5396D8D3FD4BB5D/",
+      "ImageURL": "https://d2xdqryaauvaie.cloudfront.net/campaigns/logs/campaign-log-mutant-genesis.jpg",
       "ImageSecondaryURL": "",
       "ImageScalar": 1,
       "WidthScale": 0,
@@ -53,7 +53,7 @@
       }
     },
     "LuaScript": "#include ./Mutant_Genesis_Campaign_Log.38061c.lua",
-    "LuaScriptState": "#include ./Mutant_Genesis_Campaign_Log.38061c.state.json",
+    "LuaScriptState": "",
     "XmlUI": ""
   },
   "StatesPaths": {}

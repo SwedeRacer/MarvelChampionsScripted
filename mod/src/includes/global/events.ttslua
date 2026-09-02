@@ -5,20 +5,27 @@ function onLoad()
 
     addHotkey("Begin villain phase (add threat)", function(playerColor, object, pointerPosition, isKeyUp)
         local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
-        if(not scenarioManager) then return end
+        if (not scenarioManager) then
+            return
+        end
 
         scenarioManager.call("threatButtonClicked")
     end, false)
 
     addHotkey("Deal encounter cards", function(playerColor, object, pointerPosition, isKeyUp)
         local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
-        if(not scenarioManager) then return end
+        if (not scenarioManager) then
+            return
+        end
 
         scenarioManager.call("encounterCardsButtonClicked")
     end, false)
 
     addHotkey("Context-sensitive discard", function(playerColor, object, pointerPosition, isKeyUp)
-        discardCardOrDeck({object = object, playerColor = playerColor})
+        discardCardOrDeck({
+            object = object,
+            playerColor = playerColor
+        })
     end, false)
 end
 
@@ -37,15 +44,25 @@ function onObjectNumberTyped(object, playerColor, number)
         end
     end
 
-    if(object.type == "Card") then
-        local cardData = getCardData({card = object})
-        if(not cardData) then return false end
-        if(cardData.aspect == "encounter" or cardData.type == "hero") then return true end
+    if (object.type == "Card") then
+        local cardData = getCardData({
+            card = object
+        })
+        if (not cardData) then
+            return false
+        end
+        if (cardData.aspect == "encounter" or cardData.type == "hero") then
+            return true
+        end
 
-        removeCountersFromCard({card = object})
+        removeCountersFromCard({
+            card = object
+        })
 
-        if(not playmat) then
-            local cardPlayerColor = getCardPlayerColor({card = object})
+        if (not playmat) then
+            local cardPlayerColor = getCardPlayerColor({
+                card = object
+            })
             object.deal(1, cardPlayerColor)
             return true
         end
@@ -56,7 +73,7 @@ function onObjectNumberTyped(object, playerColor, number)
             objectToDrawFrom = object,
             numberToDraw = number
         })
-        
+
         return true
     end
 
@@ -64,12 +81,20 @@ function onObjectNumberTyped(object, playerColor, number)
 end
 
 function onObjectEnterZone(zone, card)
-    local zoneDef = getZoneDefinition({zone = zone})
+    local zoneDef = getZoneDefinition({
+        zone = zone
+    })
     if (not zoneDef) then
         return
     end
-    if (not isCard(card)) then return end
-    if(isFaceDown({object = card})) then return end
+    if (not isCard(card)) then
+        return
+    end
+    if (isFaceDown({
+        object = card
+    })) then
+        return
+    end
 
     local cardData = getCardData({
         card = card
@@ -77,7 +102,9 @@ function onObjectEnterZone(zone, card)
 
     local cardType = cardData.type
 
-    if (cardType == "hero") then return end
+    if (cardType == "hero") then
+        return
+    end
 
     local playerColor = zoneDef.playerColor
     if (playerColor) then
@@ -86,21 +113,30 @@ function onObjectEnterZone(zone, card)
             property = "playerColor"
         })
 
-        if(not currentPlayerColor) then
-            setCardValue({cardGuid = card.getGUID(), property = "playerColor", value = playerColor})
+        if (not currentPlayerColor) then
+            setCardValue({
+                cardGuid = card.getGUID(),
+                property = "playerColor",
+                value = playerColor
+            })
         end
     end
 
-    if(zoneDef.rescaleOnEnterTo) then
+    if (zoneDef.rescaleOnEnterTo) then
         resizeCardOnEnterZone(card, zoneDef.rescaleOnEnterTo)
     end
 
-    if(zoneDef.repositionCards and not zone.hasTag("suppressReposition")) then
+    if (zoneDef.repositionCards and not zone.hasTag("suppressReposition")) then
         positionCardOnEnterZone(card, zoneDef.zoneIndex)
     end
 
-    if(zoneDef.addCountersAndTokens) then
-        addCountersAndTokensToCard({card = card, cardData = cardData, zoneGuid = zone.getGUID(), longDelay = zoneDef.repositionCards})
+    if (zoneDef.addCountersAndTokens) then
+        addCountersAndTokensToCard({
+            card = card,
+            cardData = cardData,
+            zoneGuid = zone.getGUID(),
+            longDelay = zoneDef.repositionCards
+        })
     end
 
     local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
@@ -120,9 +156,15 @@ function onObjectEnterZone(zone, card)
 end
 
 function resizeCardOnEnterZone(card, scale)
-    if (card.isDestroyed()) then return end
-    if( not scale ) then return end
-    if(card.hasTag("do-not-resize")) then return end
+    if (card.isDestroyed()) then
+        return
+    end
+    if (not scale) then
+        return
+    end
+    if (card.hasTag("do-not-resize")) then
+        return
+    end
 
     card.setScale(scale)
 end
@@ -141,31 +183,46 @@ function positionCardOnEnterZone(card, zoneIndex)
 
     card.setPositionSmooth(newCardPosition)
     card.setRotationSmooth(cardRotation)
-    card.setScale(ENCOUNTER_DECK_SCALE)
 end
 
 function onObjectLeaveZone(zone, card)
-    if (not card or card.isDestroyed() or not zone or zone.IsDestroyed()) then return end
-    if (not isCard(card)) then return end
-
-    local zoneDef = getZoneDefinition({zone = zone})
-    if (not zoneDef) then return end
-
-    local cardData = getCardData({card = card})
-    if(not cardData) then return end
-
-    local cardType = cardData.type or ""
-    if (cardType == "hero") then return end
-
-    if(zoneDef.addCountersAndTokens) then
-        removeCountersFromCard({ card = card })
+    if (not card or card.isDestroyed() or not zone or zone.IsDestroyed()) then
+        return
+    end
+    if (not isCard(card)) then
+        return
     end
 
-    if(zoneDef.rescaleOnExit) then
+    local zoneDef = getZoneDefinition({
+        zone = zone
+    })
+    if (not zoneDef) then
+        return
+    end
+
+    local cardData = getCardData({
+        card = card
+    })
+    if (not cardData) then
+        return
+    end
+
+    local cardType = cardData.type or ""
+    if (cardType == "hero") then
+        return
+    end
+
+    if (zoneDef.addCountersAndTokens) then
+        removeCountersFromCard({
+            card = card
+        })
+    end
+
+    if (zoneDef.rescaleOnExit) then
         resizeCardOnLeaveZone(card, cardData.type or "")
     end
 
-    if(zoneDef.repositionCards and not zone.hasTag("suppressReposition")) then
+    if (zoneDef.repositionCards and not zone.hasTag("suppressReposition")) then
         repositionCardsInZone({
             zone = zone
         })
@@ -182,12 +239,16 @@ function onObjectLeaveZone(zone, card)
 end
 
 function resizeCardOnLeaveZone(card, cardType)
-    if (card.isDestroyed()) then return end
+    if (card.isDestroyed()) then
+        return
+    end
 
     local zones = card.getZones()
 
     for _, zone in ipairs(zones) do
-        local zoneDef = getZoneDefinition({zone = zone})
+        local zoneDef = getZoneDefinition({
+            zone = zone
+        })
         if (zoneDef and zoneDef.rescaleOnEnterTo) then
             return
         end
@@ -268,7 +329,9 @@ function onPlayerAction(player, action, targets)
             zoneType = "minion"
         end
 
-        if (not zoneType) then return true end
+        if (not zoneType) then
+            return true
+        end
 
         local zoneDefs = getZoneDefinitionsByType({
             zoneType = zoneType
@@ -313,8 +376,10 @@ function onPlayerAction(player, action, targets)
 end
 
 function onObjectDestroy(object)
-    if (not isCard(object)) then return end
-    
+    if (not isCard(object)) then
+        return
+    end
+
     local cardGuid = object.getGUID()
 
     local keepInRegistry = getCardValue({
@@ -322,21 +387,47 @@ function onObjectDestroy(object)
         property = "keepInRegistry"
     })
 
-    if(keepInRegistry) then
-        setCardValue({cardGuid = cardGuid, property = "standardCounterGuid", value = nil})
-        setCardValue({cardGuid = cardGuid, property = "standardRetainedValue", value = nil})
-        setCardValue({cardGuid = cardGuid, property = "configuredCounterGuid", value = nil})
-        setCardValue({cardGuid = cardGuid, property = "configuredRetainedValue", value = nil})
+    if (keepInRegistry) then
+        setCardValue({
+            cardGuid = cardGuid,
+            property = "standardCounterGuid",
+            value = nil
+        })
+        setCardValue({
+            cardGuid = cardGuid,
+            property = "standardRetainedValue",
+            value = nil
+        })
+        setCardValue({
+            cardGuid = cardGuid,
+            property = "configuredCounterGuid",
+            value = nil
+        })
+        setCardValue({
+            cardGuid = cardGuid,
+            property = "configuredRetainedValue",
+            value = nil
+        })
     else
-        deleteCardFromRegistry({cardGuid = cardGuid})
+        deleteCardFromRegistry({
+            cardGuid = cardGuid
+        })
     end
 end
 
 function onObjectRotate(object, spin, flip, player_color, old_spin, old_flip)
-    if (not isCard(object)) then return end
-    if (spin == old_spin) then return end
+    if (not isCard(object)) then
+        return
+    end
+    if (spin == old_spin) then
+        return
+    end
 
-    rotateCountersWithCard({card = object, spin = spin, oldSpin = old_spin})
+    rotateCountersWithCard({
+        card = object,
+        spin = spin,
+        oldSpin = old_spin
+    })
 end
 
 function showReleaseNotesUI()
@@ -347,19 +438,17 @@ function showReleaseNotesUI()
             width = "750",
             color = "rgba(0,0,0,1)"
         },
-        children = {
-            {
-                tag = "Image",
-                attributes = {
-                    image = "https://d2xdqryaauvaie.cloudfront.net/assets/release-notes-20260726.png",
-                    rectAlignment = "MiddleCenter",
-                    raycastTarget = "true",
-                    height = "500",
-                    width = "750",
-                    onClick = "hideReleaseNotesUI"
-                }
+        children = {{
+            tag = "Image",
+            attributes = {
+                image = "https://steamusercontent-a.akamaihd.net/ugc/15386909686457612715/BA0D34A32D07FFA4772A53BB1FA80ACB519F089C/", -- "https://d2xdqryaauvaie.cloudfront.net/assets/release-notes-20260804.png",
+                rectAlignment = "MiddleCenter",
+                raycastTarget = "true",
+                height = "500",
+                width = "750",
+                onClick = "hideReleaseNotesUI"
             }
-        }
+        }}
     }}
 
     Global.UI.setXmlTable(scenarioUI)
@@ -367,7 +456,7 @@ end
 
 function hideReleaseNotesUI()
     local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
-    if(not scenarioManager or not scenarioManager.call("isScenarioInProgress")) then
+    if (not scenarioManager or not scenarioManager.call("isScenarioInProgress")) then
         Global.UI.setXml("")
         return
     end

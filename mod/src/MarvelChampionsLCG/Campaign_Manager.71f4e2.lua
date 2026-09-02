@@ -44,6 +44,8 @@ function placeCampaign(params)
     placeNotes(campaign)
     placeAssets(campaign)
 
+    finalizeCampaignSetup(campaign)
+
     campaignPlaced = true
     saveData()
 end
@@ -165,16 +167,15 @@ end
 
 function placeLogs(campaign)
     if(campaign.logs == nil) then return end
-    local assetBag = getObjectFromGUID(Global.getVar("ASSET_BAG_GUID"))
 
     for _, log in ipairs(campaign.logs) do
-        assetBag.call("spawnAsset", {
+        spawnAsset({
             guid = log.guid, 
             position = log.position, 
             scale = log.scale,
             rotation = log.rotation or {0,180,0},
-            caller = self,
-            callback = "configureLog"})
+            callback = "configureLog"
+        })
     end
 end
 
@@ -212,15 +213,13 @@ function placeAssets(campaign)
         local assetRotation = asset.rotation
         local assetScale = asset.scale or {1, 1, 1}
         local lockAsset = asset.locked ~= nil and asset.locked or false
-        local assetBag = getObjectFromGUID(Global.getVar("ASSET_BAG_GUID"))
 
-        assetBag.call("spawnAsset", {
+        spawnAsset({
             guid = assetGuid,
             position = assetPosition,
             scale = assetScale,
             rotation = assetRotation,
             locked = lockAsset,
-            caller = self,
             callback = "configureAsset"
         })
     end
@@ -233,10 +232,30 @@ function configureAsset(params)
     asset.setScale(params.scale)
     asset.setLock(params.locked)
     asset.addTag(groupTag)
+
+    asset.call("setGroup", {group = "campaign"})
    
     if(params.rotation ~= nil) then
         asset.setRotation(params.rotation)
     end
+end
+
+function finalizeCampaignSetup(campaign)
+    local key = campaign.key or ""
+    local functionName = "finalizeCampaignSetup_" .. key
+
+    if (self.getVar(functionName) ~= nil) then
+        self.call(functionName, {
+            campaign = campaign
+        })
+        return
+    end 
+end
+
+function spawnAsset(params)
+    local assetBag = getObjectFromGUID(Global.getVar("ASSET_BAG_GUID"))
+    params.caller = self
+    return assetBag.call("spawnAsset", params)
 end
 
 require('!/campaigns/rise_of_red_skull')
@@ -248,3 +267,4 @@ require('!/campaigns/mojo_mania')
 require('!/campaigns/next_evolution')
 require('!/campaigns/age_of_apocalypse')
 require('!/campaigns/agents_of_shield')
+require('!/campaigns/fear_no_evil')

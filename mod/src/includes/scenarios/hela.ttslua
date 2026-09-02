@@ -41,7 +41,7 @@
         },
         garm={
             cardId="21143",
-            position={-0.34, 1.00, 1.25},
+            position={0, 1.00, 1.25},
             scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER"))
         },
         odin={

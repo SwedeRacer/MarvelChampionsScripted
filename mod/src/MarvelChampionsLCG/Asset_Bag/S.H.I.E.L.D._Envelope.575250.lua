@@ -27,12 +27,17 @@ function getValue(key, default)
     return data[key]
 end
 
+function setGroup(params)
+    setValue("group", params.group)
+    self.addTag("group-" .. params.group)
+end
+
 function setUpUI()
     local ui = 
     {
         {
             tag="Panel",
-            attributes={            
+            attributes={
                 height="400",
                 width="310",
                 color="rgba(0,0,0,0)",
@@ -143,11 +148,14 @@ function investigateClicked(player, value, id)
     local evidenceStartPosition = {envelopePosition.x, envelopePosition.y - 0.05, envelopePosition.z}
     local evidenceEndPosition = {envelopePosition.x, envelopePosition.y - 0.05, envelopePosition.z + 8}
 
+    local group = getValue("group", "campaign")
+
     local evidenceCard = Global.call("spawnCard", {
         cardId = cardToReveal, 
         position = self.getPosition(), 
         rotation = self.getRotation(), 
-        scale=Global.getTable("CARD_SCALE_ENCOUNTER")})
+        scale=Global.getTable("CARD_SCALE_ENCOUNTER"),
+        tags = {"group-" .. group}})
 
     Wait.condition(
         function()

@@ -2,553 +2,716 @@ local OFFSET_ENCOUNTER_DRAW = Global.getTable("PLAYMAT_OFFSET_ENCOUNTER_CARD")
 local OFFSET_PLAYER_DECK = Global.getTable("PLAYMAT_OFFSET_DECK")
 local OFFSET_PLAYER_DISCARD = Global.getTable("PLAYMAT_OFFSET_DISCARD")
 local zoneDefaults = {
-   hero = Global.getTable("ZONE_HERO"),
-   heroCounters = Global.getTable("ZONE_HERO_COUNTERS"),
-   heroExit = Global.getTable("ZONE_HERO_EXIT"),
-   minion = Global.getTable("ZONE_MINION")
+    hero = Global.getTable("ZONE_HERO"),
+    heroCounters = Global.getTable("ZONE_HERO_COUNTERS"),
+    heroExit = Global.getTable("ZONE_HERO_EXIT"),
+    minion = Global.getTable("ZONE_MINION")
 }
 
 local data = {}
 
 function onload(saved_data)
-   loadSavedData(saved_data)
+    loadSavedData(saved_data)
 
-   setUpUI(getValue("showRemoveButton", true))
+    setUpUI(getValue("showRemoveButton", true))
 
-   self.addContextMenuItem("Print Card Registry", printCardRegistry)
+    self.addContextMenuItem("Print Card Registry", printCardRegistry)
 end
 
 function printCardRegistry(playerColor)
-   local layoutManager = getObjectFromGUID(Global.getVar("GUID_LAYOUT_MANAGER"))
-   local cardRegistry = layoutManager.call("getCardRegistry")
-   log(cardRegistry)
+    local layoutManager = getObjectFromGUID(Global.getVar("GUID_LAYOUT_MANAGER"))
+    local cardRegistry = layoutManager.call("getCardRegistry")
+    log(cardRegistry)
 end
 
 function loadSavedData(saved_data)
-   if saved_data ~= "" then
-      local loaded_data = JSON.decode(saved_data)
-      data = loaded_data
-   end
+    if saved_data ~= "" then
+        local loaded_data = JSON.decode(saved_data)
+        data = loaded_data
+    end
 end
 
 function setValue(key, value)
-   data[key] = value
-   local saved_data = JSON.encode(data)
-   self.script_state = saved_data
+    data[key] = value
+    local saved_data = JSON.encode(data)
+    self.script_state = saved_data
 end
 
 function getValue(key, default)
-   if data[key] == nil then
-      return default
-   end
+    if data[key] == nil then
+        return default
+    end
 
-   return data[key]
+    return data[key]
 end
 
 function setUpUI(showRemoveButton)
-   local ui = 
-   {
-      {
-         tag="Panel",
-         attributes={            
-            height="200",
-            width="350",
-            color="rgba(0,0,0,0)",
-            position="0 0 -12",
-            rotation="0 0 180"
-         },
-         children={
-            {
-               tag="Button",
-               value="1",
-               attributes={
-                  id="firstPLayerButton",
-                  rectAlignment="UpperRight",
-                  onClick="movePlayerOne",
-                  textColor="rgb(0,0,0)",
-                  color="rgb(0,1,0)",
-                  scale="0.25 0.25",
-                  height="80",
-                  width="80",
-                  fontSize="60",
-                  fontStyle="Bold",
-                  offsetXY="-10 -40",
-                  onMouseEnter="showTooltip",
-                  onMouseExit="hideTooltip"
-               }
-            },
-            {
-               tag="Panel",
-               attributes={
-                  id="firstPLayerButtonTooltip",
-                  scale="0.25 0.25",
-                  padding="20 20 10 10",
-                  color="rgba(0,0,0,0.75)",
-                  contentSizeFitter="both",
-                  position="155 50 -100",
-                  visibility="invisible"
-               },
-               children={
-                  {
-                     tag="Text",
-                     value="Take First Player",
-                     attributes={
-                        fontSize="24",
-                        color="rgb(1,1,1)",
-                        alignment="MiddleLeft"
-                     }
-                  }
-               }
-            },
-            {
-               tag="Button",
-               value="R",
-               attributes={
-                  id="readyAllButton",
-                  rectAlignment="UpperRight",
-                  onClick="untapAll",
-                  textColor="rgb(0,0,0)",
-                  color="rgb(0.3,0.6,1)",
-                  scale="0.25 0.25",
-                  height="80",
-                  width="80",
-                  fontSize="60",
-                  fontStyle="Bold",
-                  offsetXY="-10 -65",
-                  onMouseEnter="showTooltip",
-                  onMouseExit="hideTooltip"
-               }
-            },
-            {
-               tag="Panel",
-               attributes={
-                  id="readyAllButtonTooltip",
-                  scale="0.25 0.25",
-                  padding="20 20 10 10",
-                  color="rgba(0,0,0,0.75)",
-                  contentSizeFitter="both",
-                  position="155 25 -100",
-                  visibility="invisible"
-               },
-               children={
-                  {
-                     tag="Text",
-                     value="Ready All Cards",
-                     attributes={
-                        fontSize="24",
-                        color="rgb(1,1,1)",
-                        alignment="MiddleLeft"
-                     }
-                  }
-               }
-            },
-            {
-               tag="Button",
-               value="D",
-               attributes={
-                  id="discardRandomButton",
-                  rectAlignment="UpperRight",
-                  onClick="discardRandom",
-                  textColor="rgb(0,0,0)",
-                  color="rgb(1,0.5, 1)",
-                  scale="0.25 0.25",
-                  height="80",
-                  width="80",
-                  fontSize="60",
-                  fontStyle="Bold",
-                  offsetXY="-10 -90",
-                  onMouseEnter="showTooltip",
-                  onMouseExit="hideTooltip"
-               }
-            },
-            {
-               tag="Panel",
-               attributes={
-                  id="discardRandomButtonTooltip",
-                  scale="0.25 0.25",
-                  padding="20 20 10 10",
-                  color="rgba(0,0,0,0.75)",
-                  contentSizeFitter="both",
-                  position="155 0 -100",
-                  visibility="invisible"
-               },
-               children={
-                  {
-                     tag="Text",
-                     value="Discard a Random Card",
-                     attributes={
-                        fontSize="24",
-                        color="rgb(1,1,1)",
-                        alignment="MiddleLeft"
-                     }
-                  }
-               }
-            },
-            {
-               tag="Button",
-               value="!!",
-               attributes={
-                  id="drawEncounterButton",
-                  rectAlignment="UpperRight",
-                  onClick="drawEncounter",
-                  textColor="rgb(0,0,0)",
-                  color="rgb(1,1,0)",
-                  scale="0.25 0.25",
-                  height="80",
-                  width="80",
-                  fontSize="60",
-                  fontStyle="Bold",
-                  offsetXY="-10 -115",
-                  onMouseEnter="showTooltip",
-                  onMouseExit="hideTooltip"
-               }
-            },
-            {
-               tag="Panel",
-               attributes={
-                  id="drawEncounterButtonTooltip",
-                  scale="0.25 0.25",
-                  padding="20 20 10 10",
-                  color="rgba(0,0,0,0.75)",
-                  contentSizeFitter="both",
-                  position="155 -25 -100",
-                  visibility="invisible"
-               },
-               children={
-                  {
-                     tag="Text",
-                     value="Draw an Encounter Card",
-                     attributes={
-                        fontSize="24",
-                        color="rgb(1,1,1)",
-                        alignment="MiddleLeft"
-                     }
-                  }
-               }
-            },
-            {
-               tag="Button",
-               value="X",
-               attributes={
-                  id="discardEncounterButton",
-                  rectAlignment="UpperRight",
-                  onClick="discardEncounter",
-                  textColor="rgb(0,0,0)",
-                  color="rgb(1,0,0)",
-                  scale="0.25 0.25",
-                  height="80",
-                  width="80",
-                  fontSize="60",
-                  fontStyle="Bold",
-                  offsetXY="-10 -140",
-                  onMouseEnter="showTooltip",
-                  onMouseExit="hideTooltip"
-               }
-            },
-            {
-               tag="Panel",
-               attributes={
-                  id="discardEncounterButtonTooltip",
-                  scale="0.25 0.25",
-                  padding="20 20 10 10",
-                  color="rgba(0,0,0,0.75)",
-                  contentSizeFitter="both",
-                  position="155 -50 -100",
-                  visibility="invisible"
-               },
-               children={
-                  {
-                     tag="Text",
-                     value="Discard Encounter Card",
-                     attributes={
-                        fontSize="24",
-                        color="rgb(1,1,1)",
-                        alignment="MiddleLeft"
-                     }
-                  }
-               }
-            },
-            {
-               tag="Button",
-               value="N",
-               attributes={
-                  id="spawnNemesisButton",
-                  rectAlignment="UpperRight",
-                  onClick="spawnNemesis",
-                  textColor="rgb(1,1,1)",
-                  color="rgb(0,0,0)",
-                  scale="0.25 0.25",
-                  height="80",
-                  width="80",
-                  fontSize="60",
-                  fontStyle="Bold",
-                  offsetXY="-10 -170",
-                  onMouseEnter="showTooltip",
-                  onMouseExit="hideTooltip"
-               }
-            },
-            {
-               tag="Panel",
-               attributes={
-                  id="spawnNemesisButtonTooltip",
-                  scale="0.25 0.25",
-                  padding="20 20 10 10",
-                  color="rgba(0,0,0,0.75)",
-                  contentSizeFitter="both",
-                  position="155 -80 -100",
-                  visibility="invisible"
-               },
-               children={
-                  {
-                     tag="Text",
-                     value="Summon Your Nemesis!",
-                     attributes={
-                        fontSize="24",
-                        color="rgb(1,1,1)",
-                        alignment="MiddleLeft"
-                     }
-                  }
-               }
-            },
-            {
-               tag="Button",
-               value="REMOVE",
-               attributes={
-                  id="removeButton",
-                  active=showRemoveButton,
-                  onClick="clearPlaymat",
-                  textColor="rgb(1,0,0)",
-                  color="rgb(0,0,0)",
-                  scale="0.25 0.25",
-                  height="60",
-                  width="220",
-                  fontSize="40",
-                  rectAlignment="LowerCenter",
-                  offsetXY="0 10"
-               }
+    local ui = {{
+        tag = "Panel",
+        attributes = {
+            height = "200",
+            width = "350",
+            color = "rgba(0,0,0,0)",
+            position = "0 0 -12",
+            rotation = "0 0 180"
+        },
+        children = {{
+            tag = "Image",
+            attributes = {
+                id = "firstPLayerButton",
+                image = Global.getVar("CDN_URL") .. "/assets/playmat-first-player.png",
+                rectAlignment = "UpperRight",
+                onClick = "movePlayerOne",
+                scale = "0.25 0.25",
+                height = "80",
+                width = "80",
+                fontSize = "60",
+                fontStyle = "Bold",
+                offsetXY = "-10 -40",
+                onMouseEnter = "showTooltip",
+                onMouseExit = "hideTooltip"
             }
-         }
-      }
-   }
+        }, {
+            tag = "Panel",
+            attributes = {
+                id = "firstPLayerButtonTooltip",
+                scale = "0.25 0.25",
+                padding = "20 20 10 10",
+                color = "rgba(0,0,0,0.75)",
+                contentSizeFitter = "both",
+                position = "155 50 -100",
+                visibility = "invisible"
+            },
+            children = {{
+                tag = "Text",
+                value = "Take First Player",
+                attributes = {
+                    fontSize = "24",
+                    color = "rgb(1,1,1)",
+                    alignment = "MiddleLeft"
+                }
+            }}
+        }, {
+            tag = "Image",
+            attributes = {
+                id = "readyAllButton",
+                image = Global.getVar("CDN_URL") .. "/assets/playmat-ready.png",
+                rectAlignment = "UpperRight",
+                onClick = "untapAll",
+                scale = "0.25 0.25",
+                height = "80",
+                width = "80",
+                fontSize = "60",
+                fontStyle = "Bold",
+                offsetXY = "-10 -65",
+                onMouseEnter = "showTooltip",
+                onMouseExit = "hideTooltip"
+            }
+        }, {
+            tag = "Panel",
+            attributes = {
+                id = "readyAllButtonTooltip",
+                scale = "0.25 0.25",
+                padding = "20 20 10 10",
+                color = "rgba(0,0,0,0.75)",
+                contentSizeFitter = "both",
+                position = "155 25 -100",
+                visibility = "invisible"
+            },
+            children = {{
+                tag = "Text",
+                value = "Ready All Cards",
+                attributes = {
+                    fontSize = "24",
+                    color = "rgb(1,1,1)",
+                    alignment = "MiddleLeft"
+                }
+            }}
+        }, {
+            tag = "Image",
+            attributes = {
+                id = "discardRandomButton",
+                image = Global.getVar("CDN_URL") .. "/assets/playmat-random-discard.png",
+                rectAlignment = "UpperRight",
+                onClick = "discardRandom",
+                scale = "0.25 0.25",
+                height = "80",
+                width = "80",
+                fontSize = "60",
+                fontStyle = "Bold",
+                offsetXY = "-10 -90",
+                onMouseEnter = "showTooltip",
+                onMouseExit = "hideTooltip"
+            }
+        }, {
+            tag = "Panel",
+            attributes = {
+                id = "discardRandomButtonTooltip",
+                scale = "0.25 0.25",
+                padding = "20 20 10 10",
+                color = "rgba(0,0,0,0.75)",
+                contentSizeFitter = "both",
+                position = "155 0 -100",
+                visibility = "invisible"
+            },
+            children = {{
+                tag = "Text",
+                value = "Discard a Random Card",
+                attributes = {
+                    fontSize = "24",
+                    color = "rgb(1,1,1)",
+                    alignment = "MiddleLeft"
+                }
+            }}
+        }, {
+            tag = "Image",
+            attributes = {
+                id = "drawEncounterButton",
+                image = Global.getVar("CDN_URL") .. "/assets/playmat-encounter-deal.png",
+                rectAlignment = "UpperRight",
+                onClick = "drawEncounter",
+                scale = "0.25 0.25",
+                height = "80",
+                width = "80",
+                fontSize = "60",
+                fontStyle = "Bold",
+                offsetXY = "-10 -115",
+                onMouseEnter = "showTooltip",
+                onMouseExit = "hideTooltip"
+            }
+        }, {
+            tag = "Panel",
+            attributes = {
+                id = "drawEncounterButtonTooltip",
+                scale = "0.25 0.25",
+                padding = "20 20 10 10",
+                color = "rgba(0,0,0,0.75)",
+                contentSizeFitter = "both",
+                position = "155 -25 -100",
+                visibility = "invisible"
+            },
+            children = {{
+                tag = "Text",
+                value = "Draw an Encounter Card",
+                attributes = {
+                    fontSize = "24",
+                    color = "rgb(1,1,1)",
+                    alignment = "MiddleLeft"
+                }
+            }}
+        }, {
+            tag = "Image",
+            attributes = {
+                id = "discardEncounterButton",
+                image = Global.getVar("CDN_URL") .. "/assets/playmat-encounter-discard.png",
+                rectAlignment = "UpperRight",
+                onClick = "discardEncounter",
+                scale = "0.25 0.25",
+                height = "80",
+                width = "80",
+                fontSize = "60",
+                fontStyle = "Bold",
+                offsetXY = "-10 -140",
+                onMouseEnter = "showTooltip",
+                onMouseExit = "hideTooltip"
+            }
+        }, {
+            tag = "Panel",
+            attributes = {
+                id = "discardEncounterButtonTooltip",
+                scale = "0.25 0.25",
+                padding = "20 20 10 10",
+                color = "rgba(0,0,0,0.75)",
+                contentSizeFitter = "both",
+                position = "155 -50 -100",
+                visibility = "invisible"
+            },
+            children = {{
+                tag = "Text",
+                value = "Discard Encounter Card",
+                attributes = {
+                    fontSize = "24",
+                    color = "rgb(1,1,1)",
+                    alignment = "MiddleLeft"
+                }
+            }}
+        }, {
+            tag = "Image",
+            attributes = {
+                id = "spawnNemesisButton",
+                image = Global.getVar("CDN_URL") .. "/assets/playmat-nemesis.png",
+                rectAlignment = "UpperRight",
+                onClick = "spawnNemesis",
+                scale = "0.25 0.25",
+                height = "80",
+                width = "80",
+                fontSize = "60",
+                fontStyle = "Bold",
+                offsetXY = "-10 -170",
+                onMouseEnter = "showTooltip",
+                onMouseExit = "hideTooltip"
+            }
+        }, {
+            tag = "Panel",
+            attributes = {
+                id = "spawnNemesisButtonTooltip",
+                scale = "0.25 0.25",
+                padding = "20 20 10 10",
+                color = "rgba(0,0,0,0.75)",
+                contentSizeFitter = "both",
+                position = "155 -80 -100",
+                visibility = "invisible"
+            },
+            children = {{
+                tag = "Text",
+                value = "Summon Your Nemesis!",
+                attributes = {
+                    fontSize = "24",
+                    color = "rgb(1,1,1)",
+                    alignment = "MiddleLeft"
+                }
+            }}
+        }, {
+            tag = "Button",
+            value = "REMOVE",
+            attributes = {
+                id = "removeButton",
+                active = showRemoveButton,
+                onClick = "clearPlaymat",
+                textColor = "rgb(1,0,0)",
+                color = "rgb(0,0,0)",
+                scale = "0.25 0.25",
+                height = "60",
+                width = "220",
+                fontSize = "40",
+                rectAlignment = "LowerCenter",
+                offsetXY = "0 10"
+            }
+        } -- {
+        --     tag = "Button",
+        --     value = "RESET",
+        --     attributes = {
+        --         id = "resetButton",
+        --         active = showRemoveButton,
+        --         onClick = "resetPlaymat",
+        --         textColor = "rgb(0,0,1)",
+        --         color = "rgb(0,0,0)",
+        --         scale = "0.25 0.25",
+        --         height = "60",
+        --         width = "220",
+        --         fontSize = "40",
+        --         rectAlignment = "LowerCenter",
+        --         offsetXY = "50 10"
+        --     }
+        -- }
+        }
+    }}
 
-   self.UI.setXmlTable(ui)   
+    self.UI.setXmlTable(ui)
 end
 
 function setPlayerColor(params)
-   local matPosition = self.getPosition()
-   local color = params.color
+    local matPosition = self.getPosition()
+    local color = params.color
 
-   setValue("playerColor", color)
+    setValue("playerColor", color)
 
-   local heroZoneDef = Global.call("combineZoneDefinitions", {
-      zoneDef = {
-         zoneIndex = "hero-" .. color,
-         playerColor = color,
-         position = Vector({matPosition.x, 2, matPosition.z}),
-         group = "player" .. color
-      },
-      defaultDef = zoneDefaults.hero})
-   Global.call("createZone", {zoneDef = heroZoneDef})
+    local heroZoneDef = Global.call("combineZoneDefinitions", {
+        zoneDef = {
+            zoneIndex = "hero-" .. color,
+            playerColor = color,
+            position = Vector({matPosition.x, 2, matPosition.z}),
+            group = "player" .. color
+        },
+        defaultDef = zoneDefaults.hero
+    })
+    Global.call("createZone", {
+        zoneDef = heroZoneDef
+    })
 
-   local heroCountersZoneDef = Global.call("combineZoneDefinitions", {
-      zoneDef = {
-         zoneIndex = "heroCounters-" .. color,
-         playerColor = color,
-         position = Vector({matPosition.x + 3.25, 1.25, matPosition.z}),
-         group = "player" .. color
-      },
-      defaultDef = zoneDefaults.heroCounters})
-   Global.call("createZone", {zoneDef = heroCountersZoneDef})
+    local heroCountersZoneDef = Global.call("combineZoneDefinitions", {
+        zoneDef = {
+            zoneIndex = "heroCounters-" .. color,
+            playerColor = color,
+            position = Vector({matPosition.x + 3.25, 1.25, matPosition.z}),
+            group = "player" .. color
+        },
+        defaultDef = zoneDefaults.heroCounters
+    })
+    Global.call("createZone", {
+        zoneDef = heroCountersZoneDef
+    })
 
-   local heroExitZoneDef = Global.call("combineZoneDefinitions", {
-      zoneDef = {
-         zoneIndex = "heroExit-" .. color,
-         playerColor = color,
-         position = Vector({matPosition.x, 2, matPosition.z}),
-         group = "player" .. color
-      },
-      defaultDef = zoneDefaults.heroExit})
-   Global.call("createZone", {zoneDef = heroExitZoneDef})
+    local heroExitZoneDef = Global.call("combineZoneDefinitions", {
+        zoneDef = {
+            zoneIndex = "heroExit-" .. color,
+            playerColor = color,
+            position = Vector({matPosition.x, 2, matPosition.z}),
+            group = "player" .. color
+        },
+        defaultDef = zoneDefaults.heroExit
+    })
+    Global.call("createZone", {
+        zoneDef = heroExitZoneDef
+    })
 
-   local minionZoneDef = Global.call("combineZoneDefinitions", {
-      zoneDef = {
-         zoneIndex = "minion-" .. color,
-         playerColor = color,
-         position = Vector({matPosition.x - 3.25, 1, matPosition.z + 13.25}),
-         firstCardPosition = Vector({matPosition.x - 11, 1, matPosition.z + 12}),
-         group = "player" .. color
-      },
-      defaultDef = zoneDefaults.minion})
-   Global.call("createZone", {zoneDef = minionZoneDef})
+    local minionZoneDef = Global.call("combineZoneDefinitions", {
+        zoneDef = {
+            zoneIndex = "minion-" .. color,
+            playerColor = color,
+            position = Vector({matPosition.x - 3.25, 1, matPosition.z + 13.25}),
+            firstCardPosition = Vector({matPosition.x - 11, 1, matPosition.z + 12}),
+            group = "player" .. color
+        },
+        defaultDef = zoneDefaults.minion
+    })
+    Global.call("createZone", {
+        zoneDef = minionZoneDef
+    })
 end
 
 function movePlayerOne()
-   local playerColor = getValue("playerColor")
-   local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
-   heroManager.call("setFirstPlayer", {playerColor = playerColor})
+    local playerColor = getValue("playerColor")
+    local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
+    heroManager.call("setFirstPlayer", {
+        playerColor = playerColor
+    })
 end
 
 function untapAll()
-   local untapCards = findCardsAtPosition()
-   
-   for _, obj in ipairs(untapCards) do
-      local oldSpin = obj.getRotation().y
-      obj.setRotationSmooth({0,180,obj.getRotation().z})
-      Global.call("rotateCountersWithCard", {card = obj, spin = 180, oldSpin = oldSpin})
-   end
+    local untapCards = findCardsAtPosition()
+
+    for _, obj in ipairs(untapCards) do
+        local oldSpin = obj.getRotation().y
+        obj.setRotationSmooth({0, 180, obj.getRotation().z})
+        Global.call("rotateCountersWithCard", {
+            card = obj,
+            spin = 180,
+            oldSpin = oldSpin
+        })
+    end
 end
 
 function findCardsAtPosition()
-   matPos = self.getPosition()
-   local objList = Physics.cast({
-      origin       = matPos,
-      direction    = {0,1,0},
-      type         = 3,
-      size         = {26,1,15},
-      max_distance = 0,
-      debug        = false,
-   })
-   local cards = {}
-   for _, obj in ipairs(objList) do
-      if obj.hit_object.tag == "Card" then
-         table.insert(cards, obj.hit_object)
-      end
-   end
-   return cards
+    matPos = self.getPosition()
+    local objList = Physics.cast({
+        origin = matPos,
+        direction = {0, 1, 0},
+        type = 3,
+        size = {26, 1, 15},
+        max_distance = 0,
+        debug = false
+    })
+    local cards = {}
+    for _, obj in ipairs(objList) do
+        if obj.hit_object.tag == "Card" then
+            table.insert(cards, obj.hit_object)
+        end
+    end
+    return cards
 end
 
 function drawEncounter(player, value, id)
-   Global.call("dealEncounterCardToPlayer", {playerColor = getValue("playerColor"), faceUp = value == "-2"})
+    Global.call("dealEncounterCardToPlayer", {
+        playerColor = getValue("playerColor"),
+        faceUp = value == "-2"
+    })
 end
 
 function discardEncounter()
-   Global.call("discardPlayerEncounterCard", {playerColor = getValue("playerColor")})
+    Global.call("discardPlayerEncounterCard", {
+        playerColor = getValue("playerColor")
+    })
 end
 
 function discardRandom(object, player)
-   playerColor = getValue("playerColor")
+    playerColor = getValue("playerColor")
 
-   if playerColor == "Red" then
-    pos = {-52.50, 2, -21.72}
-   end
-   if playerColor == "Blue" then
-    pos = {-25.03, 2, -22.40}
-   end
-   if playerColor == "Green" then
-    pos = {2.44, 2, -22.40}
-   end
-   if playerColor == "Yellow" then
-    pos = {29.92, 2, -21.73}
-   end
+    if playerColor == "Red" then
+        pos = {-52.50, 2, -21.72}
+    end
+    if playerColor == "Blue" then
+        pos = {-25.03, 2, -22.40}
+    end
+    if playerColor == "Green" then
+        pos = {2.44, 2, -22.40}
+    end
+    if playerColor == "Yellow" then
+        pos = {29.92, 2, -21.73}
+    end
 
-   local cardsInHand = Player[playerColor].getHandObjects()
-   local handCount = #cardsInHand
+    local cardsInHand = Player[playerColor].getHandObjects()
+    local handCount = #cardsInHand
 
-   if(handCount == 0) then return end
+    if (handCount == 0) then
+        return
+    end
 
-   if(handCount == 1) then
-      cardsInHand[1].setPosition(pos)
-      return
-   end
+    if (handCount == 1) then
+        cardsInHand[1].setPosition(pos)
+        return
+    end
 
-   rand = math.random(handCount)
-   cardsInHand[rand].setPosition(pos)
+    rand = math.random(handCount)
+    cardsInHand[rand].setPosition(pos)
 end
 
 function clearPlaymat()
-   local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
-   local playerColor = getValue("playerColor")
-   local group = "player" .. playerColor
+    local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
+    local playerColor = getValue("playerColor")
+    local group = "player" .. playerColor
 
-   if(heroManager) then
-      heroManager.call("clearHero", {playerColor = playerColor, skipScenarioCheck = true})
-   end
+    if (heroManager) then
+        heroManager.call("clearHero", {
+            playerColor = playerColor,
+            skipScenarioCheck = true
+        })
+    end
 
-   Global.call("deleteZoneGroup", {group = group})
-   Global.call("deleteObjectsByGroup", {deleteGroup = playerColor})
+    Global.call("deleteZoneGroup", {
+        group = group
+    })
+    Global.call("deleteObjectsByGroup", {
+        deleteGroup = playerColor
+    })
+end
+
+function resetPlaymat()
+    local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
+    local playerColor = getValue("playerColor")
+    local group = "group-" .. playerColor
+    local deckPosition = getPlayerDeckPosition()
+    local discardPosition = getPlayerDiscardPosition()
+    local hero = heroManager.call("getHeroByPlayerColor", {
+        playerColor = playerColor
+    })
+
+    -- Discard all of this player's cards
+    discardCardsByGroup({
+        group = group,
+        hero = hero,
+        deckPosition = deckPosition,
+        discardPosition = discardPosition
+    })
+
+    -- Place the discard pile on the deck and shuffle
+    Wait.frames(function()
+        Global.call("refreshDeck", {
+            deckPosition = deckPosition,
+            discardPosition = discardPosition,
+            deckType = playerColor
+        })
+    end, 120)
+
+    -- Ready the identity card and flip it to alter ego side
+    local identity = Global.call("findCard", {
+        cardId = hero.identityCardId
+    })
+
+    if (identity) then
+        identity.setRotationSmooth({0, 180, 180})
+        -- identity.setPositionSmooth(getPlayerDeckPosition())
+    end
+
+    -- Reset the hero's HP counter
+    local hpCounter = Global.call("findObjectByTag", {
+        tag = "health-counter-" .. playerColor
+    })
+
+    if (hpCounter) then
+        hpCounter.call("setValue", {
+            value = hero.hitPoints
+        })
+    end
+
+    -- Replace special cards from the deck
+    Wait.frames(function()
+        heroManager.call("placeCards", {
+            hero = hero,
+            playmatPosition = self.getPosition(),
+            playerColor = playerColor
+        })
+    end, 180)
+end
+
+function discardCardsByGroup(params)
+    local group = params.group
+    local hero = params.hero
+    local deckPosition = params.deckPosition
+    local discardPosition = params.discardPosition
+
+    function cardIsInGroup(cardTable)
+        if (cardTable.tags) then
+            for _, tag in ipairs(cardTable.tags) do
+                if (tag == group) then
+                    return true
+                end
+            end
+        end
+
+        return false
+    end
+
+    local objects = getAllObjects()
+
+    for _, object in ipairs(objects) do
+        if (object.tag == "Deck") then
+            -- skip if the deck is the player's deck or discard pile
+            if (Global.call("objectIsAtPosition", {
+                object = object,
+                position = deckPosition,
+                tolerance = 0.5
+            }) or Global.call("objectIsAtPosition", {
+                object = object,
+                position = discardPosition,
+                tolerance = 0.5
+            })) then
+                goto continue
+            end
+
+            local objectPosition = object.getPosition()
+            local cards = object.getObjects()
+            local cardGuidsToDiscard = {}
+
+            for _, card in ipairs(cards) do
+                if (cardIsInGroup(card)) then
+                    table.insert(cardGuidsToDiscard, card.guid)
+                end
+            end
+
+            if (#cardGuidsToDiscard >= #cards) then
+                -- discard the entire deck
+                Global.call("moveDeck", {
+                    origin = objectPosition,
+                    destinationPosition = Global.call("ensureMinimumYPosition", {
+                        position = discardPosition,
+                        minimumY = 2
+                    }),
+                    destinationRotation = {0, 180, 0}
+                })
+            else
+                function resetDiscardCoroutine()
+                    for _, guid in ipairs(cardGuidsToDiscard) do
+                        Global.call("moveCardFromDeckByGuid", {
+                            cardGuid = guid,
+                            deckPosition = deckPosition,
+                            destinationPosition = discardPosition,
+                            flipCard = true
+                        })
+                    end
+
+                    return 1
+                end
+
+                startLuaCoroutine(self, "resetDiscardCoroutine")
+            end
+        end
+
+        if (object.tag == "Card") and object.hasTag(group) then
+            Global.call("discardCardOrDeck", {
+                object = object,
+                playerColor = getValue("playerColor")
+            })
+        end
+
+        ::continue::
+    end
 end
 
 function spawnNemesis()
-   local scenarioManager = getObjectFromGUID(Global.getVar("GUID_SCENARIO_MANAGER"))
-   scenarioManager.call("spawnNemesis", {playerColor = getValue("playerColor")})
+    local scenarioManager = getObjectFromGUID(Global.getVar("GUID_SCENARIO_MANAGER"))
+    scenarioManager.call("spawnNemesis", {
+        playerColor = getValue("playerColor")
+    })
 end
 
 function hideRemoveButton()
-   self.UI.setAttribute("removeButton", "active", false)
+    self.UI.setAttribute("removeButton", "active", false)
+    self.UI.setAttribute("resetButton", "active", false)
 
-   setValue("showRemoveButton", false)
+    setValue("showRemoveButton", false)
 end
 
 function showRemoveButton()
-   self.UI.setAttribute("removeButton", "active", true)
-   self.UI.setAttribute("removeButton", "textColor", "rgb(1,0,0)")
+    self.UI.setAttribute("removeButton", "active", true)
+    self.UI.setAttribute("removeButton", "textColor", "rgb(1,0,0)")
+    self.UI.setAttribute("resetButton", "active", true)
+    self.UI.setAttribute("resetButton", "textColor", "rgb(0,0,1)")
 end
 
 function getEncounterCardPosition()
-   return self.positionToWorld(Vector(OFFSET_ENCOUNTER_DRAW))
+    return self.positionToWorld(Vector(OFFSET_ENCOUNTER_DRAW))
 end
 
 function getPlayerDeckPosition()
-   return self.getPosition() + Vector(OFFSET_PLAYER_DECK)
+    return self.getPosition() + Vector(OFFSET_PLAYER_DECK)
 end
 
 function getPlayerDiscardPosition()
-   return self.getPosition() + Vector(OFFSET_PLAYER_DISCARD)
+    return self.getPosition() + Vector(OFFSET_PLAYER_DISCARD)
 end
 
 function showTooltip(player, value, id)
-   local tooltipId = id .. "Tooltip"
-   local playerColor = player.color
-   local visibility = self.UI.getAttribute(tooltipId, "visibility")
+    local tooltipId = id .. "Tooltip"
+    local playerColor = player.color
+    local visibility = self.UI.getAttribute(tooltipId, "visibility")
 
-   if string.find(visibility, playerColor) then return end
+    if string.find(visibility, playerColor) then
+        return
+    end
 
-   self.UI.setAttribute(tooltipId, "visibility", visibility.."|"..playerColor)
+    self.UI.setAttribute(tooltipId, "visibility", visibility .. "|" .. playerColor)
 end
 
 function hideTooltip(player, value, id)
-   local tooltipId = id .. "Tooltip"
-   local playerColor = player.color
-   local visibility = self.UI.getAttribute(tooltipId, "visibility")
+    local tooltipId = id .. "Tooltip"
+    local playerColor = player.color
+    local visibility = self.UI.getAttribute(tooltipId, "visibility")
 
-   if not string.find(visibility, playerColor) then return end
+    if not string.find(visibility, playerColor) then
+        return
+    end
 
-   self.UI.setAttribute(tooltipId, "visibility", visibility:gsub("|"..playerColor, ""))
+    self.UI.setAttribute(tooltipId, "visibility", visibility:gsub("|" .. playerColor, ""))
 end
 
 function drawCards(params)
-   local objectToDrawFrom = params.objectToDrawFrom
-   local numberToDraw = params.numberToDraw
-   local positionColor = getValue("playerColor")
+    local objectToDrawFrom = params.objectToDrawFrom
+    local numberToDraw = params.numberToDraw
+    local positionColor = getValue("playerColor")
 
-   local isDeck = objectToDrawFrom.tag == "Deck"
-   local availableCards = isDeck and objectToDrawFrom.getQuantity() or 1
-   local numberForSecondDraw = numberToDraw > availableCards and numberToDraw - availableCards or 0
-   local isPlayerDeck = isPlayerDeck(objectToDrawFrom)
-   local handPosition = Player[positionColor].getHandTransform().position
+    local isDeck = objectToDrawFrom.tag == "Deck"
+    local availableCards = isDeck and objectToDrawFrom.getQuantity() or 1
+    local numberForSecondDraw = numberToDraw > availableCards and numberToDraw - availableCards or 0
+    local isPlayerDeck = isPlayerDeck(objectToDrawFrom)
+    local handPosition = Player[positionColor].getHandTransform().position
 
-   objectToDrawFrom.deal(numberToDraw, getValue("playerColor"))
+    objectToDrawFrom.deal(numberToDraw, getValue("playerColor"))
 
-   --disableZones()
-   
-   Wait.frames(function()
-      if(isPlayerDeck and numberToDraw >= availableCards) then
-         local deckPosition = getPlayerDeckPosition()
-         local discardPosition = getPlayerDiscardPosition()
+    -- disableZones()
 
-         Global.call("refreshPlayerDeck", {
-            deckPosition = deckPosition, 
-            discardPosition = discardPosition, 
-            playerColor = positionColor})
+    Wait.frames(function()
+        if (isPlayerDeck and numberToDraw >= availableCards) then
+            local deckPosition = getPlayerDeckPosition()
+            local discardPosition = getPlayerDiscardPosition()
 
-         Wait.frames(function()
-            local playerDeck = Global.call("getDeckOrCardAtPosition", {position = deckPosition})
-            drawCards({objectToDrawFrom = playerDeck, numberToDraw = numberForSecondDraw})
-         end, 
-         30)
-      end
-   end,
-   1)
+            Global.call("refreshPlayerDeck", {
+                deckPosition = deckPosition,
+                discardPosition = discardPosition,
+                playerColor = positionColor
+            })
+
+            Wait.frames(function()
+                local playerDeck = Global.call("getDeckOrCardAtPosition", {
+                    position = deckPosition
+                })
+                drawCards({
+                    objectToDrawFrom = playerDeck,
+                    numberToDraw = numberForSecondDraw
+                })
+            end, 30)
+        end
+    end, 1)
 end
 
 -- function disableZones(params)
@@ -581,13 +744,15 @@ end
 -- end
 
 function isPlayerDeck(deck)
-   local deckPosition = deck.getPosition()
-   local playerDeckPosition = getPlayerDeckPosition()
+    local deckPosition = deck.getPosition()
+    local playerDeckPosition = getPlayerDeckPosition()
 
-   local xDiff = math.abs(deckPosition.x - playerDeckPosition.x)
-   local zDiff = math.abs(deckPosition.z - playerDeckPosition.z)
+    local xDiff = math.abs(deckPosition.x - playerDeckPosition.x)
+    local zDiff = math.abs(deckPosition.z - playerDeckPosition.z)
 
-   if(xDiff < 0.5 and zDiff < 0.5) then
-      return true
-   end
+    if (xDiff < 0.5 and zDiff < 0.5) then
+        return true
+    end
+
+    return false
 end
