@@ -1,7 +1,7 @@
 scenarios["artMuseumHeist"] = {
     name = "Art Museum Heist",
     fullyScripted = true,
-    tileImageUrl = "https://steamusercontent-a.akamaihd.net/ugc/2035118913124026079/1346FDBB47BCA704CFA9E914755A9AAF6B1CD5A3/",
+    tileImageUrl = cdnUrl .. "/selectors/scenarios/selector-art-museum-heist.png",
     villains = {},
     schemes = {
         main = {
@@ -44,15 +44,18 @@ end
 function setUpSchemeStage_artMuseumHeist_main(params)
     local artAttachments = {{
         cardId = "60122",
-        statusToAssign = "confused"
+        statusToAssign = "tough"
+        -- statusToAssign = "confused"
     }, {
-        cardId = "60123"
+        cardId = "60123",
+        statusToAssign = "tough"
     }, {
         cardId = "60124",
         statusToAssign = "tough"
     }, {
         cardId = "60125",
-        statusToAssign = "stunned"
+        statusToAssign = "tough"
+        -- statusToAssign = "stunned"
     }}
 
     artAttachments = Global.call("shuffleTable", {
@@ -73,10 +76,14 @@ function setUpSchemeStage_artMuseumHeist_main(params)
             currentVillain = villain
         end
 
-        Global.call("addStatusToVillain", {
-            villain = currentVillain,
-            statusType = attachment.statusToAssign
-        })
+        local delay = attachment.statusToAssign == "tough" and 120 or 0
+
+        Wait.frames(function()
+            Global.call("addStatusToVillain", {
+                villain = currentVillain,
+                statusType = attachment.statusToAssign
+            })
+        end, delay)
     end
 end
 

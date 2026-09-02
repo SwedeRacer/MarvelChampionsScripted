@@ -1185,6 +1185,7 @@ function placeVillainCard(params)
     local scale = params.scale or defaults.villainDeck.scale
     local flipped = false
     local locked = true
+    local hideWhenFaceDown = true
     local counterValue = params.counterValue
 
     if (params.flipped ~= nil) then
@@ -1195,14 +1196,19 @@ function placeVillainCard(params)
         locked = params.locked
     end
 
+    if (params.hideWhenFaceDown ~= nil) then
+        hideWhenFaceDown = params.hideWhenFaceDown
+    end
+
     local villainCard = Global.call("spawnCard", {
         cardId = params.cardId,
         position = params.position,
         rotation = params.rotation,
         scale = params.scale,
         name = params.name,
-        flipped = params.flipped,
-        locked = params.locked,
+        flipped = flipped,
+        locked = locked,
+        hideWhenFaceDown = hideWhenFaceDown,
         tags = {groupTag}
     })
 
@@ -1674,13 +1680,14 @@ end
 
 function spawnNemesis(params)
     local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
+    local deckPosition = params.position or {0, 1, 0}
     local hero = heroManager.call("getHeroByPlayerColor", {
         playerColor = params.playerColor
     })
 
     Global.call("spawnDeck", {
         cards = hero.decks.nemesis,
-        position = {0, 1, 0},
+        position = deckPosition,
         scale = Global.getTable("CARD_SCALE_ENCOUNTER"),
         cardTags = {groupTag}
     })
@@ -1979,9 +1986,10 @@ function placeSchemeStage(schemeKey, stage, heroCount)
             value = targetThreat
         })
         configureThreatCounterPrimaryButton(schemeThreatCounter, stage.showAdvanceButton)
-        
+
         Global.call("addConfiguredCounterToCard", {
-            card = schemeCard
+            card = schemeCard,
+            baseOffset = {1.35, 1.04, -0.75}
         })
     end, 20)
 end

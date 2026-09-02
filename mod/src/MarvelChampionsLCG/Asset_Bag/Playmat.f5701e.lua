@@ -285,25 +285,26 @@ function setUpUI(showRemoveButton)
                 width = "220",
                 fontSize = "40",
                 rectAlignment = "LowerCenter",
-                offsetXY = "-50 10"
+                offsetXY = "0 10"
             }
-        }, {
-            tag = "Button",
-            value = "RESET",
-            attributes = {
-                id = "resetButton",
-                active = showRemoveButton,
-                onClick = "resetPlaymat",
-                textColor = "rgb(0,0,1)",
-                color = "rgb(0,0,0)",
-                scale = "0.25 0.25",
-                height = "60",
-                width = "220",
-                fontSize = "40",
-                rectAlignment = "LowerCenter",
-                offsetXY = "50 10"
-            }
-        }}
+        } -- {
+        --     tag = "Button",
+        --     value = "RESET",
+        --     attributes = {
+        --         id = "resetButton",
+        --         active = showRemoveButton,
+        --         onClick = "resetPlaymat",
+        --         textColor = "rgb(0,0,1)",
+        --         color = "rgb(0,0,0)",
+        --         scale = "0.25 0.25",
+        --         height = "60",
+        --         width = "220",
+        --         fontSize = "40",
+        --         rectAlignment = "LowerCenter",
+        --         offsetXY = "50 10"
+        --     }
+        -- }
+        }
     }}
 
     self.UI.setXmlTable(ui)

@@ -1,7 +1,7 @@
 scenarios["stopThePresses"] = {
     name = "Stop the Presses",
     fullyScripted = true,
-    tileImageUrl = "https://steamusercontent-a.akamaihd.net/ugc/2035118913124026079/1346FDBB47BCA704CFA9E914755A9AAF6B1CD5A3/",
+    tileImageUrl = cdnUrl .. "/selectors/scenarios/selector-stop-the-presses.png",
     villains = {},
     schemes = {
         main = {
@@ -111,6 +111,6 @@ function setUpSchemeStage_stopThePresses_main(params)
     end, 10)
 end
 
-function setUpVillainStage_artMuseumHeist(params)
+function setUpVillainStage_stopThePresses(params)
     fearNoEvilSetupVillainStage(params)
 end

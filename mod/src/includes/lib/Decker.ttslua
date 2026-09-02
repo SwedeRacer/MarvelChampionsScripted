@@ -28,14 +28,8 @@ end
 
 -- Asset signature (equality comparison)
 local function assetSignature(assetData)
-    return table.concat({
-        assetData.FaceURL,
-        assetData.BackURL,
-        assetData.NumWidth,
-        assetData.NumHeight,
-        assetData.BackIsHidden and 'hb' or '',
-        assetData.UniqueBack and 'ub' or ''
-    })
+    return table.concat({assetData.FaceURL, assetData.BackURL, assetData.NumWidth, assetData.NumHeight,
+                         assetData.BackIsHidden and 'hb' or '', assetData.UniqueBack and 'ub' or ''})
 end
 -- Asset ID storage to avoid new ones for identical assets
 local idLookup = {}
@@ -54,7 +48,16 @@ local assetMeta = {
         return Decker.AssetDeck(self, cardNum, options)
     end
 }
-assetMeta = {__index = assetMeta}
+assetMeta = {
+    __index = assetMeta
+}
+
+local function defaultHideWhenFaceDownForAsset(asset)
+    local backUrl = asset and asset.data and asset.data.BackURL or ''
+    local found = string.find(string.lower(backUrl), 'card%-backs', 1, false)
+
+    return (found ~= nil)
+end
 
 -- Create a new CustomDeck asset
 function Decker.Asset(face, back, options)
@@ -74,7 +77,10 @@ function Decker.Asset(face, back, options)
 end
 -- Pull a Decker.Asset from card JSONs CustomDeck entry
 local function assetFromData(assetData)
-    return setmetatable({data = assetData, id = assetID(assetData)}, assetMeta)
+    return setmetatable({
+        data = assetData,
+        id = assetID(assetData)
+    }, assetMeta)
 end
 
 -- Create a base for JSON objects
@@ -82,15 +88,25 @@ function Decker.BaseObject()
     return {
         Name = 'Base',
         Transform = {
-            posX = 0, posY = 5, posZ = 0,
-            rotX = 0, rotY = 0, rotZ = 0,
-            scaleX = 1, scaleY = 1, scaleZ = 1
+            posX = 0,
+            posY = 5,
+            posZ = 0,
+            rotX = 0,
+            rotY = 0,
+            rotZ = 0,
+            scaleX = 1,
+            scaleY = 1,
+            scaleZ = 1
         },
         Nickname = '',
         Description = '',
         Value = 0,
         Tags = {},
-        ColorDiffuse = { r = 1, g = 1, b = 1 },
+        ColorDiffuse = {
+            r = 1,
+            g = 1,
+            b = 1
+        },
         Locked = false,
         Grid = true,
         Snap = true,
@@ -99,6 +115,7 @@ function Decker.BaseObject()
         Tooltip = true,
         GridProjection = false,
         Hands = true,
+        -- HideWhenFaceDown = true,
         XmlUI = '',
         LuaScript = '',
         LuaScriptState = '',
@@ -107,22 +124,55 @@ function Decker.BaseObject()
 end
 -- Typical paramters map with defaults
 local commonMap = {
-    name   = {field = 'Nickname',    default = ''},
-    value   = {field = 'Value',    default = 0},
-    tags   = {field = 'Tags',   default = {}},
-    desc   = {field = 'Description', default = ''},
-    script = {field = 'LuaScript',   default = ''},
-    xmlui  = {field = 'XmlUI',       default = ''},
-    scriptState = {field = 'LuaScriptState', default = ''},
-    locked  = {field = 'Locked',  default = false},
-    tooltip = {field = 'Tooltip', default = true},
-    guid    = {field = 'GUID',    default = 'deadbf'},
-    hands   = {field = 'Hands',   default = true},
+    name = {
+        field = 'Nickname',
+        default = ''
+    },
+    value = {
+        field = 'Value',
+        default = 0
+    },
+    tags = {
+        field = 'Tags',
+        default = {}
+    },
+    desc = {
+        field = 'Description',
+        default = ''
+    },
+    script = {
+        field = 'LuaScript',
+        default = ''
+    },
+    xmlui = {
+        field = 'XmlUI',
+        default = ''
+    },
+    scriptState = {
+        field = 'LuaScriptState',
+        default = ''
+    },
+    locked = {
+        field = 'Locked',
+        default = false
+    },
+    tooltip = {
+        field = 'Tooltip',
+        default = true
+    },
+    guid = {
+        field = 'GUID',
+        default = 'deadbf'
+    },
+    hands = {
+        field = 'Hands',
+        default = true
+    }
 }
 -- Apply some basic parameters on base JSON object
 function Decker.SetCommonOptions(obj, options)
     options = options or {}
-    for k,v in pairs(commonMap) do
+    for k, v in pairs(commonMap) do
         -- can't use and/or logic cause of boolean fields
         if options[k] ~= nil then
             obj[v.field] = options[k]
@@ -131,7 +181,7 @@ function Decker.SetCommonOptions(obj, options)
         end
     end
     -- passthrough unrecognized keys
-    for k,v in pairs(options) do
+    for k, v in pairs(options) do
         if not commonMap[k] then
             obj[k] = v
         end
@@ -153,7 +203,7 @@ end
 local deepcopy
 deepcopy = function(t)
     local copy = {}
-    for k,v in pairs(t) do
+    for k, v in pairs(t) do
         if type(v) == 'table' then
             copy[k] = deepcopy(v)
         else
@@ -192,11 +242,11 @@ local commonMeta = {
     setCommon = function(self, options)
         Decker.SetCommonOptions(self.data, options)
         return self
-    end,
+    end
 }
 -- apply common part on a specific metatable
 local function customMeta(mt)
-    for k,v in pairs(commonMeta) do
+    for k, v in pairs(commonMeta) do
         mt[k] = v
     end
     mt.__index = mt
@@ -208,7 +258,9 @@ local cardMeta = {
     setAsset = function(self, asset)
         local cardIndex = self.data.CardID:sub(-2, -1)
         self.data.CardID = asset.id .. cardIndex
-        self.data.CustomDeck = {[asset.id] = asset.data}
+        self.data.CustomDeck = {
+            [asset.id] = asset.data
+        }
         return self:_recache()
     end,
     getAsset = function(self)
@@ -235,25 +287,35 @@ function Decker.Card(asset, row, col, options)
     options = options or {}
     local card = Decker.BaseObject()
     card.Name = 'Card'
-    -- optional custom fields
+
     Decker.SetCommonOptions(card, options)
+
+    if options.hideWhenFaceDown == nil then
+        card.HideWhenFaceDown = defaultHideWhenFaceDownForAsset(asset)
+    end
+
+    -- optional custom fields
     if options.sideways ~= nil then
         card.SidewaysCard = options.sideways
         -- FIXME passthrough set that field, find some more elegant solution
         card.sideways = nil
     end
+
     -- CardID string is parent deck ID concat with its 0-based index (always two digits)
-    local num = (row-1)*asset.data.NumWidth + col - 1
+    local num = (row - 1) * asset.data.NumWidth + col - 1
     num = string.format('%02d', num)
     card.CardID = asset.id .. num
     -- just the parent asset reference needed
-    card.CustomDeck = {[asset.id] = asset.data}
+    card.CustomDeck = {
+        [asset.id] = asset.data
+    }
 
-    local obj = setmetatable({data = card}, cardMeta)
+    local obj = setmetatable({
+        data = card
+    }, cardMeta)
     obj:_recache()
     return obj
 end
-
 
 -- DeckerDeck meta
 local deckMeta = {
@@ -280,7 +342,7 @@ local deckMeta = {
     -- rebuild self.data.CustomDeck based on contained cards
     _rescanUsedDecks = function(self)
         local cardIDs = {}
-        for k,card in ipairs(self.data.ContainedObjects) do
+        for k, card in ipairs(self.data.ContainedObjects) do
             local cardID = next(card.CustomDeck)
             if not cardIDs[cardID] then
                 cardIDs[cardID] = card.CustomDeck[cardID]
@@ -311,8 +373,10 @@ local deckMeta = {
     end,
     removeMany = function(self, ...)
         local indices = {...}
-        table.sort(indices, function(e1,e2) return self:index(e1) > self:index(e2) end)
-        for _,ind in ipairs(indices) do
+        table.sort(indices, function(e1, e2)
+            return self:index(e1) > self:index(e2)
+        end)
+        for _, ind in ipairs(indices) do
             self:remove(ind, true)
         end
         self:_rescanUsedDecks()
@@ -321,7 +385,7 @@ local deckMeta = {
     insert = function(self, card, ind)
         ind = ind or (self:count() + 1)
         local rind = self:index(ind)
-        assert(rind > 0 and rind <= (self:count()+1), 'DeckObj.insert: index ' .. ind .. ' out of bounds')
+        assert(rind > 0 and rind <= (self:count() + 1), 'DeckObj.insert: index ' .. ind .. ' out of bounds')
         table.insert(self.data.DeckIDs, rind, card.data.CardID)
         table.insert(self.data.ContainedObjects, rind, card.data)
         local id = next(card.data.CustomDeck)
@@ -331,11 +395,11 @@ local deckMeta = {
         return self:_recache()
     end,
     reverse = function(self)
-        local s,e = 1, self:count()
+        local s, e = 1, self:count()
         while s < e do
             self:swap(s, e)
-            s = s+1
-            e = e-1
+            s = s + 1
+            e = e - 1
         end
         return self:_recache()
     end,
@@ -346,8 +410,10 @@ local deckMeta = {
     end,
     cardAt = function(self, ind)
         local rind = self:index(ind)
-        assert(rind > 0 and rind <= (self:count()+1), 'DeckObj.insert: index ' .. ind .. ' out of bounds')
-        local card = setmetatable({data = deepcopy(self.data.ContainedObjects[rind])}, cardMeta)
+        assert(rind > 0 and rind <= (self:count() + 1), 'DeckObj.insert: index ' .. ind .. ' out of bounds')
+        local card = setmetatable({
+            data = deepcopy(self.data.ContainedObjects[rind])
+        }, cardMeta)
         card:_recache()
         return card
     end,
@@ -363,7 +429,7 @@ local deckMeta = {
             idReplace[oldAsset.id] = newAsset.id
         end
         -- update deckIDs
-        for k,cardID in ipairs(self.data.DeckIDs) do
+        for k, cardID in ipairs(self.data.DeckIDs) do
             local deckID, cardInd = cardID:sub(1, -3), cardID:sub(-2, -1)
             if idReplace[deckID] then
                 self.data.DeckIDs[k] = idReplace[deckID] .. cardInd
@@ -376,11 +442,11 @@ local deckMeta = {
             end
         end
         -- update CustomDeck data - add replacing
-        for _,replacingID in pairs(idReplace) do
+        for _, replacingID in pairs(idReplace) do
             self.data.CustomDeck[replacingID] = assets[replacingID]
         end
         -- update card data
-        for k,cardData in ipairs(self.data.ContainedObjects) do
+        for k, cardData in ipairs(self.data.ContainedObjects) do
             local deckID = next(cardData.CustomDeck)
             if idReplace[deckID] then
                 cardData.CustomDeck[deckID] = nil
@@ -391,8 +457,8 @@ local deckMeta = {
     end,
     getAssets = function(self)
         local assets = {}
-        for id,assetData in pairs(self.data.CustomDeck) do
-            assets[#assets+1] = assetFromData(assetData)
+        for id, assetData in pairs(self.data.CustomDeck) do
+            assets[#assets + 1] = assetFromData(assetData)
         end
         return assets
     end
@@ -408,16 +474,18 @@ function Decker.Deck(cards, options)
     deck.DeckIDs = {}
     deck.CustomDeck = {}
     deck.ContainedObjects = {}
-    for _,card in ipairs(cards) do
-        deck.DeckIDs[#deck.DeckIDs+1] = card.data.CardID
+    for _, card in ipairs(cards) do
+        deck.DeckIDs[#deck.DeckIDs + 1] = card.data.CardID
         local id = next(card.data.CustomDeck)
         if not deck.CustomDeck[id] then
             deck.CustomDeck[id] = card.data.CustomDeck[id]
         end
-        deck.ContainedObjects[#deck.ContainedObjects+1] = card.data
+        deck.ContainedObjects[#deck.ContainedObjects + 1] = card.data
     end
 
-    local obj = setmetatable({data = deck}, deckMeta)
+    local obj = setmetatable({
+        data = deck
+    }, deckMeta)
     obj:_recache()
     return obj
 end
@@ -426,11 +494,11 @@ function Decker.AssetDeck(asset, cardNum, options)
     cardNum = cardNum or asset.data.NumWidth * asset.data.NumHeight
     local row, col, width = 1, 1, asset.data.NumWidth
     local cards = {}
-    for k=1,cardNum do
-        cards[#cards+1] = Decker.Card(asset, row, col)
-        col = col+1
+    for k = 1, cardNum do
+        cards[#cards + 1] = Decker.Card(asset, row, col)
+        col = col + 1
         if col > width then
-            row, col = row+1, 1
+            row, col = row + 1, 1
         end
     end
     return Decker.Deck(cards, options)

@@ -39226,7 +39226,8 @@ PACK_02 = [[
     "BackURL": "/card-backs/encounter.jpg",
     "FrontURL": "/card-faces/02009.jpg",
     "text": "[star] <b>Boost</b>: Place 1 infamy counter on Criminal Enterprise. If you cannot, remove 1 madness counter from State of Madness.",
-    "baseThreat": 2,
+    "threat": 1,
+    "": true,
     "boostStar": true,
     "crisis": 1
   },
@@ -41881,7 +41882,9 @@ PACK_04 = [[
     "escalationThreat": 1,
     "escalationStar": true,
     "stage": 1,
-    "threat": 12
+    "threat": 12,
+    "counter": "general",
+    "counterName": "Delay"
   },
   {
     "name": "Dense Forest",
@@ -56246,8 +56249,7 @@ PACK_60 = [[
     "attack": 1,
     "scheme": 3,
     "deckLimit": 1,
-    "stage": 1,
-    "toughness": true
+    "stage": 1
   },
   {
     "name": "Disturbed Psyche",
@@ -56257,7 +56259,9 @@ PACK_60 = [[
     "BackURL": "/card-backs/encounter-permanent.jpg",
     "FrontURL": "/card-faces/60112.jpg",
     "text": "Setup.\n<b>Setup</b>: Put the villain into play on a random side (and reveal it).\n<b>Forced Interrupt</b>: When the villain phase ends, flip the villain.\n<b>If there are 3 or more tokens here, the players when the game!</b>",
-    "setup": true
+    "setup": true,
+    "counter": "health",
+    "counterName": "Damage"
   },
   {
     "name": "Establish Trust",
@@ -56270,7 +56274,7 @@ PACK_60 = [[
     "flavor": "\"Mary, it's me. I don't want to fight you.\" --Matt Murdock",
     "backText": "Attach to the villain. Permanent.\n[star] Attached villain cannot activate.\n<b>Forced Response</b>: After the villain takes damage or the round ends, deal each player 1 facedown encounter card and flip this card.",
     "backFlavor": "One of us is tender, one of us is not, and one of us takes vengeance.",
-    "threat": 8
+    "baseThreat": 8
   },
   {
     "name": "Establish Trust",
@@ -56281,7 +56285,7 @@ PACK_60 = [[
     "FrontURL": "/card-faces/60113A.jpg",
     "text": "Permanent. Setup.\n[star] In expert mode, this card gains hinder 3[per_hero].\n<b>When Defeated</b>: Place 1 threat token on Disturbed Psyche. Flip this card.",
     "flavor": "\"Mary, it's me. I don't want to fight you.\" --Matt Murdock",
-    "threat": 8,
+    "baseThreat": 8,
     "setup": true
   },
   {
@@ -56491,7 +56495,8 @@ PACK_60 = [[
     "baseThreat": 2,
     "threat": 9,
     "counter": "general",
-    "counterName": "Speed"
+    "counterName": "Speed",
+    "counterValue": 1
   },
   {
     "name": "Out Front",
@@ -56529,7 +56534,7 @@ PACK_60 = [[
     "FrontURL": "/card-faces/60131.jpg",
     "text": "[star] Hinder 1[per_hero].\nThe villain cannot be dealt damage.",
     "flavor": "\"Eat your heart out, Johnny Blaze!\" --Echo",
-    "threat": 2,
+    "baseThreat": 2,
     "crisis": 1
   },
   {
@@ -56910,9 +56915,9 @@ PACK_60 = [[
     "aspect": "encounter",
     "BackURL": "/card-backs/encounter.jpg",
     "FrontURL": "/card-faces/60157.jpg",
-    "text": "[Daily Bugle] supports cannot ready.\n<b>When Revealed</b>: Exhause each [Daily Bugle] support.",
+    "text": "[Daily Bugle] supports cannot ready.\n<b>When Revealed</b>: Exhaust each [Daily Bugle] support.",
     "flavor": "\"I'd love for your audience to hear my side of the story. Now, where to begin...?\"",
-    "threat": 6
+    "baseThreat": 6
   },
   {
     "name": "Breaking News",
@@ -56921,7 +56926,7 @@ PACK_60 = [[
     "aspect": "encounter",
     "BackURL": "/card-backs/encounter.jpg",
     "FrontURL": "/card-faces/60158.jpg",
-    "text": "<b>When Revealed</b>: Choose:\n* Exhaust a [Daily Bugle] support (under any player's control) and remove 1 stamina counter from it.\n* Place 2 threat on the main scheme.\n<b>Boost</b>: Exhause a [Daily Bugle] support (under any player's control).",
+    "text": "<b>When Revealed</b>: Choose:\n* Exhaust a [Daily Bugle] support (under any player's control) and remove 1 stamina counter from it.\n* Place 2 threat on the main scheme.\n<b>Boost</b>: Exhaust a [Daily Bugle] support (under any player's control).",
     "boostStar": true
   },
   {
@@ -57159,7 +57164,7 @@ PACK_60 = [[
     "FrontURL": "/card-faces/60173.jpg",
     "text": "<b>When Defeated</b>: The player who defeated this scheme places 3 threat on their nemesis side scheme. If it is not in play, they find it and reveal it.",
     "flavor": "Kingpin uses a combination of lies, bribes, and threats to get others to do his bidding.",
-    "threat": 2,
+    "baseThreat": 2,
     "hazard": 1
   },
   {
@@ -57171,7 +57176,7 @@ PACK_60 = [[
     "FrontURL": "/card-faces/60174.jpg",
     "text": "Each minion gets +2 hit points.",
     "flavor": "\"We're stronger when we work together.\" --Kingpin",
-    "threat": 3
+    "baseThreat": 3
   },
   {
     "name": "Bag of Tricks",
@@ -57247,7 +57252,8 @@ PACK_60 = [[
     "BackURL": "/card-backs/encounter.jpg",
     "FrontURL": "/card-faces/60180.jpg",
     "text": "[star] Hinder 2[per_hero].\n<b>Forced Response</b>: After any amount of threat is removed from Collapsing Bridge, place 1 threat here.",
-    "threat": 1,
+    "baseThreat": 1,
+    "baseThreatIsFixed": true,
     "hinder": 2,
     "hazard": 1
   },
@@ -57312,7 +57318,7 @@ PACK_60 = [[
     "FrontURL": "/card-faces/60185.jpg",
     "text": "[star] Hinder 1[per_hero].\nEach [Police] minion gains guard and patrol.\n<b>When Revealed</b>: Search the encounter deck and discard pile for a [Police] minion and reveal it.",
     "flavor": "\"Stand back! This is a crime scene.\" --Police officer",
-    "threat": 3,
+    "baseThreat": 3,
     "hinder": 1
   },
   {
@@ -57373,7 +57379,7 @@ PACK_60 = [[
     "BackURL": "/card-backs/encounter.jpg",
     "FrontURL": "/card-faces/60189.jpg",
     "text": "[star] Hinder 2[per_hero].\n<b>Forced Interrupt</b>: When a character with a [Vehicle] attachment would:\n* Add threat to a scheme, that threat is added here instead.\n* Remove threat from a scheme, that threat is removed from here instead.",
-    "threat": 2,
+    "baseThreat": 2,
     "hinder": 2,
     "crisis": 1
   },
@@ -57510,7 +57516,7 @@ PACK_60 = [[
     "BackURL": "/card-backs/encounter.jpg",
     "FrontURL": "/card-faces/60199.jpg",
     "text": "<b>Forced Response</b>: After the villain phase begins, deal 3 indirect damage to the fist player. For each ally defeated this way, remove 1[per_hero] threat from Hit List.",
-    "threat": 2
+    "baaseThreat": 2
   },
   {
     "name": "Ivan Banionis",
@@ -57583,8 +57589,92 @@ PACK_60 = [[
     "aspect": "encounter",
     "BackURL": "/card-backs/encounter.jpg",
     "FrontURL": "/card-faces/60204.jpg",
-    "text": "<b>When Revealed</b>: Discard cards from the top of the encounter deck until a [Tracksuit] minion is discarded and tuck that minion here.\n<Forced Response</b>: After a player reveals a [Tracksuit] minion from the encounter deck, that player reveals 1 minion tucked here.",
-    "threat": 3
+    "text": "<b>When Revealed</b>: Discard cards from the top of the encounter deck until a [Tracksuit] minion is discarded and tuck that minion here.\n<b>Forced Response</b>: After a player reveals a [Tracksuit] minion from the encounter deck, that player reveals 1 minion tucked here.",
+    "baseThreat": 3
+  },
+  {
+    "name": "Art Museum Heist",
+    "code": "60205",
+    "type": "environment",
+    "aspect": "encounter",
+    "BackURL": "/card-faces/60205B.jpg",
+    "FrontURL": "/card-faces/60205A.jpg",
+    "text": "<b>Setup</b>: Give each identity a tough status card.",
+    "backText": "<b>Setup</b>: Each player chooses to stun or confuse their identity (in expert mode, do both instead).",
+    "flavor": "You draw inspiration from the works of art you secured against theft.",
+    "backFlavor": "You are demoralized by your failure to prevent the museum art theft.",
+    "setup": true
+  },
+  {
+    "name": "The Getaway",
+    "code": "60206",
+    "type": "environment",
+    "aspect": "encounter",
+    "BackURL": "/card-faces/60206B.jpg",
+    "FrontURL": "/card-faces/60206A.jpg",
+    "text": "<b>Setup</b>: After resolving mulligans, each player may search their deck and discard pile for an upgrade and add it to their hand. In expert mode, each player who did so discards 1 card from their hand.",
+    "backText": "In expert mode, attachments cannot be discarded from play during the first round.\n<b>Setup</b>: Each player searches the encounter deck for an attachment and reveals it. Deal a facedown encounter card to each player who could not.",
+    "flavor": "The bank provides you a generous reward as thanks for returning the stolen money.",
+    "backFlavor": "Your enemies have put their ill-gotten gains towards improving their armaments.",
+    "setup": true
+  },
+  {
+    "name": "Protection Racket",
+    "code": "60207",
+    "type": "environment",
+    "aspect": "encounter",
+    "BackURL": "/card-faces/60207B.jpg",
+    "FrontURL": "/card-faces/60207A.jpg",
+    "text": "<b>Setup</b>: After resolving mulligans, each player may search their deck and discard pile for a support and add it to their hand. In expert mode, each player who did so discards 1 card from their hand.",
+    "backText": "<b>Setup</b>: EAch player chooses and discards 1 card from their hand (in expert mode, 2 cards instead).",
+    "flavor": "You stood up for the neighborhood businesses, giving the community the courage to rally around you.",
+    "backFlavor": "Threats against the neighborhood businesses have left the community too frightened to help you.",
+    "setup": true
+  },
+  {
+    "name": "The Raft Breakout",
+    "code": "60208",
+    "type": "environment",
+    "aspect": "encounter",
+    "BackURL": "/card-faces/60208B.jpg",
+    "FrontURL": "/card-faces/60208A.jpg",
+    "text": "<b>Setup</b>: After resolving mulligans, each player may search their deck and discard pile for an ally and add it to their hand. In expert mode, each player who did so discards 1 card from their hand.",
+    "backText": "<b>Setup</b>: Shuffle each minion in The Raft Breakout encounter set into the encounter deck (in expert mode, deal 1 of those minions at random to each player as a facedown encounter card before shuffling in the rest).",
+    "flavor": "Your work in securing the Raft has freed up other heroes to help you take down the next villain.",
+    "backFlavor": "Many dangerous fugitives are on the loose thanks to your failure at the Raft.",
+    "setup": true
+  },
+  {
+    "name": "Stop the Presses!",
+    "code": "60209",
+    "type": "environment",
+    "aspect": "encounter",
+    "BackURL": "/card-faces/60209B.jpg",
+    "FrontURL": "/card-faces/60209A.jpg",
+    "text": "<b>Setup</b>: Each player puts 1 [Daily Bugle] support (that has not been removed from the campaign) into play from the Stop the Presses! encounter set.",
+    "backText": "<b>Setup</b>: Deal each player 1 facedown encounter card (in expert mode, 2 encounter cards instead).",
+    "flavor": "J. Jonah Jameson has promised the help of his Daily Bugle staff in gratitude for protecting his newspaper. You don't expect it to last.",
+    "backFlavor": "Following the ransacking of the Daily Bugle offices, every media outlet in the city is too scared to help in your efforts to stop the crime wave, and you suspect some are even working with the criminals.",
+    "setup": true
+  },
+  {
+    "name": "Typhoid Mary",
+    "code": "60210",
+    "type": "ally",
+    "isUnique": true,
+    "aspect": "encounter",
+    "BackURL": "/card-faces/60210B.jpg",
+    "FrontURL": "/card-faces/60210A.jpg",
+    "text": "Setup. Victory -1.\n[star] <b>Forced Response</b>: After you reveal a minion, remove all damage from here and flip this card.",
+    "backText": "Victory -1.\n[star] <b>Forced Response</b>: After you reveal a side scheme, remove all damage from here and flip this card.",
+    "health": 3,
+    "traits": "Mutant. Psionic.",
+    "attack": 1,
+    "attackStar": true,
+    "scheme": 2,
+    "schemeStar": true,
+    "thwartCost": 1,
+    "attackCost": 1
   }
 ]
 ]]

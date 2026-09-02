@@ -9,16 +9,18 @@ function setCardID(_, value, _)
 end
 
 function random_guid()
-  local value = math.random(0, 2^24)
-  return string.format('%x', value)
+    local value = math.random(0, 2 ^ 24)
+    return string.format('%x', value)
 end
 
 function mapCardData(cardData)
     local card = {}
 
-    for k,v in pairs(cardData) do
-        if(k~="FrontURL" and k~="FrontURL_mutant" and k~="FrontURL_shield" and k~="FrontURL_defender" and k~="BackURL" and k~="flavor" and k~="text" and k~="backText" and k~="steady" and k~="stalwart" and k~="toughness") then
-            if(k=="code") then
+    for k, v in pairs(cardData) do
+        if (k ~= "FrontURL" and k ~= "FrontURL_mutant" and k ~= "FrontURL_shield" and k ~= "FrontURL_defender" and k ~=
+            "BackURL" and k ~= "flavor" and k ~= "text" and k ~= "backText" and k ~= "steady" and k ~= "stalwart" and k ~=
+            "toughness") then
+            if (k == "code") then
                 card[k] = string.sub(tostring(v), 1, 5)
             else
                 card[k] = string.gsub(tostring(v), "\"", "\\\"")
@@ -26,35 +28,39 @@ function mapCardData(cardData)
         end
     end
 
+    -- if (not string.find(cardData.BackURL, 'card%-backs', 1, false)) then
+    --     card.HideWhenFaceDown = false
+    -- end
+
     local cardjson = json.encode(card)
 
     return cardjson
 end
 
 function getCardTypeSuffix(type)
-    if(type == "event") then
+    if (type == "event") then
         return " - Event"
-    elseif(type == "resource") then
+    elseif (type == "resource") then
         return " - Resource"
-    elseif(type == "support") then
+    elseif (type == "support") then
         return " - Support"
-    elseif(type == "upgrade") then
+    elseif (type == "upgrade") then
         return " - Upgrade"
-    elseif(type == "ally") then
+    elseif (type == "ally") then
         return " - Ally"
-    elseif(type == "player_side_scheme") then
+    elseif (type == "player_side_scheme") then
         return " - Player Side Scheme"
-    elseif(type == "side_scheme") then
+    elseif (type == "side_scheme") then
         return " - Side Scheme"
-    elseif(type == "environment") then
+    elseif (type == "environment") then
         return " - Environment"
-    elseif(type == "treachery") then
+    elseif (type == "treachery") then
         return " - Treachery"
-    elseif(type == "minion") then
+    elseif (type == "minion") then
         return " - Minion"
-    elseif(type == "obligation") then
+    elseif (type == "obligation") then
         return " - Obligation"
-    elseif(type == "attachment") then
+    elseif (type == "attachment") then
         return " - Attachment"
     end
 
@@ -63,7 +69,9 @@ end
 
 -- Fix card pool to deal with duplicates
 function buildCardPool(packId)
-    if(not packId) then return {} end
+    if (not packId) then
+        return {}
+    end
 
     if (CARDPOOL_BY_PACK_ID[packId] ~= nil) then
         return CARDPOOL_BY_PACK_ID[packId]
@@ -73,11 +81,11 @@ function buildCardPool(packId)
     local CARDPOOL_OBJ = getObjectFromGUID('843931')
     local CARDPOOL_JSON = CARDPOOL_OBJ.getVar('PACK_' .. packId)
 
-    if(CARDPOOL_JSON == nil) then
-        log("Pack "..packId.." has not been added to the card pool.")
+    if (CARDPOOL_JSON == nil) then
+        log("Pack " .. packId .. " has not been added to the card pool.")
         return nil;
     end
-    
+
     local CARDPOOL_DATA = json.decode(CARDPOOL_JSON)
 
     for _, cardData in pairs(CARDPOOL_DATA) do
@@ -86,64 +94,99 @@ function buildCardPool(packId)
             local cardBack = baseUrl .. cardData.BackURL
             local cardAsset = Decker.Asset(cardFace, cardBack)
             local sideways = string.sub(cardData.type, -6, -1) == "scheme"
-            local tags={cardData.type}
+            local tags = {cardData.type}
 
-            if(cardData.steady) then table.insert(tags, "steady") end
-            if(cardData.stalwart) then table.insert(tags, "stalwart") end
-            if(cardData.toughness) then table.insert(tags, "toughness") end
+            if (cardData.steady) then
+                table.insert(tags, "steady")
+            end
+            if (cardData.stalwart) then
+                table.insert(tags, "stalwart")
+            end
+            if (cardData.toughness) then
+                table.insert(tags, "toughness")
+            end
 
             local gmNotes = mapCardData(cardData)
 
             local cardName = cardData.name .. getCardTypeSuffix(cardData.type)
 
-            local card = Decker.Card(cardAsset, 1, 1, { guid=random_guid(), name=cardName, sideways=sideways, tags=tags, GMNotes=gmNotes })
-            
-            if(cardData.linked) then
+            local card = Decker.Card(cardAsset, 1, 1, {
+                guid = random_guid(),
+                name = cardName,
+                sideways = sideways,
+                tags = tags,
+                GMNotes = gmNotes
+            })
+
+            if (cardData.linked) then
                 card.linked = cardData.linked
             end
 
             cardpool[cardData.code] = card
 
-            if(cardData.FrontURL_mutant) then
+            if (cardData.FrontURL_mutant) then
                 local mutantCardAsset = Decker.Asset(baseUrl .. cardData.FrontURL_mutant, baseUrl .. cardData.BackURL)
-                local mutantCard = Decker.Card(mutantCardAsset, 1, 1, { guid=random_guid(), name=cardName, sideways=sideways, tags=tags, GMNotes=gmNotes })
-                cardpool[cardData.code.."_mutant"] = mutantCard
+                local mutantCard = Decker.Card(mutantCardAsset, 1, 1, {
+                    guid = random_guid(),
+                    name = cardName,
+                    sideways = sideways,
+                    tags = tags,
+                    GMNotes = gmNotes
+                })
+                cardpool[cardData.code .. "_mutant"] = mutantCard
             end
 
-            if(cardData.FrontURL_shield) then
+            if (cardData.FrontURL_shield) then
                 local shieldCardAsset = Decker.Asset(baseUrl .. cardData.FrontURL_shield, baseUrl .. cardData.BackURL)
-                local shieldCard = Decker.Card(shieldCardAsset, 1, 1, { guid=random_guid(), name=cardName, sideways=sideways, tags=tags, GMNotes=gmNotes })
-                cardpool[cardData.code.."_shield"] = shieldCard
+                local shieldCard = Decker.Card(shieldCardAsset, 1, 1, {
+                    guid = random_guid(),
+                    name = cardName,
+                    sideways = sideways,
+                    tags = tags,
+                    GMNotes = gmNotes
+                })
+                cardpool[cardData.code .. "_shield"] = shieldCard
             end
 
-            if(cardData.FrontURL_defender) then
-                local defenderCardAsset = Decker.Asset(baseUrl .. cardData.FrontURL_defender, baseUrl .. cardData.BackURL)
-                local defenderCard = Decker.Card(defenderCardAsset, 1, 1, { guid=random_guid(), name=cardName, sideways=sideways, tags=tags, GMNotes=gmNotes })
-                cardpool[cardData.code.."_defender"] = defenderCard
+            if (cardData.FrontURL_defender) then
+                local defenderCardAsset = Decker.Asset(baseUrl .. cardData.FrontURL_defender,
+                    baseUrl .. cardData.BackURL)
+                local defenderCard = Decker.Card(defenderCardAsset, 1, 1, {
+                    guid = random_guid(),
+                    name = cardName,
+                    sideways = sideways,
+                    tags = tags,
+                    GMNotes = gmNotes
+                })
+                cardpool[cardData.code .. "_defender"] = defenderCard
             end
         else
-            cardpool[cardData.code] = {duplicate_of = cardData.duplicate_of}
+            cardpool[cardData.code] = {
+                duplicate_of = cardData.duplicate_of
+            }
         end
     end
-    
+
     CARDPOOL_BY_PACK_ID[packId] = cardpool
     return cardpool
 end
 
 function getCardFromCardPool(cardId, artVariant)
-    local packId = string.sub(cardId, 1,2)
+    local packId = string.sub(cardId, 1, 2)
     local cardpool = buildCardPool(packId)
 
-    if(cardpool == nil) then return nil end
+    if (cardpool == nil) then
+        return nil
+    end
 
-    local card = artVariant ~= nil and cardpool[cardId.."_"..artVariant] or cardpool[cardId]
+    local card = artVariant ~= nil and cardpool[cardId .. "_" .. artVariant] or cardpool[cardId]
 
-    --Account for inconcistencies in MarvelCDB card Ids
-    if(card == nil) then
-        if(string.match(string.sub(cardId, -1), "%d") ~= nil) then
-            card = getCardFromCardPool(cardId.."a") 
+    -- Account for inconcistencies in MarvelCDB card Ids
+    if (card == nil) then
+        if (string.match(string.sub(cardId, -1), "%d") ~= nil) then
+            card = getCardFromCardPool(cardId .. "a")
         else
-            card = getCardFromCardPool(string.sub(cardId, 1, -2)) 
+            card = getCardFromCardPool(string.sub(cardId, 1, -2))
         end
     end
 
@@ -156,9 +199,12 @@ function getCard(player)
     local FACE_UP_ROTATION = {0, 180, 0}
     local FACE_DOWN_ROTATION = {0, 180, 180}
     local card = getCardFromCardPool(cardId)
-    
+
     if (card.duplicate_of == nil) then
-        card:spawn({position = position, rotation = FACE_UP_ROTATION})
+        card:spawn({
+            position = position,
+            rotation = FACE_UP_ROTATION
+        })
     else
         CARD_ID = card.duplicate_of
         getCard(player)
@@ -181,8 +227,12 @@ function spawnCard(params)
     local y = 180
     local z = 0
 
-    if (landscape) then y = 90 end
-    if (params.flipped) then z = 180 end
+    if (landscape) then
+        y = 90
+    end
+    if (params.flipped) then
+        z = 180
+    end
 
     -- Default face up
     local rotation = {x, y, z}
@@ -203,23 +253,24 @@ function spawnCard(params)
 
     addTagsToCard(card, tags)
 
-    local spawnedCard = 
-        card:spawn({position = position, scale = scale, rotation = rotation, name = name})
+    local spawnedCard = card:spawn({
+        position = position,
+        scale = scale,
+        rotation = rotation,
+        name = name
+    })
 
-    if(locked) then
-        Wait.frames(
-            function()
-                Wait.condition(
-                    function()
-                        if(spawnedCard.isDestroyed()) then return end
-                        spawnedCard.setLock(true)
-                    end, 
-                    function()
-                        return spawnedCard.isDestroyed() or spawnedCard.resting
-                    end,
-                    15)
-            end,
-            10)
+    if (locked) then
+        Wait.frames(function()
+            Wait.condition(function()
+                if (spawnedCard.isDestroyed()) then
+                    return
+                end
+                spawnedCard.setLock(true)
+            end, function()
+                return spawnedCard.isDestroyed() or spawnedCard.resting
+            end, 15)
+        end, 10)
     end
 
     return spawnedCard
@@ -247,7 +298,7 @@ function spawnDeck(params)
 
     local deepcopy = function(t)
         local copy = {}
-        for k,v in pairs(t) do
+        for k, v in pairs(t) do
             if type(v) == 'table' then
                 copy[k] = deepcopy(v)
             else
@@ -258,17 +309,17 @@ function spawnDeck(params)
     end
 
     deck = {}
-    for cardId,number in pairs(cards) do
+    for cardId, number in pairs(cards) do
         for i = 1, number, 1 do
             local card = getCardFromCardPool(cardId, artVariant)
-            
-            if(card.duplicate_of) then
+
+            if (card.duplicate_of) then
                 card = getCardFromCardPool(card.duplicate_of, artVariant)
             end
-            
-            if(card.linked) then
+
+            if (card.linked) then
                 for linkedCardId in string.gmatch(card.linked, "([^,]+)") do
-                    if(linkedCards[linkedCardId] == nil) then
+                    if (linkedCards[linkedCardId] == nil) then
                         linkedCards[linkedCardId] = 1
                     else
                         linkedCards[linkedCardId] = linkedCards[linkedCardId] + 1
@@ -284,14 +335,14 @@ function spawnDeck(params)
 
     local linkedCardList = ""
 
-    for cardId,number in pairs(linkedCards) do
+    for cardId, number in pairs(linkedCards) do
         linkedCardList = linkedCardList .. cardId .. ","
 
-        if(cards[cardId] == nil) then
+        if (cards[cardId] == nil) then
             for i = 1, number, 1 do
                 local card = getCardFromCardPool(cardId, artVariant)
 
-                if(card.duplicate_of) then
+                if (card.duplicate_of) then
                     card = getCardFromCardPool(card.duplicate_of, artVariant)
                 end
 
@@ -302,9 +353,17 @@ function spawnDeck(params)
         end
     end
 
-    newDeck = Decker.Deck(deck, {name = name, GMNotes = linkedCardList})
+    newDeck = Decker.Deck(deck, {
+        name = name,
+        GMNotes = linkedCardList
+    })
 
-    return newDeck:spawn({position = position, scale = scale, rotation = rotation, name = name})
+    return newDeck:spawn({
+        position = position,
+        scale = scale,
+        rotation = rotation,
+        name = name
+    })
 end
 
 function createUI(_, menu_position)

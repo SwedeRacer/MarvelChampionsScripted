@@ -9,7 +9,7 @@ scenarios["batroc"] =
             hpCounter={
                 imageUrl="https://steamusercontent-a.akamaihd.net/ugc/6301420264312745/DEB4FB8CF4132C489E3A42B5259669D2BB01C900/",
                 primaryButtonLabel = "RESET",
-                primaryButtonClickFunction = "resetBatroc"
+                primaryButtonClickFunction = "batrocReset"
             },
             stages={
                 stageA={
@@ -134,7 +134,7 @@ function setUpSchemeStage_batroc_main(params)
     end
 end
 
-function resetBatroc()
+function batrocReset()
     local villainHpCounter = getObjectFromGUID(currentScenario.villains.batroc.hpCounter.guid)
     local mode = currentScenario.mode
     local stage = mode == "standard" 

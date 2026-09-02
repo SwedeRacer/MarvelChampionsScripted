@@ -1,23 +1,18 @@
 scenarios["protectionRacket"] = {
     name = "Protection Racket",
     fullyScripted = true,
-    tileImageUrl = "https://steamusercontent-a.akamaihd.net/ugc/2035118913124026079/1346FDBB47BCA704CFA9E914755A9AAF6B1CD5A3/",
+    tileImageUrl = cdnUrl .. "/selectors/scenarios/selector-protection-racket.png",
     villains = {},
-    schemes = {
-        main = {
-            stages = {
-                stage1 = {
-                    cardId = "60121",
-                    startingThreatPerPlayer = 1,
-                    targetThreatPerPlayer = 9
-                }
-            }
-        }
-    },
+    schemes = {},
     decks = {
         encounterDeck = {
             name = "Protection Racket Encounter Deck",
             cards = {
+                ["60134"] = 1,
+                ["60135"] = 1,
+                ["60136"] = 1,
+                ["60137"] = 1,
+                ["60138"] = 1,
                 ["60139"] = 1,
                 ["60140"] = 1,
                 ["60141"] = 2
@@ -27,7 +22,30 @@ scenarios["protectionRacket"] = {
     modularSets = {
         disasters = "recommended",
         tracksuitMafia = "recommended"
-    }
+    },
+    zones = {
+        sideScheme = {
+            position = {19.00, 1.00, 18.50},
+            firstCardPosition = {12.00, 0.98, 23.50}
+        },
+        attachment = {
+            position = {0, 1.00, 19.00},
+            scale = {16.00, 1.00, 14.00},
+            width = 2,
+            height = 3,
+            rescaleOnEnterTo = {1.70, 1.00, 1.70},
+            firstCardPosition = {-6.25, 0.97, 23.25},
+            horizontalGap = 12.5,
+            verticalGap = 5.5,
+            layoutDirection = "horizontal"
+        }
+    },
+    text = {{
+        text = "MAIN SCHEMES",
+        position = {-35.25, 1.00, 18.75},
+        color = {1, 1, 1},
+        fontSize = 88
+    }}
 }
 
 function getEncounterSetControlPanel_protectionRacket()
@@ -36,4 +54,153 @@ end
 
 function prepareScenario_protectionRacket()
     fearNoEvilPrepareScenario()
+end
+
+function finalizeSetup_protectionRacket()
+    local mainSchemeCardIds = {"60134", "60135", "60136", "60137", "60138"}
+    mainSchemeCardIds = Global.call("shuffleTable", {
+        table = mainSchemeCardIds
+    })
+
+    local playerSchemePositions = {
+        Red = {
+            scheme = {-44.19, 0.98, 9.25},
+            counter = {-36.19, 1.01, 9.25}
+        },
+        Blue = {
+            scheme = {-16.75, 0.97, 9.25},
+            counter = {-8.75, 1.01, 9.25}
+        },
+        Green = {
+            scheme = {10.75, 0.97, 9.25},
+            counter = {18.75, 1.01, 9.25}
+        },
+        Yellow = {
+            scheme = {38.21, 0.97, 9.25},
+            counter = {46.21, 1.01, 9.25}
+        }
+    }
+
+    local mode = getMode()
+    local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
+    local allPlayers = heroManager.call("getPlayersInPlayerOrder")
+    local snapPoints = {}
+
+    function protectionRacketPlaceMainSchemesCoroutine()
+        for i, player in ipairs(allPlayers) do
+            local schemePosition = playerSchemePositions[player.playerColor].scheme
+            local counterPosition = playerSchemePositions[player.playerColor].counter
+
+            table.insert(snapPoints, {
+                position = schemePosition,
+                rotation = {0, 90, 0},
+                rotation_snap = true,
+                tags = {"main_scheme"}
+            })
+
+            local textPosition = Vector(schemePosition)
+            textPosition.y = 0.95
+            textPosition.z = textPosition.z + 2.3
+            spawnObject({
+                type = "3DText",
+                position = textPosition,
+                rotation = {90, 0, 0},
+                callback_function = function(spawned_object)
+                    spawned_object.TextTool.setValue("PLACE\nSCHEME\nHERE")
+                    spawned_object.TextTool.setFontSize(100)
+                    spawned_object.TextTool.setFontColor({1, 1, 1})
+                    spawned_object.interactable = false
+                    spawned_object.addTag(groupTag)
+                    spawned_object.addTag("main_scheme_label")
+                end
+            })
+
+            if (mode == "expert") then
+                Global.call("moveCardFromEncounterDeckById", {
+                    cardId = mainSchemeCardIds[i],
+                    searchInDiscard = true,
+                    destinationPosition = schemePosition,
+                    destinationRotation = {0, 90, 180},
+                    scale = Global.getTable("CARD_SCALE_MAIN_SCHEME"),
+                    moveFast = true
+                })
+            end
+
+            local threatCounter = spawnAsset({
+                guid = Global.getVar("ASSET_GUID_MAIN_THREAT_COUNTER"),
+                position = counterPosition,
+                rotation = Global.getTable("MAIN_THREAT_COUNTER_ROTATION"),
+                scale = Global.getTable("MAIN_THREAT_COUNTER_SCALE"),
+                lock = true,
+                showAdvanceButton = false,
+                scheme = nil,
+                callback = "protectionRacketConfigureMainSchemeThreatCounter"
+            })
+
+            for i = 1, 30 do
+                coroutine.yield(0)
+            end
+        end
+
+        local cardIndexStart = mode == "expert" and #allPlayers + 1 or 1
+
+        for i = cardIndexStart, 5 do
+            Global.call("moveCardFromEncounterDeckById", {
+                cardId = mainSchemeCardIds[i],
+                searchInDiscard = true,
+                destinationPosition = {-35.25, 1.00, 22.25},
+                destinationRotation = {0, 90, 0},
+                scale = Global.getTable("CARD_SCALE_MAIN_SCHEME"),
+                moveFast = true
+            })
+
+            for i = 1, 30 do
+                coroutine.yield(0)
+            end
+        end
+
+        if (mode == "standard") then
+            Global.call("displayMessage", {
+                message = "Choose a main scheme for each player and place in front of them.",
+                messageType = Global.getVar("MESSAGE_TYPE_INSTRUCTION")
+            })
+        end
+
+        Global.setSnapPoints(snapPoints)
+
+        return 1
+    end
+
+    startLuaCoroutine(self, "protectionRacketPlaceMainSchemesCoroutine")
+
+    Wait.time(function()
+        local objects = getAllObjects()
+        for _, obj in ipairs(objects) do
+            if (obj.hasTag("main_scheme_label")) then
+                obj.destruct()
+            end
+        end
+    end, 15)
+end
+
+function protectionRacketConfigureMainSchemeThreatCounter(params)
+    local counter = params.spawnedObject
+
+    Wait.frames(function()
+        counter.call("setTargetValue", {
+            value = 10
+        })
+    end, 60)
+
+    counter.setPosition(params.position)
+    counter.setRotation(params.rotation)
+    counter.setScale(params.scale)
+    counter.setName("")
+    counter.setDescription("")
+    counter.setLock(true)
+    counter.addTag(groupTag)
+end
+
+function setUpVillainStage_protectionRacket(params)
+    fearNoEvilSetupVillainStage(params)
 end

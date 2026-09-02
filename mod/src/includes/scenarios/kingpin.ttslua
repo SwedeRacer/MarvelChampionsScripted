@@ -6,16 +6,18 @@ scenarios["kingpin"] = {
         kingpin = {
             name = "Kingpin",
             hpCounter = {
-                imageUrl = cdnUrl .. "/tiles/kingpin-hp-counter.png"
+                imageUrl = cdnUrl .. "/selectors/scenarios/selector-kingpin.png"
             },
             stages = {
                 stage1 = {
                     cardId = "60159",
-                    hitPointsPerPlayer = 14
+                    hitPointsPerPlayer = 14,
+                    locked = false
                 },
                 stage2 = {
                     cardId = "60160",
-                    hitPointsPerPlayer = 15
+                    hitPointsPerPlayer = 15,
+                    locked = false
                 }
             }
         }
@@ -60,9 +62,68 @@ scenarios["kingpin"] = {
         }
     },
     modularSets = {
-        bombScare = "recommended"
+        tombstone = "recommended",
+        tracksuitMafia = "recommended"
     }
 }
+
+function setUpSchemeStage_kingpin_main(params)
+    local stage = params.stage
+    local stageNumber = string.sub(stage.key, -1)
+    local mode = getMode()
+    local publicSupportCardId = "60163"
+    local organizedCrimeCardId = "60174"
+
+    if (stageNumber == "1") then
+        kingpinPlaceAllNemesisDecks()
+        Global.call("displayMessage", {
+            message = "Reveal each hero's nemesis minion. If that minion shares a title with a character in play, remove that minion from the game and find an reveal an Underling minion instead.",
+            messageType = Global.getVar("MESSAGE_TYPE_INSTRUCTION")
+        })
+
+        Global.call("moveCardFromEncounterDeckById", {
+            cardId = publicSupportCardId,
+            searchInDiscard = true,
+            zoneIndex = "environment",
+            settings = {
+                hideWhenFaceDown = false
+            }
+        })
+    end
+
+    if (stageNumber == "2") then
+        Global.call("displayMessage", {
+            message = "Find and reveal each hero's nemesis minion. Each player whose nemesis minion did not enter play in this way should find an Underling minion and reveal it instead.",
+            messageType = Global.getVar("MESSAGE_TYPE_INSTRUCTION")
+        })
+
+        if (mode == "expert") then
+            Global.call("moveCardFromEncounterDeckById", {
+                cardId = organizedCrimeCardId,
+                searchInDiscard = true,
+                zoneIndex = "sideScheme"
+            })
+        end
+    end
+end
+
+function kingpinPlaceAllNemesisDecks()
+    local heroManager = getObjectFromGUID(Global.getVar("GUID_HERO_MANAGER"))
+    local players = heroManager.call("getPlayersInPlayerOrder")
+
+    for _, player in ipairs(players) do
+        local playmat = heroManager.call("getPlaymat", {
+            playerColor = player.playerColor,
+            test = "blah"
+        })
+        local nemesisPosition = Vector(playmat.call("getEncounterCardPosition"))
+
+        spawnNemesis({
+            playerColor = player.playerColor,
+            position = nemesisPosition
+        })
+    end
+end
 
 function fearNoEvilGetEncounterSetPanel()
     local underlings = {{
@@ -73,57 +134,120 @@ function fearNoEvilGetEncounterSetPanel()
         name = "Electro"
     }, {
         key = "hammerhead",
-        name = "Hammerhead"
+        name = "Hammerhead",
+        label = "Hammer-\nhead"
     }, {
         key = "purpleMan",
         name = "Purple Man",
-        fileName = "purple-man"
+        fileName = "purple-man",
+        label = "Purple\nMan"
     }, {
         key = "typhoidMary",
         name = "Typhoid Mary",
-        fileName = "typhoid-mary"
+        fileName = "typhoid-mary",
+        label = "Typhoid\nMary"
     }}
 
     local guid = self.getGUID()
     local underlingButtons = {}
+    local selectedUnderlingButtonId = selectedScenario.underlingButtonId or "random"
+    local randomButtonImageUrl =
+        "https://steamusercontent-a.akamaihd.net/ugc/12635327849228453947/CB7134374683D9348843072934D55AF278B01109/"
 
     for _, underling in pairs(underlings) do
-        log(cdnUrl .. "/selectors/scenarios/selector-" .. (underling.fileName or underling.key) .. ".png")
+        local isSelected = underling.key == selectedUnderlingButtonId
+        local underlingLabel = underling.label or underling.Label or underling.name
+
         table.insert(underlingButtons, {
             tag = "Panel",
-            value = underling.name,
             attributes = {
-                id = underling.key,
-                onValueChanged = guid .. "/fearNoEvilUnderlingButtonClicked",
-                height = "85",
-                width = "170",
-                fontSize = "15",
-                textColor = "rgba(1,1,1,1)",
+                preferredHeight = "85",
+                preferredWidth = "170",
+                id = "underlingHighlight-" .. underling.key,
+                color = isSelected and "rgba(1,1,0,1)" or "rgba(0,0,0,0)"
+            },
+            children = {{
+                tag = "Button",
+                attributes = {
+                    id = underling.key,
+                    onClick = guid .. "/fearNoEvilUnderlingButtonClicked",
+                    preferredHeight = "85",
+                    preferredWidth = "170",
+                    color = "rgba(0,0,0,0)",
+                    colors = "rgba(1,1,1,1)|rgba(1,1,1,1)|rgba(1,1,1,1)|rgba(1,1,1,1)"
+                },
+                children = {{
+                    tag = "Image",
+                    attributes = {
+                        image = cdnUrl .. "/selectors/scenarios/selector-" .. (underling.fileName or underling.key) ..
+                            ".png",
+                        height = "81",
+                        width = "166",
+                        preserveAspect = "false",
+                        rectAlignment = "MiddleCenter"
+                    }
+                }, {
+                    tag = "Text",
+                    value = underlingLabel,
+                    attributes = {
+                        alignment = "MiddleCenter",
+                        rectAlignment = "MiddleCenter",
+                        offsetXY = "35 7",
+                        fontSize = "18",
+                        color = "rgba(0,0,0,1)",
+                        raycastTarget = "false"
+                    }
+                }}
+            }}
+        })
+    end
+
+    local randomSelected = selectedUnderlingButtonId == "random"
+    table.insert(underlingButtons, {
+        tag = "Panel",
+        attributes = {
+            preferredHeight = "85",
+            preferredWidth = "85",
+            id = "underlingHighlight-random",
+            color = randomSelected and "rgba(1,1,0,1)" or "rgba(0,0,0,0)"
+        },
+        children = {{
+            tag = "Button",
+            attributes = {
+                id = "random",
+                onClick = guid .. "/fearNoEvilUnderlingButtonClicked",
+                preferredHeight = "85",
+                preferredWidth = "85",
+                color = "rgba(0,0,0,0)",
                 colors = "rgba(1,1,1,1)|rgba(1,1,1,1)|rgba(1,1,1,1)|rgba(1,1,1,1)"
             },
             children = {{
                 tag = "Image",
                 attributes = {
-                    image = cdnUrl .. "/selectors/scenarios/selector-" .. (underling.fileName or underling.key) .. ".png",
-                    height = "85",
-                    width = "170",
-                    preserveAspect = "true",
+                    image = randomButtonImageUrl,
+                    height = "81",
+                    width = "81",
+                    preserveAspect = "false",
                     rectAlignment = "MiddleCenter"
                 }
             }}
-        })
-    end
+        }}
+    })
 
     local encounterSetControlPanel = {
         tag = "Panel",
+        attributes = {
+            preferredHeight = "125",
+            flexibleHeight = "0",
+            width = "955"
+        },
         children = {{
             tag = "VerticalLayout",
             attributes = {
-                color="rgba(1,0,0,1)",
                 rectAlignment = "UpperLeft",
                 childAlignment = "UpperLeft",
                 childForceExpandHeight = "false",
-                spacing = "16",
+                spacing = "10",
                 contentSizeFitter = "vertical"
             },
             children = {{
@@ -140,27 +264,12 @@ function fearNoEvilGetEncounterSetPanel()
                     childAlignment = "MiddleCenter",
                     childForceExpandHeight = "false",
                     childForceExpandWidth = "false",
-                    spacing = "0"
+                    preferredHeight = "85",
+                    width = "955",
+                    spacing = "4",
+                    contentSizeFitter = "vertical"
                 },
-                children = {{
-                    tag = "HorizontalLayout",
-                    attributes = {
-                        color="rgba(0,1,0,1)",
-                        preferredHeight = "85",
-                        flexibleHeight = "1",
-                        width = "955",
-                        contentSizeFitter = "vertical",
-                        spacing = "5"
-                    },
-                    children = underlingButtons
-                }}
-            }, {
-                tag = "Panel",
-                attributes = {
-                    id = "bottomSpacer",
-                    preferredHeight = "8",
-                    flexibleHeight = "0"
-                }
+                children = underlingButtons
             }}
         }}
     }
@@ -169,15 +278,25 @@ function fearNoEvilGetEncounterSetPanel()
 end
 
 function fearNoEvilPrepareScenario()
-    local villainKey = selectedScenario.underlingKey or "bullseye" -- "random"
-    local selectedVillain = fearNoEvilGetUnderling(villainKey)
+    local selectedVillainKey = selectedScenario.underlingKey or "random"
+    local selectedVillain = fearNoEvilGetUnderling(selectedVillainKey)
+    local villainKey = selectedVillain.key
     local encounterDeck = currentScenario.decks.encounterDeck
     local villainEncounterCards = selectedVillain.encounterCards
 
-    currentScenario.villains["bullseye"] = selectedVillain
+    currentScenario.villains[villainKey] = selectedVillain
 
     for cardId, count in pairs(villainEncounterCards) do
         encounterDeck.cards[cardId] = count
+    end
+
+    if (selectedVillainKey == "typhoidMary") then
+        local coinFlip = math.random(2)
+
+        if (coinFlip == 2) then
+            currentScenario.villains.typhoidMary.stages.stageA.flipCard = true
+            currentScenario.villains.typhoidMary.stages.stageB.flipCard = true
+        end
     end
 end
 
@@ -239,6 +358,62 @@ function fearNoEvilSetupVillainStage(params)
                 zoneIndex = "sideScheme"
             })
         end
+    end
+
+    if (villainKey == "electro") then
+        local electricChargeCardId = "60079"
+
+        function setupElectricShock()
+            Global.call("moveCardFromEncounterDeckById", {
+                cardId = electricChargeCardId,
+                searchInDiscard = true,
+                zoneIndex = "attachment"
+            })
+        end
+
+        function addShockCountersToElectricCharge(multiplier)
+            local electricChargeCard = Global.call("findCard", {
+                cardId = electricChargeCardId
+            })
+            local electricChargeCounter = Global.call("getCounterFromCard", {
+                card = electricChargeCard,
+                counterClass = "configured"
+            })
+            local heroCount = getHeroCount()
+
+            electricChargeCounter.call("adjustValue", {
+                adjustment = heroCount * multiplier
+            })
+        end
+
+        if (stageNumber == "1") then
+            setupElectricShock()
+        end
+
+        if (stageNumber == "2") then
+            if (mode == "expert") then
+                setupElectricShock()
+            else
+                addShockCountersToElectricCharge(2)
+            end
+        end
+
+        if (stageNumber == "3") then
+            addShockCountersToElectricCharge(3)
+        end
+    end
+
+    if (villainKey == "typhoidMary") then
+        local villainCard = Global.call("findCard", {
+            cardId = stage.cardId
+        })
+
+        local villainIsFaceUp = Global.call("isFaceUp", {
+            object = villainCard,
+            ignoreToggles = true
+        })
+
+        fearNoEvilApplyTyphoidMaryExpertEffects(mode, villainIsFaceUp)
     end
 end
 
@@ -385,18 +560,24 @@ function fearNoEvilGetUnderling(key)
             key = "typhoidMary",
             name = "Typhoid Mary",
             hpCounter = {
-                imageUrl = cdnUrl .. "/selectors/scenarios/selector-typhoid-mary.png"
+                imageUrl = cdnUrl .. "/selectors/scenarios/selector-typhoid-mary.png",
+                primaryButtonLabel = "RESET",
+                primaryButtonClickFunction = "fearNoEvilResetTyphoidMary"
             },
             stages = {
-                stage1 = {
-                    key = "stage1",
+                stageA = {
+                    key = "stageA",
                     cardId = "60110",
-                    hitPointsPerPlayer = 13
+                    hitPointsPerPlayer = 10,
+                    locked = false,
+                    showAdvanceButton = true
                 },
-                stage2 = {
-                    key = "stage2",
+                stageB = {
+                    key = "stageB",
                     cardId = "60111",
-                    hitPointsPerPlayer = 15
+                    hitPointsPerPlayer = 13,
+                    locked = false,
+                    showAdvanceButton = true
                 }
             },
             encounterCards = {
@@ -431,14 +612,78 @@ function fearNoEvilGetUnderling(key)
 end
 
 function fearNoEvilUnderlingButtonClicked(player, value, id)
-    local underling = fearNoEvilGetUnderling(id)
+    local underlingButtonIds = {"bullseye", "electro", "hammerhead", "purpleMan", "typhoidMary", "random"}
 
-    if (underling) then
-        selectedScenario.underlingKey = underling.key
-        selectedScenario.underlingName = underling.name
-        selectedScenario.underlingEncounterCards = underling.encounterCards
-        selectedScenario.underlingHpCounterImageUrl = underling.hpCounter.imageUrl
+    for _, underlingButtonId in ipairs(underlingButtonIds) do
+        local isSelected = underlingButtonId == id
+        Global.UI.setAttribute("underlingHighlight-" .. underlingButtonId, "color",
+            isSelected and "rgba(1,1,0,1)" or "rgba(0,0,0,0)")
+    end
 
-        Global.call("updateScenarioControlPanel")
+    selectedScenario.underlingButtonId = id
+    selectedScenario.underlingKey = id
+end
+
+function fearNoEvilResetTyphoidMary()
+    local villainHpCounter = getObjectFromGUID(currentScenario.villains.typhoidMary.hpCounter.guid)
+    local mode = currentScenario.mode
+    local stage = mode == "standard" and currentScenario.villains.typhoidMary.stages.stageA or
+                      currentScenario.villains.typhoidMary.stages.stageB
+    local heroCount = getHeroCount()
+
+    villainHpCounter.call("setValue", {
+        value = stage.hitPointsPerPlayer * heroCount
+    })
+
+    local disturbedPsycheCardId = "60112"
+    local disturbedPsycheCard = Global.call("findCard", {
+        cardId = disturbedPsycheCardId
+    })
+    local disturbedPsycheCounter = Global.call("getCounterFromCard", {
+        card = disturbedPsycheCard,
+        counterClass = "configured"
+    })
+
+    disturbedPsycheCounter.call("adjustValue", {
+        adjustment = 1
+    })
+
+    local currentDisturbedPsycheDamage = disturbedPsycheCounter.call("getValue")
+
+    if currentDisturbedPsycheDamage >= 3 then
+        Global.call("displayMessage", {
+            message = "Typhoid Mary has been defeated. The Heroes win!",
+            messageType = Global.getVar("MESSAGE_TYPE_ALERT")
+        })
+    end
+
+    local villainCard = Global.call("findCard", {
+        cardId = stage.cardId
+    })
+
+    local villainIsFaceUp = Global.call("isFaceUp", {
+        object = villainCard,
+        ignoreToggles = true
+    })
+
+    villainCard.flip()
+
+    villainIsFaceUp = not villainIsFaceUp
+    fearNoEvilApplyTyphoidMaryExpertEffects(mode, villainIsFaceUp)
+end
+
+function fearNoEvilApplyTyphoidMaryExpertEffects(mode, villainIsFaceUp)
+    if (mode == "expert") then
+        if (villainIsFaceUp) then
+            Global.call("addStatusToVillain", {
+                villain = currentScenario.villains.typhoidMary,
+                statusType = "tough"
+            })
+        else
+            Global.call("displayMessage", {
+                message = "Bloody Mary deals 1 damage to each identity.",
+                messageType = Global.getVar("MESSAGE_TYPE_INSTRUCTION")
+            })
+        end
     end
 end

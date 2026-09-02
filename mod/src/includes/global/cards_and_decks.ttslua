@@ -97,7 +97,8 @@ function dealEncounterCardToPlayer(params)
     moveCard({
         card = card,
         destinationPosition = dealToPosition,
-        destinationRotation = dealToRotation
+        destinationRotation = dealToRotation,
+        moveFast = true
     })
 
     if (refreshNeeded) then
@@ -141,7 +142,8 @@ function drawBoostcard()
     moveCard({
         card = card,
         destinationPosition = drawToPosition,
-        destinationRotation = drawToRotation
+        destinationRotation = drawToRotation,
+        moveFast = false
     })
 
     if (refreshNeeded) then
@@ -413,6 +415,7 @@ function moveCardFromDeckById(params)
     local settings = params.settings or {}
     local values = params.values or {}
     local tags = params.tags or {}
+    local moveFast = params.moveFast
 
     if (flipCard) then
         destinationRotation["z"] = 180
@@ -462,7 +465,8 @@ function moveCardFromDeckById(params)
     moveCard({
         card = card,
         destinationPosition = destinationPosition,
-        destinationRotation = destinationRotation
+        destinationRotation = destinationRotation,
+        moveFast = moveFast
     })
 
     if (destinationScale) then
@@ -502,6 +506,7 @@ function moveCardFromDeckByGuid(params)
     local settings = params.settings or {}
     local values = params.values or {}
     local tags = params.tags or {}
+    local moveFast = params.moveFast
 
     if (flipCard) then
         destinationRotation["z"] = 180
@@ -538,7 +543,8 @@ function moveCardFromDeckByGuid(params)
     moveCard({
         card = card,
         destinationPosition = destinationPosition,
-        destinationRotation = destinationRotation
+        destinationRotation = destinationRotation,
+        moveFast = moveFast
     })
 
     if (destinationScale) then
@@ -606,6 +612,7 @@ function moveCardFromEncounterDeckById(params)
             minimumY = 4.0
         }),
         destinationRotation = destination.rotation,
+        destinationScale = params.scale,
         flipCard = flipCard,
         values = params.values,
         tags = params.tags,
@@ -1854,7 +1861,7 @@ function discardCardOrDeck(params)
         card = object
     })
 
-    if (cardData.type == "hero") then
+    if (cardData.type == "hero" or cardData.type == "villain" or cardData.type == "main_scheme") then
         return
     end
 

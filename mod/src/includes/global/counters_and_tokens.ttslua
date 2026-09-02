@@ -311,12 +311,14 @@ function addConfiguredCounterToCard(params)
         local heroCount = heroManager.call("getHeroCount")
         value = baseValue + (heroCount * valuePerHero)
     end
+
     addCounterToCard({
         card = card,
         counterClass = "configured",
         counterType = cardData.counter,
         counterName = cardData.counterName,
-        value = value
+        value = value,
+        baseOffset = params.baseOffset
     })
 end
 

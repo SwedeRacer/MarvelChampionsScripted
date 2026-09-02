@@ -18,8 +18,7 @@ function extendUI(params)
     local targetValue = tostring(getDataValue("targetValue", ""))
     local showTargetValue = targetValue ~= ""
 
-    local primaryButton = 
-    {
+    local primaryButton = {
         tag = "Button",
         value = primaryButtonLabel,
         attributes = {
@@ -39,8 +38,7 @@ function extendUI(params)
 
     table.insert(ui[1].children, primaryButton)
 
-    local targetLabel = 
-    {
+    local targetLabel = {
         tag = "Button",
         value = "TARGET: " .. targetValue,
         attributes = {
@@ -77,7 +75,7 @@ function setTargetValue(params)
     setDataValue("targetValue", targetValue)
     valueUpdated()
 
-    if(targetValue ~= "") then
+    if (targetValue ~= "") then
         self.UI.setAttribute("targetValueLabel", "text", labelText)
         self.UI.setAttribute("targetValueLabel", "textColor", "rgb(1,1,1)")
         self.UI.show("targetValueLabel")
@@ -101,7 +99,9 @@ function primaryButtonClicked()
 end
 
 function showPrimaryButton()
-    if(getDataValue("showPrimaryButton", false)) then return end
+    if (getDataValue("showPrimaryButton", false)) then
+        return
+    end
     setDataValue("showPrimaryButton", true)
 
     self.UI.setAttribute("primaryButton", "text", getDataValue("primaryButtonLabel", "ADVANCE"))
@@ -110,7 +110,9 @@ function showPrimaryButton()
 end
 
 function hidePrimaryButton()
-    if(not getDataValue("showPrimaryButton", false)) then return end
+    if (not getDataValue("showPrimaryButton", false)) then
+        return
+    end
 
     setDataValue("showPrimaryButton", false)
     self.UI.hide("primaryButton")
@@ -125,16 +127,16 @@ function updateHighlightState()
         self.UI.setAttribute("targetValueLabel", "textColor", "rgb(1,1,1)")
         return
     end
-    
+
     local percentage = (currentValue - (targetValue / 2)) / (targetValue / 2)
     percentage = math.max(0, math.min(1, percentage))
 
     local red = 1
-    local green = 1 - percentage 
+    local green = 1 - percentage
     local blue = 0
-    
+
     local colorString = "rgb(" .. red .. "," .. green .. "," .. blue .. ")"
-    
+
     self.highlightOn({red, green, blue})
     self.UI.setAttribute("targetValueLabel", "textColor", colorString)
 end
@@ -148,22 +150,22 @@ function valueUpdated()
         local currentValue = getValue()
         local targetValue = getDataValue("targetValue", 0)
         local shouldFlash = targetValue > 0 and currentValue >= (targetValue * 0.75)
-        
+
         if shouldFlash then
             local flashInterval = 0.5
             local totalFlashTime = 3 * flashInterval * 2
-            
+
             for i = 1, 3 do
                 Wait.time(function()
                     self.highlightOff()
                     self.UI.setAttribute("targetValueLabel", "textColor", "rgba(0,0,0,0)")
                 end, (i - 1) * flashInterval * 2)
-                
+
                 Wait.time(function()
                     updateHighlightState()
                 end, ((i - 1) * flashInterval * 2) + flashInterval)
             end
-            
+
             -- Final check after flash sequence completes
             Wait.time(function()
                 updateHighlightState()

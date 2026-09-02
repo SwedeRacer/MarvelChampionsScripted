@@ -1,131 +1,133 @@
-scenarios["absorbingMan"] =
-{
-    name="Absorbing Man",
+scenarios["absorbingMan"] = {
+    name = "Absorbing Man",
     fullyScripted = true,
-    tileImageUrl="https://steamusercontent-a.akamaihd.net/ugc/1833525541771241261/A31710FDD358F30518B36A6113BE984D88FA6D1A/",
-    villains={
-        absorbingMan={
-            name="Absorbing Man",
-            hpCounter={
-                imageUrl="https://steamusercontent-a.akamaihd.net/ugc/1833525541771241261/A31710FDD358F30518B36A6113BE984D88FA6D1A/",
+    tileImageUrl = "https://steamusercontent-a.akamaihd.net/ugc/1833525541771241261/A31710FDD358F30518B36A6113BE984D88FA6D1A/",
+    villains = {
+        absorbingMan = {
+            name = "Absorbing Man",
+            hpCounter = {
+                imageUrl = "https://steamusercontent-a.akamaihd.net/ugc/1833525541771241261/A31710FDD358F30518B36A6113BE984D88FA6D1A/"
             },
-            stages={
-                stage1={
-                    cardId="04076",
-                    hitPointsPerPlayer=14
+            stages = {
+                stage1 = {
+                    cardId = "04076",
+                    hitPointsPerPlayer = 14
                 },
-                stage2={
-                    cardId="04077",
-                    hitPointsPerPlayer=15
+                stage2 = {
+                    cardId = "04077",
+                    hitPointsPerPlayer = 15
                 },
-                stage3={
-                    cardId="04078",
-                    hitPointsPerPlayer=16
+                stage3 = {
+                    cardId = "04078",
+                    hitPointsPerPlayer = 16
                 }
             }
         }
     },
-    schemes={
-        main={
-            stages={
-                stage1={
-                    cardId="04079",
-                    startingThreatPerPlayer=2,
-                    targetThreatPerPlayer=12
+    schemes = {
+        main = {
+            stages = {
+                stage1 = {
+                    cardId = "04079",
+                    startingThreatPerPlayer = 2,
+                    targetThreatPerPlayer = 12
                 }
             }
         }
     },
-    counters={
-        delay={
-            type="general",
-            name="Delay",
-            position={11.78, 1.09, 20.38},
-            scale={0.52, 1.00, 0.52},
-            locked=true
-        }
-    },
-    decks={
-        encounterDeck={
-            name="Absorbing Man's Encounter Deck",
-            cards={
-                ["04080"]=1,
-                ["04081"]=1,
-                ["04082"]=1,
-                ["04083"]=1,
-                ["04084"]=1,
-                ["04085"]=2,
-                ["04086"]=2,
-                ["04087"]=2,
-                ["04088"]=2,
-                ["04089"]=3,
-                ["04090"]=2,
-                ["04091"]=2,
-                ["04092"]=1
+    decks = {
+        encounterDeck = {
+            name = "Absorbing Man's Encounter Deck",
+            cards = {
+                ["04080"] = 1,
+                ["04081"] = 1,
+                ["04082"] = 1,
+                ["04083"] = 1,
+                ["04084"] = 1,
+                ["04085"] = 2,
+                ["04086"] = 2,
+                ["04087"] = 2,
+                ["04088"] = 2,
+                ["04089"] = 3,
+                ["04090"] = 2,
+                ["04091"] = 2,
+                ["04092"] = 1
             }
         }
     },
-    modularSets={
-        hydraPatrol="recommended"
+    modularSets = {
+        hydraPatrol = "recommended"
     }
 }
 
 function setUpSchemeStage_absorbingMan_main(params)
-  local stage = params.stage
-  local stageNumber = string.sub(stage.key, -1)
+    local stage = params.stage
+    local stageNumber = string.sub(stage.key, -1)
 
-  if(stageNumber ~= "1") then return end
+    if (stageNumber ~= "1") then
+        return
+    end
 
-  Global.call("discardFromEncounterDeck", {
-      searchFunction = "isEnvironment",
-      searchFunctionTarget = self,
-      cardsToFind = 1,
-      stopWhenCardsFound = true,
-      zoneIndex = "environment",
-      callBackFunction = "completeAbsorbingManSetup",
-      callBackTarget = self
+    Global.call("discardFromEncounterDeck", {
+        searchFunction = "isEnvironment",
+        searchFunctionTarget = self,
+        cardsToFind = 1,
+        stopWhenCardsFound = true,
+        zoneIndex = "environment",
+        callBackFunction = "completeAbsorbingManSetup",
+        callBackTarget = self
     })
 end
 
 function isEnvironment(params)
-  local card = params.card
-  local cardData = Global.call("getCardData", {card = card})
-  local cardType = cardData.type
+    local card = params.card
+    local cardData = Global.call("getCardData", {
+        card = card
+    })
+    local cardType = cardData.type
 
-  return cardType == "environment"
+    return cardType == "environment"
 end
 
 function completeAbsorbingManSetup()
-  Wait.frames(
-    function()
-      local deckPosition = getEncounterDeckPosition()
-      local discardPosition = getEncounterDiscardPosition()
+    Wait.frames(function()
+        local deckPosition = getEncounterDeckPosition()
+        local discardPosition = getEncounterDiscardPosition()
 
-      Global.call("moveDeck",
-      {
-        origin = discardPosition,
-        destinationPosition = Global.call("ensureMinimumYPosition", {position = deckPosition, minimumY = 2}),
-        destinationRotation = {0,180,180},
-      })
+        Global.call("moveDeck", {
+            origin = discardPosition,
+            destinationPosition = Global.call("ensureMinimumYPosition", {
+                position = deckPosition,
+                minimumY = 2
+            }),
+            destinationRotation = {0, 180, 180}
+        })
 
-      Wait.frames(
-        function()
-          Global.call("shuffleDeck", {deckPosition = deckPosition})
-        end,
-        90)
-    end,
-    60)
+        Wait.frames(function()
+            Global.call("shuffleDeck", {
+                deckPosition = deckPosition
+            })
+        end, 90)
+    end, 60)
 end
 
 function setUpVillainStage_absorbingMan(params)
-  local stage = params.stage
-  local stageNumber = string.sub(stage.key, -1)
+    local stage = params.stage
+    local stageNumber = string.sub(stage.key, -1)
 
-  if(stageNumber == "2") then
-    if(Global.call("cardIsInPlay", {cardId = "04092"})) then
-      Global.call("dealEncounterCardsToAllPlayers", {cardsPerPlayer = 1})
-    else
-      Global.call("moveCardFromEncounterDeckById", {cardId = "04092", searchInDiscard = true, zoneIndex = "sideScheme"})
+    if (stageNumber == "2") then
+        if (Global.call("cardIsInPlay", {
+            cardId = "04092"
+        })) then
+            Global.call("dealEncounterCardsToAllPlayers", {
+                cardsPerPlayer = 1
+            })
+        else
+            Global.call("moveCardFromEncounterDeckById", {
+                cardId = "04092",
+                searchInDiscard = true,
+                zoneIndex = "sideScheme"
+            })
+        end
     end
-  end
 end
