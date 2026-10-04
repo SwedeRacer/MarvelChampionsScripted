@@ -55651,6 +55651,7 @@ PACK_60 = [[
     "FrontURL": "/card-faces/60073.jpg",
     "text": "<b>When Revealed</b>: Place additional threat here equal to Bullseye's stage number.\n[star] <b>Boost</b>: After this activation, reveal this card.",
     "baseThreat": 4,
+    "baseThreatIsFixed": true,
     "boost": 1,
     "boostStar": true,
     "amplify": 1
@@ -55788,6 +55789,7 @@ PACK_60 = [[
     "text": "<b>When Defeated</b>: Place 3 charge counters on Electric Charge.",
     "flavor": "Electro is drawing electricity from the power grid. You need to cut off her supply!",
     "baseThreat": 6,
+    "baseThreatIsFixed": true,
     "boost": 3,
     "amplify": 1
   },
@@ -55986,6 +55988,7 @@ PACK_60 = [[
     "text": "<b>Forced Response</b>: After a minion is defeated, give it to the villain as a facedown boost card.",
     "flavor": "\"Welcome to the big time.\" --Hammerhead",
     "baseThreat": 6,
+    "baseThreatIsFixed": true,
     "boost": 1
   },
   {
@@ -55997,6 +56000,7 @@ PACK_60 = [[
     "FrontURL": "/card-faces/60095.jpg",
     "text": "<b>When Revealed</b>: Defeat the minion with the fewest remaining hit points in play. Discard cards from the encounter deck until you discard a minion. Reveal that minion.",
     "baseThreat": 5,
+    "baseThreatIsFixed": true,
     "boost": 1,
     "amplify": 1
   },
@@ -56194,10 +56198,11 @@ PACK_60 = [[
     "FrontURL": "/card-faces/60108.jpg",
     "text": "[star] Hinder 3[per_hero].\nEach minion gains the [Influenced] trait.",
     "baseThreat": 2,
+    "baseThreatIsFixed": true,
+    "hinder": 3,
     "boost": 3,
     "boostStar": true,
-    "amplify": 1,
-    "hinder": 3
+    "amplify": 1
   },
   {
     "name": "Sway the Masses",
@@ -56274,7 +56279,9 @@ PACK_60 = [[
     "flavor": "\"Mary, it's me. I don't want to fight you.\" --Matt Murdock",
     "backText": "Attach to the villain. Permanent.\n[star] Attached villain cannot activate.\n<b>Forced Response</b>: After the villain takes damage or the round ends, deal each player 1 facedown encounter card and flip this card.",
     "backFlavor": "One of us is tender, one of us is not, and one of us takes vengeance.",
-    "baseThreat": 8
+    "baseThreat": 8,
+    "hinderExpert": 3,
+    "setup": true
   },
   {
     "name": "Establish Trust",
@@ -56286,6 +56293,7 @@ PACK_60 = [[
     "text": "Permanent. Setup.\n[star] In expert mode, this card gains hinder 3[per_hero].\n<b>When Defeated</b>: Place 1 threat token on Disturbed Psyche. Flip this card.",
     "flavor": "\"Mary, it's me. I don't want to fight you.\" --Matt Murdock",
     "baseThreat": 8,
+    "hinderExpert": 3,
     "setup": true
   },
   {
@@ -56387,7 +56395,8 @@ PACK_60 = [[
     "attack": 2,
     "scheme": 0,
     "boost": 1,
-    "boostStar": true
+    "boostStar": true,
+    "toughness": true
   },
   {
     "name": "Art Museum Heist",
@@ -56535,6 +56544,8 @@ PACK_60 = [[
     "text": "[star] Hinder 1[per_hero].\nThe villain cannot be dealt damage.",
     "flavor": "\"Eat your heart out, Johnny Blaze!\" --Echo",
     "baseThreat": 2,
+    "baseThreatIsFixed": true,
+    "hinder": 1,
     "crisis": 1
   },
   {
@@ -56802,7 +56813,8 @@ PACK_60 = [[
     "attackStar": true,
     "scheme": 1,
     "boost": 3,
-    "boostStar": true
+    "boostStar": true,
+    "toughness": true
   },
   {
     "name": "Imprisoned",
@@ -56917,7 +56929,8 @@ PACK_60 = [[
     "FrontURL": "/card-faces/60157.jpg",
     "text": "[Daily Bugle] supports cannot ready.\n<b>When Revealed</b>: Exhaust each [Daily Bugle] support.",
     "flavor": "\"I'd love for your audience to hear my side of the story. Now, where to begin...?\"",
-    "baseThreat": 6
+    "baseThreat": 6,
+    "baseThreatIsFixed": true,
   },
   {
     "name": "Breaking News",
@@ -57319,6 +57332,7 @@ PACK_60 = [[
     "text": "[star] Hinder 1[per_hero].\nEach [Police] minion gains guard and patrol.\n<b>When Revealed</b>: Search the encounter deck and discard pile for a [Police] minion and reveal it.",
     "flavor": "\"Stand back! This is a crime scene.\" --Police officer",
     "baseThreat": 3,
+    "baseThreatIsFixed": true,
     "hinder": 1
   },
   {
@@ -57380,6 +57394,7 @@ PACK_60 = [[
     "FrontURL": "/card-faces/60189.jpg",
     "text": "[star] Hinder 2[per_hero].\n<b>Forced Interrupt</b>: When a character with a [Vehicle] attachment would:\n* Add threat to a scheme, that threat is added here instead.\n* Remove threat from a scheme, that threat is removed from here instead.",
     "baseThreat": 2,
+    "baseThreatIsFixed": true,
     "hinder": 2,
     "crisis": 1
   },
@@ -57516,7 +57531,7 @@ PACK_60 = [[
     "BackURL": "/card-backs/encounter.jpg",
     "FrontURL": "/card-faces/60199.jpg",
     "text": "<b>Forced Response</b>: After the villain phase begins, deal 3 indirect damage to the fist player. For each ally defeated this way, remove 1[per_hero] threat from Hit List.",
-    "baaseThreat": 2
+    "baseThreat": 3
   },
   {
     "name": "Ivan Banionis",

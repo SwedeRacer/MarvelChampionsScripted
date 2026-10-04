@@ -1,109 +1,138 @@
-scenarios["venomgoblin"] =
-{
-    name="Venom Goblin",
-    tileImageUrl="https://steamusercontent-a.akamaihd.net/ugc/1834662762015324268/4E05FFF64F4A303C0F674C9D0BB2A1EE07FC589A/",
-    villains={
-        venomgoblin={
-            name="Venom Goblin",
-            hpCounter={
-                imageUrl="https://steamusercontent-a.akamaihd.net/ugc/1834662762015324268/4E05FFF64F4A303C0F674C9D0BB2A1EE07FC589A/",
+scenarios["venomgoblin"] = {
+    name = "Venom Goblin",
+    tileImageUrl = "https://steamusercontent-a.akamaihd.net/ugc/1834662762015324268/4E05FFF64F4A303C0F674C9D0BB2A1EE07FC589A/",
+    villains = {
+        venomgoblin = {
+            name = "Venom Goblin",
+            hpCounter = {
+                imageUrl = "https://steamusercontent-a.akamaihd.net/ugc/1834662762015324268/4E05FFF64F4A303C0F674C9D0BB2A1EE07FC589A/"
             },
-            stages={
-                stage1={
-                    cardId="27113",
-                    hitPointsPerPlayer=16
+            stages = {
+                stage1 = {
+                    cardId = "27113",
+                    hitPointsPerPlayer = 16
                 },
-                stage2={
-                    cardId="27114",
-                    hitPointsPerPlayer=18
+                stage2 = {
+                    cardId = "27114",
+                    hitPointsPerPlayer = 18
                 },
-                stage3={
-                    cardId="27115",
-                    hitPointsPerPlayer=21
+                stage3 = {
+                    cardId = "27115",
+                    hitPointsPerPlayer = 21
                 }
             }
         }
     },
-    schemes={
-        lowerManhattan={
-            position = {8.38, 0.97, 22.45},
-            stages={
-                stage1={
-                    cardId="27117",
-                    startingThreatPerPlayer=1,
-                    targetThreatPerPlayer=11
-                },
+    schemes = {
+        lowerManhattan = {
+            position = {15.25, 0.97, 22.75},
+            stages = {
+                stage1 = {
+                    cardId = "27117",
+                    startingThreatPerPlayer = 1,
+                    targetThreatPerPlayer = 11
+                }
             },
-            threatCounter={
-                position={11.19, 1.10, 20.93},
-                scale={1.00, 1.00, 1.00},
-                locked=true
+            threatCounter = {
+                position = {15.75, 1.10, 21.25},
+                scale = {1.00, 1.00, 1.00},
+                locked = true
             }
         },
-        midtownManhattan={
-            position={18.38, 0.97, 22.45},
-            stages={
-                stage1={
-                    cardId="27118",
-                    startingThreatPerPlayer=2,
-                    targetThreatPerPlayer=12
+        midtownManhattan = {
+            position = {24.75, 0.97, 22.75},
+            stages = {
+                stage1 = {
+                    cardId = "27118",
+                    startingThreatPerPlayer = 2,
+                    targetThreatPerPlayer = 12
                 }
             },
-            threatCounter={
-                position={21.19, 1.10, 20.93},
-                scale={1.00, 1.00, 1.00},
-                locked=true
+            threatCounter = {
+                position = {25.25, 1.10, 21.25},
+                scale = {1.00, 1.00, 1.00},
+                locked = true
             }
         },
-        upperManhattan={
-            position={28.38, 0.97, 22.45},
-            stages={
-                stage1={
-                    cardId="27119",
-                    startingThreat=0,
-                    targetThreatPerPlayer=12
+        upperManhattan = {
+            position = {34.25, 0.97, 22.75},
+            stages = {
+                stage1 = {
+                    cardId = "27119",
+                    startingThreat = 0,
+                    targetThreatPerPlayer = 12
                 }
             },
-            threatCounter={
-                position={31.19, 1.10, 20.93},
-                scale={1.00, 1.00, 1.00},
-                locked=true
+            threatCounter = {
+                position = {34.75, 1.10, 21.25},
+                scale = {1.00, 1.00, 1.00},
+                locked = true
             }
         }
     },
-    cards={
-        skiesOverNewYork={
-            cardId="27116",
-            position={15.75, 1.00, 29.25},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER")),
-            flipped=true
-        }
-    },            
-    decks={
-        encounterDeck={
-            name="Venom Goblin's Encounter Deck",
-            cards={
-                ["27120"]=1,
-                ["27121"]=2,
-                ["27122"]=2,
-                ["27123"]=4,
-                ["27124"]=1,
-                ["27125"]=1,
-                ["27126"]=2,
+    decks = {
+        encounterDeck = {
+            name = "Venom Goblin's Encounter Deck",
+            cards = {
+                ["27116"] = 1,
+                ["27120"] = 1,
+                ["27121"] = 2,
+                ["27122"] = 2,
+                ["27123"] = 4,
+                ["27124"] = 1,
+                ["27125"] = 1,
+                ["27126"] = 2
             }
         }
     },
-    modularSets={
-        symbioticStrength="required",
-        goblinGear="recommended"
+    modularSets = {
+        symbioticStrength = "required",
+        goblinGear = "recommended"
     },
-    extras={
-        glider={
-            name="Venom Goblin",
-            guid="9749eb",
-            position={18.75, 1.15, 23.73},
-            rotation={0, 0, 0},
-            scale={1,1,1}
+    extras = {
+        glider = {
+            name = "Venom Goblin",
+            guid = "9749eb",
+            position = {27.25, 1.15, 23.73},
+            rotation = {0, 0, 0},
+            scale = {1, 1, 1},
+            locked = false
         }
-    }
+    },
+    zones = {
+        environment = {
+            position = {18.25, 1.00, 30.25},
+            firstCardPosition = {13.25, 0.97, 30.25}
+        }
+    },
+    snapPoints = {{
+        position = {17.75, 1.15, 23.75},
+        rotation = {0, 0, 0},
+        rotation_snap = true,
+        tags = {"venom-goblin"}
+    }, {
+        position = {27.25, 1.15, 23.75},
+        rotation = {0, 0, 0},
+        rotation_snap = true,
+        tags = {"venom-goblin"}
+    }, {
+        position = {36.25, 1.15, 23.75},
+        rotation = {0, 0, 0},
+        rotation_snap = true,
+        tags = {"venom-goblin"}
+    }}
 }
+
+function setUpSchemeStage_venomgoblin_lowerManhattan(params)
+    local skiesOverNewYorkCardId = "27116"
+
+    Global.call("moveCardFromEncounterDeckById", {
+        cardId = skiesOverNewYorkCardId,
+        searchInDiscard = true,
+        zoneIndex = "environment",
+        settings = {
+            hideWhenFaceDown = false
+        },
+        flipCard = true
+    })
+end

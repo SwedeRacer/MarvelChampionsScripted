@@ -1,73 +1,83 @@
-scenarios["sabretooth"] =
-{
-    name="Sabretooth",
-    tileImageUrl="https://steamusercontent-a.akamaihd.net/ugc/2292958473524122178/A5FC09EBFFC2BE3443F4440C4BBD5DB32594D468/",
-    villains={
-        sabretooth={
-            name="Sabretooth",
-            hpCounter={
-                imageUrl="https://steamusercontent-a.akamaihd.net/ugc/2292958473524122178/A5FC09EBFFC2BE3443F4440C4BBD5DB32594D468/",
+scenarios["sabretooth"] = {
+    name = "Sabretooth",
+    tileImageUrl = "https://steamusercontent-a.akamaihd.net/ugc/2292958473524122178/A5FC09EBFFC2BE3443F4440C4BBD5DB32594D468/",
+    villains = {
+        sabretooth = {
+            name = "Sabretooth",
+            hpCounter = {
+                imageUrl = "https://steamusercontent-a.akamaihd.net/ugc/2292958473524122178/A5FC09EBFFC2BE3443F4440C4BBD5DB32594D468/"
             },
-            stages={
-                stage1={
-                    cardId="32060",
-                    hitPointsPerPlayer=13
+            stages = {
+                stage1 = {
+                    cardId = "32060",
+                    hitPointsPerPlayer = 13
                 },
-                stage2={
-                    cardId="32061",
-                    hitPointsPerPlayer=15
+                stage2 = {
+                    cardId = "32061",
+                    hitPointsPerPlayer = 15
                 },
-                stage3={
-                    cardId="32062",
-                    hitPointsPerPlayer=18
+                stage3 = {
+                    cardId = "32062",
+                    hitPointsPerPlayer = 18
                 }
             }
         }
     },
-    schemes={
-        main={
-            stages={
-                stage1={
-                    cardId="32063",
-                    startingThreat=0,
-                    targetThreat=0
+    schemes = {
+        main = {
+            stages = {
+                stage1 = {
+                    cardId = "32063",
+                    startingThreat = 0,
+                    targetThreat = 0
                 },
-                stage2={
-                    cardId="32064",
-                    startingThreat=0,
-                    targetThreatPerPlayer=9
+                stage2 = {
+                    cardId = "32064",
+                    startingThreat = 0,
+                    targetThreatPerPlayer = 9
                 }
             }
         }
     },
-    cards={
-        findTheSenator={
-            cardId="32065",
-            position={7.25, 0.97, 16.75},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER")),
-            landscape=true
-        },
-        robertKelly={
-            cardId="32066",
-            position={14.75, 0.97, 21.25},
-            scale=Vector(Global.getVar("CARD_SCALE_PLAYER"))
-        }
-    },
-    decks={
-        encounterDeck={
-            name="Sabretooth's Encounter Deck",
-            cards={
-                ["32067"]=1,
-                ["32068"]=1,
-                ["32069"]=2,
-                ["32070"]=3,
-                ["32071"]=2,
-                ["32072"]=1
+    decks = {
+        encounterDeck = {
+            name = "Sabretooth's Encounter Deck",
+            cards = {
+                ["32065"] = 1,
+                ["32066"] = 1,
+                ["32067"] = 1,
+                ["32068"] = 1,
+                ["32069"] = 2,
+                ["32070"] = 3,
+                ["32071"] = 2,
+                ["32072"] = 1
             }
         }
     },
-    modularSets={
-        brotherhood="recommended",
-        mystique="recommended"
+    modularSets = {
+        brotherhood = "recommended",
+        mystique = "recommended"
     }
 }
+
+function setUpSchemeStage_sabretooth_main(params)
+    local stage = params.stage
+    local stageNumber = string.sub(stage.key, -1)
+    local findTheSenatorCardId = "32065"
+    local robertKellyCardId = "32066"
+
+    if (stageNumber == "1") then
+        Global.call("moveCardFromEncounterDeckById", {
+            cardId = findTheSenatorCardId,
+            searchInDiscard = true,
+            zoneIndex = "sideScheme"
+        })
+
+        Global.call("moveCardFromEncounterDeckById", {
+            cardId = robertKellyCardId,
+            searchInDiscard = true,
+            destinationPosition = {21.75, 0.97, 22.75},
+            scale = Vector(Global.getVar("CARD_SCALE_PLAYER"))
+        })
+    end
+end

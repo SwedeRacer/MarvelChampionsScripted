@@ -1,100 +1,110 @@
-scenarios["thanos"] =
-{
-    name="Thanos",
-    tileImageUrl="https://steamusercontent-a.akamaihd.net/ugc/1849305905150145079/54DEDEDC81C5F76EDB6DCFE7A64F64476AF811BF/",
-    villains={
-        thanos={
-            name="Thanos",
-            hpCounter={
-                imageUrl="https://steamusercontent-a.akamaihd.net/ugc/1849305905150145079/54DEDEDC81C5F76EDB6DCFE7A64F64476AF811BF/",
+scenarios["thanos"] = {
+    name = "Thanos",
+    tileImageUrl = "https://steamusercontent-a.akamaihd.net/ugc/1849305905150145079/54DEDEDC81C5F76EDB6DCFE7A64F64476AF811BF/",
+    villains = {
+        thanos = {
+            name = "Thanos",
+            hpCounter = {
+                imageUrl = "https://steamusercontent-a.akamaihd.net/ugc/1849305905150145079/54DEDEDC81C5F76EDB6DCFE7A64F64476AF811BF/"
             },
-            stages={
-                stage1={
-                    cardId="21111",
-                    hitPointsPerPlayer=16
+            stages = {
+                stage1 = {
+                    cardId = "21111",
+                    hitPointsPerPlayer = 16
                 },
-                stage2={
-                    cardId="21112",
-                    hitPointsPerPlayer=23
+                stage2 = {
+                    cardId = "21112",
+                    hitPointsPerPlayer = 23
                 },
-                stage3={
-                    cardId="21113",
-                    hitPointsPerPlayer=28
+                stage3 = {
+                    cardId = "21113",
+                    hitPointsPerPlayer = 28
                 }
             }
         }
     },
-    schemes={
-        main={
-            stages={
-                stage1={
-                    cardId="21114",
-                    startingThreat=0,
-                    targetThreatPerPlayer=12
+    schemes = {
+        main = {
+            stages = {
+                stage1 = {
+                    cardId = "21114",
+                    startingThreat = 0,
+                    targetThreatPerPlayer = 12
                 },
-                stage2={
-                    cardId="21115",
-                    startingThreat=0,
-                    targetThreatPerPlayer=12
+                stage2 = {
+                    cardId = "21115",
+                    startingThreat = 0,
+                    targetThreatPerPlayer = 12
                 }
             }
         }
     },
-    cards={
-        sanctuary={
-            cardId="21116",
-            position={7.25, 0.97, 16.75},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER")),
-            landscape=true
-        },
-        infinityGuantlet={
-            cardId="21129",
-            position={-7.25, 0.97, 22.25},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER"))
+    cards = {
+        infinityGuantlet = {
+            cardId = "21129",
+            position = {-7.25, 0.97, 22.25},
+            scale = Vector(Global.getVar("CARD_SCALE_ENCOUNTER"))
         }
     },
-    decks={
-        encounterDeck={
-            name="Thanos' Encounter Deck",
-            cards={
-                ["21117"]=1,
-                ["21118"]=1,
-                ["21119"]=2,
-                ["21120"]=2,
-                ["21121"]=2,
-                ["21122"]=2,
-                ["21123"]=2,
-                ["21124"]=1
+    decks = {
+        encounterDeck = {
+            name = "Thanos' Encounter Deck",
+            cards = {
+                ["21116"] = 1,
+                ["21117"] = 1,
+                ["21118"] = 1,
+                ["21119"] = 2,
+                ["21120"] = 2,
+                ["21121"] = 2,
+                ["21122"] = 2,
+                ["21123"] = 2,
+                ["21124"] = 1
             }
         },
-        infinityStones={
-            name="Infinity Stones",
-            position={-15.25, 1, 30.25},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER")),
-            cards={
-                ["21130"]=1,
-                ["21131"]=1,
-                ["21132"]=1,
-                ["21133"]=1,
-                ["21134"]=1,
-                ["21135"]=1
+        infinityStones = {
+            name = "Infinity Stones",
+            position = {-15.25, 1, 30.25},
+            scale = Vector(Global.getVar("CARD_SCALE_ENCOUNTER")),
+            cards = {
+                ["21130"] = 1,
+                ["21131"] = 1,
+                ["21132"] = 1,
+                ["21133"] = 1,
+                ["21134"] = 1,
+                ["21135"] = 1
             }
         }
     },
-    text={
-        infinityStones={
-            position={-15.25, 1, 36},
-            text="Infinity\nStones",
-            fontSize=60
+    text = {
+        infinityStones = {
+            position = {-15.25, 1, 36},
+            text = "Infinity\nStones",
+            fontSize = 60
         }
     },
-    modularSets={
-        infinityGauntlet="required",
-        blackOrder="recommended",
-        childrenOfThanos="recommended"
+    modularSets = {
+        infinityGauntlet = "required",
+        blackOrder = "recommended",
+        childrenOfThanos = "recommended"
     }
 }
 
 function prepareScenario_thanos()
-  removeModularSet({modularSetKey = "infinityGauntlet"})
+    removeModularSet({
+        modularSetKey = "infinityGauntlet"
+    })
+end
+
+function setUpSchemeStage_thanos_main(params)
+    local stage = params.stage
+    local stageNumber = string.sub(stage.key, -1)
+    local sanctuaryCardId = "21116"
+
+    if (stageNumber == "1") then
+        Global.call("moveCardFromEncounterDeckById", {
+            cardId = sanctuaryCardId,
+            searchInDiscard = true,
+            zoneIndex = "sideScheme"
+        })
+    end
 end

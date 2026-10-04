@@ -26,18 +26,7 @@ scenarios["protectionRacket"] = {
     zones = {
         sideScheme = {
             position = {19.00, 1.00, 18.50},
-            firstCardPosition = {12.00, 0.98, 23.50}
-        },
-        attachment = {
-            position = {0, 1.00, 19.00},
-            scale = {16.00, 1.00, 14.00},
-            width = 2,
-            height = 3,
-            rescaleOnEnterTo = {1.70, 1.00, 1.70},
-            firstCardPosition = {-6.25, 0.97, 23.25},
-            horizontalGap = 12.5,
-            verticalGap = 5.5,
-            layoutDirection = "horizontal"
+            firstCardPosition = {12.00, 1.00, 23.50}
         }
     },
     text = {{

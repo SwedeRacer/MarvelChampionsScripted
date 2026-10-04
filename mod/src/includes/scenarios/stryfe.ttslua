@@ -1,79 +1,87 @@
-scenarios["stryfe"] =
-{
-    name="Stryfe",
-    tileImageUrl="https://steamusercontent-a.akamaihd.net/ugc/2292958473524122369/72E77A2041618A13050055D730149707949E2DBC/",
-    villains={
-        stryfe={
-            name="Stryfe",
-            hpCounter={
-                imageUrl="https://steamusercontent-a.akamaihd.net/ugc/2292958473524122369/72E77A2041618A13050055D730149707949E2DBC/",
+scenarios["stryfe"] = {
+    name = "Stryfe",
+    tileImageUrl = "https://steamusercontent-a.akamaihd.net/ugc/2292958473524122369/72E77A2041618A13050055D730149707949E2DBC/",
+    villains = {
+        stryfe = {
+            name = "Stryfe",
+            hpCounter = {
+                imageUrl = "https://steamusercontent-a.akamaihd.net/ugc/2292958473524122369/72E77A2041618A13050055D730149707949E2DBC/"
             },
-            stages={
-                stage1={
-                    cardId="40163",
-                    hitPointsPerPlayer=15
+            stages = {
+                stage1 = {
+                    cardId = "40163",
+                    hitPointsPerPlayer = 15
                 },
-                stage2={
-                    cardId="40164",
-                    hitPointsPerPlayer=17
+                stage2 = {
+                    cardId = "40164",
+                    hitPointsPerPlayer = 17
                 },
-                stage3={
-                    cardId="40165",
-                    hitPointsPerPlayer=20
+                stage3 = {
+                    cardId = "40165",
+                    hitPointsPerPlayer = 20
                 }
             }
         }
     },
-    schemes={
-        main={
-            stages={
-                stage1={
-                    cardId="40166",
-                    startingThreat=0,
-                    targetThreatPerPlayer=9
+    schemes = {
+        main = {
+            stages = {
+                stage1 = {
+                    cardId = "40166",
+                    startingThreat = 0,
+                    targetThreatPerPlayer = 9
                 },
-                stage2={
-                    cardId="40167",
-                    startingThreat=0,
-                    targetThreatPerPlayer=8
+                stage2 = {
+                    cardId = "40167",
+                    startingThreat = 0,
+                    targetThreatPerPlayer = 8
                 }
             }
         }
     },
-    cards={
-        hopeSummers={
-            cardId="40130",
-            position={-3, 1.00, 1.25},
-            scale=Vector(Global.getVar("CARD_SCALE_PLAYER"))
-        },
-        stryfesGrasp={
-            cardId="40168",
-            position={7.25, 0.97, 16.75},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER")),
-            landscape=true
+    cards = {
+        hopeSummers = {
+            cardId = "40130",
+            position = {-3, 1.00, 1.25},
+            scale = Vector(Global.getVar("CARD_SCALE_PLAYER"))
         }
     },
-    decks={
-        encounterDeck={
-            name="Mister Sinister's Encounter Deck",
-            cards={
-                ["40169"]=1,
-                ["40170"]=1,
-                ["40171"]=1,
-                ["40172"]=1,
-                ["40173"]=2,
-                ["40174"]=1,
-                ["40175"]=1,
-                ["40176"]=1,
-                ["40177"]=1,
-                ["40178"]=2,
-                ["40179"]=3,
-                ["40131"]=1 -- Bit of a hack; adding card from Hope Summers modular set for convenience
+    decks = {
+        encounterDeck = {
+            name = "Stryfe's Encounter Deck",
+            cards = {
+                ["40168"] = 1,
+                ["40169"] = 1,
+                ["40170"] = 1,
+                ["40171"] = 1,
+                ["40172"] = 1,
+                ["40173"] = 2,
+                ["40174"] = 1,
+                ["40175"] = 1,
+                ["40176"] = 1,
+                ["40177"] = 1,
+                ["40178"] = 2,
+                ["40179"] = 3,
+                ["40131"] = 1 -- Bit of a hack; adding card from Hope Summers modular set for convenience
             }
         }
     },
-    modularSets={
-        extremeMeasures="recommended",
-        mutantInsurrection="recommended"
+    modularSets = {
+        extremeMeasures = "recommended",
+        mutantInsurrection = "recommended"
     }
 }
+
+function setUpSchemeStage_stryfe_main(params)
+    local stage = params.stage
+    local stageNumber = string.sub(stage.key, -1)
+    local stryfesGraspCardId = "40168"
+
+    if (stageNumber == "1") then
+        Global.call("moveCardFromEncounterDeckById", {
+            cardId = stryfesGraspCardId,
+            searchInDiscard = true,
+            zoneIndex = "sideScheme"
+        })
+    end
+end

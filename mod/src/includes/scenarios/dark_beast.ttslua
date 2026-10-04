@@ -1,158 +1,185 @@
-scenarios["darkBeast"] =
-{
-    name="Dark Beast",
-    tileImageUrl="https://steamusercontent-a.akamaihd.net/ugc/2517025868834704120/5307B0499B55FF2BA1F2BC02F0CF2DA8DDFCE533/",
-    villains={
-        darkBeast={
-            name="Dark Beast",
-            hpCounter={
-                imageUrl="https://steamusercontent-a.akamaihd.net/ugc/2517025868834704120/5307B0499B55FF2BA1F2BC02F0CF2DA8DDFCE533/",
+scenarios["darkBeast"] = {
+    name = "Dark Beast",
+    tileImageUrl = "https://steamusercontent-a.akamaihd.net/ugc/2517025868834704120/5307B0499B55FF2BA1F2BC02F0CF2DA8DDFCE533/",
+    villains = {
+        darkBeast = {
+            name = "Dark Beast",
+            hpCounter = {
+                imageUrl = "https://steamusercontent-a.akamaihd.net/ugc/2517025868834704120/5307B0499B55FF2BA1F2BC02F0CF2DA8DDFCE533/"
             },
-            stages={
-                stage1={
-                    cardId="45118",
-                    hitPointsPerPlayer=15
+            stages = {
+                stage1 = {
+                    cardId = "45118",
+                    hitPointsPerPlayer = 15
                 },
-                stage2={
-                    cardId="45119",
-                    hitPointsPerPlayer=18
+                stage2 = {
+                    cardId = "45119",
+                    hitPointsPerPlayer = 18
                 },
-                stage3={
-                    cardId="45120",
-                    hitPointsPerPlayer=22
+                stage3 = {
+                    cardId = "45120",
+                    hitPointsPerPlayer = 22
                 }
             }
         }
     },
-    schemes={
-        main={
-            stages={
-                stage1={
-                    cardId="45121",
-                    startingThreatPerPlayer=1,
-                    targetThreatPerPlayer=10
+    schemes = {
+        main = {
+            stages = {
+                stage1 = {
+                    cardId = "45121",
+                    startingThreatPerPlayer = 1,
+                    targetThreatPerPlayer = 10
                 }
             }
         }
     },
-    decks={
-        encounterDeck={
-            name="Dark Beast's Encounter Deck",
-            cards={
-                ["45122"]=1,
-                ["45123"]=1,
-                ["45124"]=2,
-                ["45125"]=3,
-                ["45126"]=2
+    decks = {
+        encounterDeck = {
+            name = "Dark Beast's Encounter Deck",
+            cards = {
+                ["45122"] = 1,
+                ["45123"] = 1,
+                ["45124"] = 2,
+                ["45125"] = 3,
+                ["45126"] = 2
             }
         }
     },
-    modularSets={
-        dystopianNightmare="recommended",
-        blueMoon="required",
-        genosha="required",
-        savageLand="required"
+    modularSets = {
+        dystopianNightmare = "recommended",
+        blueMoon = "required",
+        genosha = "required",
+        savageLand = "required"
     },
-    zones={
-        environment={
-            onEnterFunction="darkBeastDiscardSettingEnvironments"
+    zones = {
+        environment = {
+            onEnterFunction = "darkBeastDiscardSettingEnvironments"
         }
     },
-    extras={
-        darkBeastEnvironmentPanel={
-            name="",
-            guid="bc4a47",
-            position={32.75, 0.96, 19.25},
-            rotation={0, 180, 0},
-            scale={5,1,5}
+    extras = {
+        darkBeastEnvironmentPanel = {
+            name = "",
+            guid = "bc4a47",
+            position = {26.75, 0.96, 22.75},
+            rotation = {0, 180, 0},
+            scale = {3, 1, 3}
         }
     }
 }
 
 function prepareScenario_darkBeast()
-  removeModularSet({modularSetKey = "genosha"})
-  removeModularSet({modularSetKey = "blueMoon"})
-  removeModularSet({modularSetKey = "savageLand"})
+    removeModularSet({
+        modularSetKey = "genosha"
+    })
+    removeModularSet({
+        modularSetKey = "blueMoon"
+    })
+    removeModularSet({
+        modularSetKey = "savageLand"
+    })
 
-  local environments = {}
-  table.insert(environments, "genosha")
-  table.insert(environments, "blueMoon")
-  table.insert(environments, "savageLand")
+    local environments = {}
+    table.insert(environments, "genosha")
+    table.insert(environments, "blueMoon")
+    table.insert(environments, "savageLand")
 
-  currentScenario.environments = Global.call("shuffleTable", {table=environments})
-  currentScenario.environmentIndex = 1
+    currentScenario.environments = Global.call("shuffleTable", {
+        table = environments
+    })
+    currentScenario.environmentIndex = 1
 end
 
 function placeDarkBeastEnvironment()
-  if(currentScenario.environmentIndex > #currentScenario.environments) then
-    broadcastToAll("All environments have been placed.", {1,1,1})
-    return
-  end
+    if (currentScenario.environmentIndex > #currentScenario.environments) then
+        broadcastToAll("All environments have been placed.", {1, 1, 1})
+        return
+    end
 
-  local encounterSetKey = currentScenario.environments[currentScenario.environmentIndex]
-  local encounterSetManager = getObjectFromGUID(Global.getVar("GUID_MODULAR_SET_MANAGER"))
-  encounterSetManager.call("addEncounterSetToDeck", {setKey = encounterSetKey})
-  local environmentCardId = ""
+    local encounterSetKey = currentScenario.environments[currentScenario.environmentIndex]
+    local encounterSetManager = getObjectFromGUID(Global.getVar("GUID_MODULAR_SET_MANAGER"))
+    encounterSetManager.call("addEncounterSetToDeck", {
+        setKey = encounterSetKey
+    })
+    local environmentCardId = ""
 
-  if(encounterSetKey == "savageLand") then
-    environmentCardId = "45127"
-  end
+    if (encounterSetKey == "savageLand") then
+        environmentCardId = "45127"
+    end
 
-  if(encounterSetKey == "genosha") then
-    environmentCardId = "45133"
-  end
+    if (encounterSetKey == "genosha") then
+        environmentCardId = "45133"
+    end
 
-  if(encounterSetKey == "blueMoon") then
-    environmentCardId = "45139"
-  end
+    if (encounterSetKey == "blueMoon") then
+        environmentCardId = "45139"
+    end
 
-  Wait.frames(function()
-    Global.call("moveCardFromEncounterDeckById", {cardId = environmentCardId, searchInDiscard = false, zoneIndex = "environment"})
-  end,
-  30)
+    Wait.frames(function()
+        Global.call("moveCardFromEncounterDeckById", {
+            cardId = environmentCardId,
+            searchInDiscard = false,
+            zoneIndex = "environment"
+        })
+    end, 30)
 
-  local encounterSet = encounterSetManager.call("getModularSet", {modularSetKey = encounterSetKey})
+    local encounterSet = encounterSetManager.call("getModularSet", {
+        modularSetKey = encounterSetKey
+    })
 
-  Global.call("displayMessage", {
-      message = encounterSet.name .. " encounter set has been added to encounter deck.",
-      messageType = Global.getVar("MESSAGE_TYPE_INFO")
-  })
+    Global.call("displayMessage", {
+        message = encounterSet.name .. " encounter set has been added to encounter deck.",
+        messageType = Global.getVar("MESSAGE_TYPE_INFO")
+    })
 
-  currentScenario.environmentIndex = currentScenario.environmentIndex + 1
+    currentScenario.environmentIndex = currentScenario.environmentIndex + 1
 end
 
 function darkBeastDiscardSettingEnvironments(params)
-  local zone = params.zone
-  local card = params.item
+    local zone = params.zone
+    local card = params.item
 
-   Wait.condition(
-    function()
-      if (card.isDestroyed()) then return end
-
-      local cardData = Global.call("getCardData", {card = card})
-
-      if(not cardData) then return end
-
-      local traits = cardData.traits or ""
-      if (not string.find(traits, "Setting.", 1, true)) then return end
-
-      local cardId = cardData.code
-      local zoneItems = zone.getObjects()
-      
-      for i, v in ipairs(zoneItems) do
-        if(v.tag == "Card") then
-          local vCardData = Global.call("getCardData", {card = v})
-          if(not vCardData) then return end
-
-          local vCardId = vCardData.code
-          local vTraits = vCardData.traits or ""
-
-          if (vCardId ~= cardId and string.find(vTraits, "Setting.", 1, true)) then
-            Global.call("discardEncounterCard", {discardFromPosition = v.getPosition()})
-          end
+    Wait.condition(function()
+        if (card.isDestroyed()) then
+            return
         end
-      end
-    end,
-    function() return card.isDestroyed() or card.resting end,
-    5)
+
+        local cardData = Global.call("getCardData", {
+            card = card
+        })
+
+        if (not cardData) then
+            return
+        end
+
+        local traits = cardData.traits or ""
+        if (not string.find(traits, "Setting.", 1, true)) then
+            return
+        end
+
+        local cardId = cardData.code
+        local zoneItems = zone.getObjects()
+
+        for i, v in ipairs(zoneItems) do
+            if (v.tag == "Card") then
+                local vCardData = Global.call("getCardData", {
+                    card = v
+                })
+                if (not vCardData) then
+                    return
+                end
+
+                local vCardId = vCardData.code
+                local vTraits = vCardData.traits or ""
+
+                if (vCardId ~= cardId and string.find(vTraits, "Setting.", 1, true)) then
+                    Global.call("discardEncounterCard", {
+                        discardFromPosition = v.getPosition()
+                    })
+                end
+            end
+        end
+    end, function()
+        return card.isDestroyed() or card.resting
+    end, 5)
 end

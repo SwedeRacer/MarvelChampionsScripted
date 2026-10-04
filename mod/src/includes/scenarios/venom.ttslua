@@ -1,62 +1,69 @@
-scenarios["venom"] =
-{
-    name="Venom",
-    tileImageUrl="https://steamusercontent-a.akamaihd.net/ugc/1834662762015321996/340B2A0AD541B66D6F2184D8E810943AC73B7553/",
-    villains={
-        venom={
-            name="Venom",
-            hpCounter={
-                imageUrl="https://steamusercontent-a.akamaihd.net/ugc/1834662762015321996/340B2A0AD541B66D6F2184D8E810943AC73B7553/",
+scenarios["venom"] = {
+    name = "Venom",
+    tileImageUrl = "https://steamusercontent-a.akamaihd.net/ugc/1834662762015321996/340B2A0AD541B66D6F2184D8E810943AC73B7553/",
+    villains = {
+        venom = {
+            name = "Venom",
+            hpCounter = {
+                imageUrl = "https://steamusercontent-a.akamaihd.net/ugc/1834662762015321996/340B2A0AD541B66D6F2184D8E810943AC73B7553/"
             },
-            stages={
-                stage1={
-                    cardId="27073",
-                    hitPointsPerPlayer=17
+            stages = {
+                stage1 = {
+                    cardId = "27073",
+                    hitPointsPerPlayer = 17
                 },
-                stage2={
-                    cardId="27074",
-                    hitPointsPerPlayer=18
+                stage2 = {
+                    cardId = "27074",
+                    hitPointsPerPlayer = 18
                 },
-                stage3={
-                    cardId="27075",
-                    hitPointsPerPlayer=20
+                stage3 = {
+                    cardId = "27075",
+                    hitPointsPerPlayer = 20
                 }
             }
         }
     },
-    schemes={
-        main={
-            stages={
-                stage1={
-                    cardId="27076",
-                    startingThreatPerPlayer=2,
-                    targetThreatPerPlayer=10
+    schemes = {
+        main = {
+            stages = {
+                stage1 = {
+                    cardId = "27076",
+                    startingThreatPerPlayer = 2,
+                    targetThreatPerPlayer = 10
                 }
             }
         }
     },
-    cards={
-        bellTower={
-            cardId="27077",
-            position={15.75, 1.00, 29.25},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER"))
-        }
-    },            
-    decks={
-        encounterDeck={
-            name="Venom's Encounter Deck",
-            cards={
-                ["27078"]=2,
-                ["27079"]=1,
-                ["27080"]=1,
-                ["27081"]=1,
-                ["27082"]=2,
-                ["27083"]=2
+    decks = {
+        encounterDeck = {
+            name = "Venom's Encounter Deck",
+            cards = {
+                ["27077"] = 1,
+                ["27078"] = 2,
+                ["27079"] = 1,
+                ["27080"] = 1,
+                ["27081"] = 1,
+                ["27082"] = 2,
+                ["27083"] = 2
             }
         }
     },
-    modularSets={
-        symbioticStrength="required",
-        downToEarth="recommended"
+    modularSets = {
+        symbioticStrength = "required",
+        downToEarth = "recommended"
     }
 }
+
+function setUpSchemeStage_venom_main(params)
+    local stage = params.stage
+    local stageNumber = string.sub(stage.key, -1)
+    local bellTowerCardId = "27077"
+
+    if (stageNumber == "1") then
+        Global.call("moveCardFromEncounterDeckById", {
+            cardId = bellTowerCardId,
+            searchInDiscard = true,
+            zoneIndex = "environment"
+        })
+    end
+end
