@@ -140,6 +140,9 @@ function onObjectEnterZone(zone, card)
     end
 
     local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
+    if (not scenarioManager) then
+        return
+    end
 
     if (zoneDef.onEnterFunction) then
         scenarioManager.call(zoneDef.onEnterFunction, {
@@ -230,6 +233,10 @@ function onObjectLeaveZone(zone, card)
 
     if (zoneDef.onLeaveFunction) then
         local scenarioManager = getObjectFromGUID(GUID_SCENARIO_MANAGER)
+        if (not scenarioManager) then
+            return
+        end
+
         scenarioManager.call(zoneDef.onLeaveFunction, {
             zone = zone,
             item = card
@@ -441,7 +448,7 @@ function showReleaseNotesUI()
         children = {{
             tag = "Image",
             attributes = {
-                image = "https://steamusercontent-a.akamaihd.net/ugc/15386909686457612715/BA0D34A32D07FFA4772A53BB1FA80ACB519F089C/", -- "https://d2xdqryaauvaie.cloudfront.net/assets/release-notes-20260804.png",
+                image = "https://d2xdqryaauvaie.cloudfront.net/assets/release-notes-20261007.png",
                 rectAlignment = "MiddleCenter",
                 raycastTarget = "true",
                 height = "500",

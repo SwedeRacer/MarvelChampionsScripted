@@ -135,7 +135,7 @@ function calculateSideSchemeThreat(params)
     local expertHinder = cardData.hinderExpert and tonumber(cardData.hinderExpert) or 0
 
     if (mode == "expert") then
-        hinder = expertHinder or standardHinder
+        hinder = expertHinder > 0 and expertHinder or standardHinder
     else
         hinder = standardHinder
     end

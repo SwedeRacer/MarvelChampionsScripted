@@ -1,0 +1,59 @@
+heroes["jessicaJones"] = {
+    name = "Jessica Jones",
+    label = "Jessica Jones",
+    identityCardId = "61001",
+    hitPoints = 11,
+    tileImageUrl = cdnUrl .. "/selectors/heroes/selector-jessica-jones-temp.jpg",
+    playmatImageUrl = cdnUrl .. "/playmats/playmat-jessica-jones.png",
+    obligationCardId = "61030",
+    teams = "defenders",
+    artVariant = "defender",
+    decks = {
+        hero = {
+            ["61002"] = 1,
+            ["61003"] = 1,
+            ["61004"] = 2,
+            ["61005"] = 1,
+            ["61006"] = 3,
+            ["61007"] = 1,
+            ["61008"] = 1,
+            ["61009"] = 1,
+            ["61010"] = 1,
+            ["61011"] = 1,
+            ["61012"] = 1,
+            ["61013"] = 1,
+            ["61014"] = 1
+        },
+        starter = {
+            ["61015"] = 1,
+            ["61016"] = 1,
+            ["61017"] = 1,
+            ["61018"] = 3,
+            ["61019"] = 3,
+            ["61020"] = 1,
+            ["61021"] = 1,
+            ["61022"] = 1,
+            ["61023"] = 3,
+            ["61024"] = 3,
+            ["61025"] = 1,
+            ["61026"] = 3,
+            ["61027"] = 1,
+            ["61028"] = 1,
+            ["61029"] = 1
+        },
+        nemesis = {
+            ["61031"] = 1,
+            ["61032"] = 1,
+            ["61033a"] = 1,
+            ["61033b"] = 1,
+            ["61033c"] = 1
+        }
+    },
+    cards = {
+        aliasInvestigations = {
+            cardId = "61002",
+            name = "Alias Investigations",
+            offset = {-4.94, 3, -0.02}
+        }
+    }
+}
