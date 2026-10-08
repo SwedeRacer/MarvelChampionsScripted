@@ -193,3 +193,70 @@ end
 function setUpVillainStage_protectionRacket(params)
     fearNoEvilSetupVillainStage(params)
 end
+
+function assignThreat_protectionRacket()
+    local accelerationFromSchemeStage = 1
+    local accelerationFromCards, accelerationCardList = Global.call("countCardIconsInPlay", {
+        iconType = "acceleration"
+    })
+    local accelerationFromCounters = Global.call("getTotalAccelerationFromCounters")
+    local totalAcceleration = accelerationFromSchemeStage + accelerationFromCards + accelerationFromCounters
+
+    local allObjects = getAllObjects()
+    local threatCounterCount = 0
+
+    for _, obj in ipairs(allObjects) do
+        if (obj.hasTag("Counter") and obj.hasTag("main-scheme")) then
+            local threatCounter = obj
+            threatCounter.call("adjustValue", {
+                adjustment = totalAcceleration
+            })
+            threatCounterCount = threatCounterCount + 1
+        end
+    end
+
+    local threatSources = {}
+
+    if (accelerationFromCounters > 0) then
+        table.insert(threatSources, tostring(accelerationFromCounters) .. " from acceleration counters")
+    end
+
+    if (accelerationFromCards > 0) then
+        local cardListString = ""
+        if #accelerationCardList == 1 then
+            cardListString = accelerationCardList[1]
+        elseif #accelerationCardList == 2 then
+            cardListString = accelerationCardList[1] .. " and " .. accelerationCardList[2]
+        elseif #accelerationCardList > 2 then
+            for i = 1, #accelerationCardList - 1 do
+                cardListString = cardListString .. accelerationCardList[i] .. ", "
+            end
+            cardListString = cardListString .. "and " .. accelerationCardList[#accelerationCardList]
+        end
+
+        local cardMessage = ""
+
+        if (accelerationFromCards == 1) then
+            cardMessage = "1 from the acceleration icon on " .. cardListString
+        else
+            cardMessage = tostring(accelerationFromCards) .. " from the acceleration icons on " .. cardListString
+        end
+
+        table.insert(threatSources, cardMessage)
+    end
+
+    local mainSchemeLabel = threatCounterCount == 1 and "the main scheme" or "all main schemes"
+
+    local message = "Added " .. tostring(totalAcceleration) .. " threat to " .. mainSchemeLabel
+
+    if #threatSources > 0 then
+        message = message .. " (includes " .. table.concat(threatSources, " and ") .. ")"
+    end
+
+    message = message .. "."
+
+    displayMessage({
+        message = message,
+        messageType = messageTypes.info
+    })
+end

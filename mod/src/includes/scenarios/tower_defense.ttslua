@@ -1,121 +1,120 @@
-scenarios["towerDefense"] =
-{
-    name="Tower Defense",
-    tileImageUrl="https://steamusercontent-a.akamaihd.net/ugc/1849305905150121236/51DE813B79BDB1100212F0F05F303100627912AC/",
-    --placeBoostPanel=false,
-    villains={
-        proximaMidnight={
-            name="Proxima Midnight",
-            deckPosition={-6.84, 1.00, 20.44},
-            hpCounter={
-                imageUrl="https://steamusercontent-a.akamaihd.net/ugc/1849305905150135976/E9896414070810D2509CE451A33FDFB69BD082DB/",
-                position={-6.84, 1.00, 29.16}
+scenarios["towerDefense"] = {
+    name = "Tower Defense",
+    tileImageUrl = "https://steamusercontent-a.akamaihd.net/ugc/1849305905150121236/51DE813B79BDB1100212F0F05F303100627912AC/",
+    -- placeBoostPanel=false,
+    villains = {
+        proximaMidnight = {
+            name = "Proxima Midnight",
+            deckPosition = {-6.84, 1.00, 20.44},
+            hpCounter = {
+                imageUrl = "https://steamusercontent-a.akamaihd.net/ugc/1849305905150135976/E9896414070810D2509CE451A33FDFB69BD082DB/",
+                position = {-6.84, 1.00, 29.16}
             },
-            stages={
-                stage1={
-                    cardId="21092",
-                    hitPointsPerPlayer=9
+            stages = {
+                stage1 = {
+                    cardId = "21092",
+                    hitPointsPerPlayer = 9
                 },
-                stage2={
-                    cardId="21093",
-                    hitPointsPerPlayer=12
+                stage2 = {
+                    cardId = "21093",
+                    hitPointsPerPlayer = 12
                 },
-                stage3={
-                    cardId="21094",
-                    hitPointsPerPlayer=15
+                stage3 = {
+                    cardId = "21094",
+                    hitPointsPerPlayer = 15
                 }
             }
         },
-        corvusGlaive={
-            name="Corvus Glaive",
-            deckPosition={5.25, 1.00, 20.43},
-            hpCounter={
-                imageUrl="https://steamusercontent-a.akamaihd.net/ugc/1849305905150124820/5FE7B3E843483F341D1E0AD49CC49C7744EA9086/",
-                position={5.25, 0.96, 29.15}
+        corvusGlaive = {
+            name = "Corvus Glaive",
+            deckPosition = {5.25, 1.00, 20.43},
+            hpCounter = {
+                imageUrl = "https://steamusercontent-a.akamaihd.net/ugc/1849305905150124820/5FE7B3E843483F341D1E0AD49CC49C7744EA9086/",
+                position = {5.25, 0.96, 29.15}
             },
-            stages={
-                stage1={
-                    cardId="21095",
-                    hitPointsPerPlayer=8
+            stages = {
+                stage1 = {
+                    cardId = "21095",
+                    hitPointsPerPlayer = 8
                 },
-                stage2={
-                    cardId="21096",
-                    hitPointsPerPlayer=11
+                stage2 = {
+                    cardId = "21096",
+                    hitPointsPerPlayer = 11
                 },
-                stage3={
-                    cardId="21097",
-                    hitPointsPerPlayer=14
+                stage3 = {
+                    cardId = "21097",
+                    hitPointsPerPlayer = 14
                 }
             }
         }
     },
-    blackHole={
-        position={-15.15, 1.13, 28.48}
+    blackHole = {
+        position = {-15.15, 1.13, 28.48}
     },
-    schemes={
-        underSiege={
-            stages={
-                stage1={
-                    cardId="21098",
-                    startingThreatPerPlayer=1,
-                    targetThreatPerPlayer=6
+    schemes = {
+        underSiege = {
+            stages = {
+                stage1 = {
+                    cardId = "21098",
+                    startingThreatPerPlayer = 1,
+                    targetThreatPerPlayer = 6
                 }
             },
-            position={16.75, 0.97, 22.25},
-            threatCounter={
-                position={25.13, 1.01, 22.25},
-                scale={1.61, 1.00, 1.61}
+            position = {16.75, 0.97, 22.25},
+            threatCounter = {
+                position = {25.13, 1.01, 22.25},
+                scale = {1.61, 1.00, 1.61}
             }
         },
-        armiesOfThanos={
-            stages={
-                stage1={
-                    cardId="21099",
-                    startingThreatPerPlayer=1,
-                    targetThreatPerPlayer=6
+        armiesOfThanos = {
+            stages = {
+                stage1 = {
+                    cardId = "21099",
+                    startingThreatPerPlayer = 1,
+                    targetThreatPerPlayer = 6
                 }
             },
-            position={16.75, 0.97, 15.75},
-            threatCounter={
-                position={25.13, 1.01, 15.75},
-                scale={1.61, 1.00, 1.61}
+            position = {16.75, 0.97, 15.75},
+            threatCounter = {
+                position = {25.13, 1.01, 15.75},
+                scale = {1.61, 1.00, 1.61}
             }
         }
     },
-    cards={
-        avengersTower={
-            cardId="21100",
-            position={15.50, 1.25, 30.00},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER"))
+    cards = {
+        avengersTower = {
+            cardId = "21100",
+            position = {15.50, 1.25, 30.00},
+            scale = Vector(Global.getVar("CARD_SCALE_ENCOUNTER"))
         },
-        focusedDefense={
-            cardId="21101",
-            position={19.25, 3.00, 15.75},
-            scale=Vector(Global.getVar("CARD_SCALE_PLAYER"))
+        focusedDefense = {
+            cardId = "21101",
+            position = {19.25, 3.00, 15.75},
+            scale = Vector(Global.getVar("CARD_SCALE_PLAYER"))
         }
     },
-    decks={
-        encounterDeck={
-            name="Tower Defense Encounter Deck",
-            position={-19.25, 1.00, 22.25},
-            discardPosition={-24.75, 1.00, 22.25},
-            cards={
-                ["21102"]=4,
-                ["21103"]=1,
-                ["21104"]=1,
-                ["21105"]=2,
-                ["21106"]=2,
-                ["21107"]=2,
-                ["21108"]=1,
-                ["21109"]=2,
-                ["21110"]=2
+    decks = {
+        encounterDeck = {
+            name = "Tower Defense Encounter Deck",
+            position = {-19.25, 1.00, 22.25},
+            discardPosition = {-24.75, 1.00, 22.25},
+            cards = {
+                ["21102"] = 4,
+                ["21103"] = 1,
+                ["21104"] = 1,
+                ["21105"] = 2,
+                ["21106"] = 2,
+                ["21107"] = 2,
+                ["21108"] = 1,
+                ["21109"] = 2,
+                ["21110"] = 2
             }
         }
     },
-    modularSets={
-        armiesOfTitan="recommended"
+    modularSets = {
+        armiesOfTitan = "recommended"
     },
-    zones={
+    zones = {
         sideScheme = {
             position = {22.00, 1.00, 7.00},
             scale = {21.00, 1.00, 10.00},
@@ -132,6 +131,72 @@ scenarios["towerDefense"] =
         encounterDeck = {
             position = {-22.10, 1.00, 22.25},
             scale = {10.25, 2.00, 7.00}
-        },
+        }
     }
 }
+
+function assignThreat_towerDefense()
+    local heroCount = getHeroCount()
+    local accelerationFromSchemeStage = heroCount
+    local accelerationFromCards, accelerationCardList = Global.call("countCardIconsInPlay", {
+        iconType = "acceleration"
+    })
+    local accelerationFromCounters = Global.call("getTotalAccelerationFromCounters")
+    local totalAcceleration = accelerationFromSchemeStage + accelerationFromCards + accelerationFromCounters
+
+    local allObjects = getAllObjects()
+    local threatCounterCount = 0
+
+    for _, obj in ipairs(allObjects) do
+        if (obj.hasTag("Counter") and obj.hasTag("main-scheme")) then
+            local threatCounter = obj
+            threatCounter.call("adjustValue", {
+                adjustment = totalAcceleration
+            })
+            threatCounterCount = threatCounterCount + 1
+        end
+    end
+
+    local threatSources = {}
+
+    if (accelerationFromCounters > 0) then
+        table.insert(threatSources, tostring(accelerationFromCounters) .. " from acceleration counters")
+    end
+
+    if (accelerationFromCards > 0) then
+        local cardListString = ""
+        if #accelerationCardList == 1 then
+            cardListString = accelerationCardList[1]
+        elseif #accelerationCardList == 2 then
+            cardListString = accelerationCardList[1] .. " and " .. accelerationCardList[2]
+        elseif #accelerationCardList > 2 then
+            for i = 1, #accelerationCardList - 1 do
+                cardListString = cardListString .. accelerationCardList[i] .. ", "
+            end
+            cardListString = cardListString .. "and " .. accelerationCardList[#accelerationCardList]
+        end
+
+        local cardMessage = ""
+
+        if (accelerationFromCards == 1) then
+            cardMessage = "1 from the acceleration icon on " .. cardListString
+        else
+            cardMessage = tostring(accelerationFromCards) .. " from the acceleration icons on " .. cardListString
+        end
+
+        table.insert(threatSources, cardMessage)
+    end
+
+    local message = "Added " .. tostring(totalAcceleration) .. " threat to both main schemes"
+
+    if #threatSources > 0 then
+        message = message .. " (includes " .. table.concat(threatSources, " and ") .. ")"
+    end
+
+    message = message .. "."
+
+    displayMessage({
+        message = message,
+        messageType = messageTypes.info
+    })
+end

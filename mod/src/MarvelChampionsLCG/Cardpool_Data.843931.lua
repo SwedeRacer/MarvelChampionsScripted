@@ -15040,7 +15040,8 @@ PACK_27 = [[
     "FrontURL": "/card-faces/27142.jpg",
     "text": "In expert mode, Life-size Decoy gains toughness.\nThe engaged player cannot thwart side schemes.\n<hr />\n[star] <b>Boost</b>: Put this minion into play engaged with you.",
     "health": 5,
-    "boostStar": true
+    "boostStar": true,
+    "toughnessExpert": true
   },
   {
     "name": "Coordinated Effort",
@@ -15079,6 +15080,7 @@ PACK_27 = [[
     "baseThreat": 5,
     "baseThreatIsFixed": true,
     "boost": 2,
+    "boostExpert": 4,
     "boostStar": true
   },
   {
@@ -48875,7 +48877,8 @@ PACK_55 = [[
     "traits": "Brute. Troll.",
     "attack": 3,
     "scheme": 0,
-    "boost": 2
+    "boost": 2,
+    "toughnessExpert": true
   },
   {
     "name": "Law of Attraction",
@@ -49467,7 +49470,8 @@ PACK_55 = [[
     "baseThreat": 2,
     "baseThreatIsFixed": true,
     "boost": 1,
-    "hazard": 1
+    "hazard": 1,
+    "hinderExpert": 1
   },
   {
     "name": "Love Triangle",

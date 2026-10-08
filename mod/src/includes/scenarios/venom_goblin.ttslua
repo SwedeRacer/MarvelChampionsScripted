@@ -60,7 +60,7 @@ scenarios["venomgoblin"] = {
                 stage1 = {
                     cardId = "27119",
                     startingThreat = 0,
-                    targetThreatPerPlayer = 12
+                    targetThreatPerPlayer = 10
                 }
             },
             threatCounter = {
@@ -134,5 +134,50 @@ function setUpSchemeStage_venomgoblin_lowerManhattan(params)
             hideWhenFaceDown = false
         },
         flipCard = true
+    })
+end
+
+function assignThreat_venomgoblin()
+    local heroCount = getHeroCount()
+    local accelerationFromSchemeStage = heroCount
+    local accelerationFromCards, accelerationCardList = Global.call("countCardIconsInPlay", {
+        iconType = "acceleration"
+    })
+
+    for _, scheme in pairs(currentScenario.schemes) do
+        local schemeStage = scheme.stages.stage1
+        local schemeCardId = schemeStage.cardId
+        local schemeCard = Global.call("findCard", {
+            cardId = schemeCardId
+        })
+        local objectsOnSchemeCard = Global.call("getItemsOnCard", {
+            card = schemeCard
+        })
+
+        local accelerationCounter = nil
+        local threatCounter = nil
+
+        for _, obj in ipairs(objectsOnSchemeCard) do
+            if (obj.hasTag("Counter") and obj.hasTag("acceleration")) then
+                accelerationCounter = obj
+            end
+            if (obj.hasTag("Counter") and obj.hasTag("main-scheme")) then
+                threatCounter = obj
+            end
+        end
+
+        local accelerationFromCounter = accelerationCounter and accelerationCounter.call("getValue") or 0
+        local totalAcceleration = accelerationFromSchemeStage + accelerationFromCards + accelerationFromCounter
+
+        if (threatCounter) then
+            threatCounter.call("adjustValue", {
+                adjustment = totalAcceleration
+            })
+        end
+    end
+
+    displayMessage({
+        message = "Added threat to main schemes.",
+        messageType = messageTypes.info
     })
 end

@@ -291,6 +291,13 @@ function threatButtonClicked(player, value, id)
         return
     end
 
+    local functionName = "assignThreat_" .. currentScenario.key
+
+    if (self.getVar(functionName) ~= nil) then
+        self.call(functionName)
+        return
+    end
+
     local scheme = currentScenario.schemes["main"]
     local threatCounterGuid = scheme.threatCounter.guid
     local threatCounter = getObjectFromGUID(threatCounterGuid)
