@@ -50,5 +50,5 @@ heroes["valkyrie"] = {
             name = "Death-Glow",
             offset = {-4.95, 2, 4.64}
         }
-    }    
+    }
 }

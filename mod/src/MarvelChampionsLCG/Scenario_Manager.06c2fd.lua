@@ -636,6 +636,13 @@ function setUpSnapPoints()
     table.insert(snapPoints, {
         position = discardPos
     })
+
+    if (currentScenario and currentScenario.snapPoints) then
+        for _, snapPoint in ipairs(currentScenario.snapPoints) do
+            table.insert(snapPoints, snapPoint)
+        end
+    end
+
     Global.setSnapPoints(snapPoints)
 end
 

@@ -1,93 +1,92 @@
-scenarios["hood"] =
-{
-    name="The Hood",
-    tileImageUrl="https://steamusercontent-a.akamaihd.net/ugc/1833524420369390047/812F91439CB08F9A17D25523A7375B04E3D9C4A5/",
-    requiredEncounterSetCount=7,
-    preselectModularEncounterSets=false,
-    villains={
-        hood={
-            name="The Hood",
-            hpCounter={
-                imageUrl="https://steamusercontent-a.akamaihd.net/ugc/1833524420369390047/812F91439CB08F9A17D25523A7375B04E3D9C4A5/",
+scenarios["hood"] = {
+    name = "The Hood",
+    tileImageUrl = "https://steamusercontent-a.akamaihd.net/ugc/1833524420369390047/812F91439CB08F9A17D25523A7375B04E3D9C4A5/",
+    requiredEncounterSetCount = 7,
+    preselectModularEncounterSets = false,
+    villains = {
+        hood = {
+            name = "The Hood",
+            hpCounter = {
+                imageUrl = "https://steamusercontent-a.akamaihd.net/ugc/1833524420369390047/812F91439CB08F9A17D25523A7375B04E3D9C4A5/"
             },
-            stages={
-                stage1={
-                    cardId="24001",
-                    hitPointsPerPlayer=14
+            stages = {
+                stage1 = {
+                    cardId = "24001",
+                    hitPointsPerPlayer = 14
                 },
-                stage2={
-                    cardId="24002",
-                    hitPointsPerPlayer=16
+                stage2 = {
+                    cardId = "24002",
+                    hitPointsPerPlayer = 16
                 },
-                stage3={
-                    cardId="24003",
-                    hitPointsPerPlayer=18
+                stage3 = {
+                    cardId = "24003",
+                    hitPointsPerPlayer = 18
                 }
             }
         }
     },
-    schemes={
-        main={
-            stages={
-                stage1={
-                    cardId="24004",
-                    startingThreatPerPlayer=1,
-                    targetThreatPerPlayer=5
+    schemes = {
+        main = {
+            stages = {
+                stage1 = {
+                    cardId = "24004",
+                    startingThreatPerPlayer = 1,
+                    targetThreatPerPlayer = 5
                 },
-                stage2={
-                    cardId="24005",
-                    startingThreatPerPlayer=2,
-                    targetThreatPerPlayer=8
+                stage2 = {
+                    cardId = "24005",
+                    startingThreatPerPlayer = 2,
+                    targetThreatPerPlayer = 8
                 },
-                stage3={
-                    cardId="24006",
-                    startingThreatPerPlayer=3,
-                    targetThreatPerPlayer=10
+                stage3 = {
+                    cardId = "24006",
+                    startingThreatPerPlayer = 3,
+                    targetThreatPerPlayer = 10
                 }
             }
         }
     },
-    decks={
-        encounterDeck={
-            name="The Hood's Encounter Deck",
-            cards={
-                ["24007"]=1,
-                ["24008"]=1,
-                ["24009"]=2,
-                ["24010"]=1,
-                ["24011"]=1,
-                ["24012"]=1,
-                ["24013"]=3
+    decks = {
+        encounterDeck = {
+            name = "The Hood's Encounter Deck",
+            cards = {
+                ["24007"] = 1,
+                ["24008"] = 1,
+                ["24009"] = 2,
+                ["24010"] = 1,
+                ["24011"] = 1,
+                ["24012"] = 1,
+                ["24013"] = 3
             }
         }
     },
-    modularSets={
-        streetsOfMayhem="recommended",
-        brothersGrimm="recommended",
-        ransackedArmory="recommended",
-        stateOfEmergency="recommended",
-        beastyBoys="recommended",
-        misterHyde="recommended",
-        sinisterSyndicate="recommended",
-        crossfiresCrew="recommended",
-        wreckingCrew="recommended"
+    modularSets = {
+        streetsOfMayhem = "recommended",
+        brothersGrimm = "recommended",
+        ransackedArmory = "recommended",
+        stateOfEmergency = "recommended",
+        beastyBoys = "recommended",
+        misterHyde = "recommended",
+        sinisterSyndicate = "recommended",
+        crossfiresCrew = "recommended",
+        wreckingCrew = "recommended"
     },
-    extras={
-        encounterSetPlacer={
-            name="",
-            guid="39d4a2",
-            position={18.25, 0.97, 22.45},
-            rotation={0, 180, 0},
-            scale={3.1,1,3.1},
-            locked=true
+    extras = {
+        encounterSetPlacer = {
+            name = "",
+            guid = "39d4a2",
+            position = {25.25, 0.97, 22.75},
+            rotation = {0, 180, 0},
+            scale = {3.1, 1, 3.1},
+            locked = true
         }
     }
 }
 
 function prepareScenario_hood()
-  local encounterSets = getSelectedSets()
-  currentScenario.hoodEncounterSets = encounterSets
-  clearSelectedSets()
+    local encounterSets = getSelectedSets()
+    currentScenario.hoodEncounterSets = encounterSets
+    clearSelectedSets()
 end
 
 function getEncounterSetControlPanel_hood()
@@ -95,20 +94,18 @@ function getEncounterSetControlPanel_hood()
     local encounterSetControlPanel = {
         tag = "Panel",
         attributes = {
-            preferredHeight = "100",
+            preferredHeight = "100"
         },
-        children = {
-            {
-                tag = "VerticalLayout",
-                attributes = {
-                    rectAlignment = "UpperLeft",
-                    childAlignment = "UpperCenter",
-                    childForceExpandHeight = "false",
-                    spacing = "10",
-                    contentSizeFitter = "vertical"
-                },
-                children = {
-            {
+        children = {{
+            tag = "VerticalLayout",
+            attributes = {
+                rectAlignment = "UpperLeft",
+                childAlignment = "UpperCenter",
+                childForceExpandHeight = "false",
+                spacing = "10",
+                contentSizeFitter = "vertical"
+            },
+            children = {{
                 tag = "Text",
                 value = "Select at least seven modular encounter sets. Click the Easy, Medium, or Hard buttons for preselected combinations, use the Random button for a completely random selection, or choose whatever sets you'd like.",
                 attributes = {
@@ -116,82 +113,66 @@ function getEncounterSetControlPanel_hood()
                     alignment = "UpperLeft",
                     color = "rgba(1,1,1,1)"
                 }
-            },
-            {
+            }, {
                 tag = "HorizontalLayout",
                 attributes = {
                     class = "togglePanelContainer"
                 },
-                children = {
-                    {
-                        tag = "Panel",
-                        attributes = {
-                            class = "togglePanel",
-                            onClick = guid .. "/selectHoodEasyModularSets"
-                        },
-                        children = {
-                            {
-                                tag="Text",
-                                value = "Easy",
-                                attributes = {
-                                    class = "togglePanelLabel"
-                                }
-                            }
-                        }
+                children = {{
+                    tag = "Panel",
+                    attributes = {
+                        class = "togglePanel",
+                        onClick = guid .. "/selectHoodEasyModularSets"
                     },
-                    {
-                        tag = "Panel",
+                    children = {{
+                        tag = "Text",
+                        value = "Easy",
                         attributes = {
-                            class = "togglePanel",
-                            onClick = guid .. "/selectHoodMediumModularSets"
-                        },
-                        children = {
-                            {
-                                tag="Text",
-                                value = "Medium",
-                                attributes = {
-                                    class = "togglePanelLabel"
-                                }
-                            }
+                            class = "togglePanelLabel"
                         }
+                    }}
+                }, {
+                    tag = "Panel",
+                    attributes = {
+                        class = "togglePanel",
+                        onClick = guid .. "/selectHoodMediumModularSets"
                     },
-                    {
-                        tag = "Panel",
+                    children = {{
+                        tag = "Text",
+                        value = "Medium",
                         attributes = {
-                            class = "togglePanel",
-                            onClick = guid .. "/selectHoodHardModularSets"
-                        },
-                        children = {
-                            {
-                                tag="Text",
-                                value = "Hard",
-                                attributes = {
-                                    class = "togglePanelLabel"
-                                }
-                            }
+                            class = "togglePanelLabel"
                         }
+                    }}
+                }, {
+                    tag = "Panel",
+                    attributes = {
+                        class = "togglePanel",
+                        onClick = guid .. "/selectHoodHardModularSets"
                     },
-                    {
-                        tag = "Panel",
+                    children = {{
+                        tag = "Text",
+                        value = "Hard",
                         attributes = {
-                            class = "togglePanel",
-                            onClick = guid .. "/selectHoodRandomModularSets"
-                        },
-                        children = {
-                            {
-                                tag="Text",
-                                value = "Random",
-                                attributes = {
-                                    class = "togglePanelLabel"
-                                }
-                            }
+                            class = "togglePanelLabel"
                         }
-                    }
-                }
-            }
-                }
-            }
-        }
+                    }}
+                }, {
+                    tag = "Panel",
+                    attributes = {
+                        class = "togglePanel",
+                        onClick = guid .. "/selectHoodRandomModularSets"
+                    },
+                    children = {{
+                        tag = "Text",
+                        value = "Random",
+                        attributes = {
+                            class = "togglePanelLabel"
+                        }
+                    }}
+                }}
+            }}
+        }}
     }
 
     return encounterSetControlPanel
@@ -207,7 +188,7 @@ function selectHoodEasyModularSets()
     selectEncounterSet("beastyBoys")
     selectEncounterSet("misterHyde")
     selectEncounterSet("sinisterSyndicate")
-end 
+end
 
 function selectHoodMediumModularSets()
     clearSelectedModularEncounterSets()
@@ -234,52 +215,62 @@ function selectHoodHardModularSets()
 end
 
 function selectHoodRandomModularSets()
-  clearSelectedModularEncounterSets()
-  math.randomseed(os.time())
+    clearSelectedModularEncounterSets()
+    math.randomseed(os.time())
 
-  local encounterSetManager = getObjectFromGUID(Global.getVar("GUID_MODULAR_SET_MANAGER"))
-  local encounterSets = encounterSetManager.call("getEncounterSetsByType", {modular = true})
-  local selectedSets = {}
+    local encounterSetManager = getObjectFromGUID(Global.getVar("GUID_MODULAR_SET_MANAGER"))
+    local encounterSets = encounterSetManager.call("getEncounterSetsByType", {
+        modular = true
+    })
+    local selectedSets = {}
 
-  for i = 1, 7, 1 do
-    local unselectedSets = {}
+    for i = 1, 7, 1 do
+        local unselectedSets = {}
 
-    for k, v in pairs(encounterSets) do
-      if(not v.selected) then
-        table.insert(unselectedSets, k)
-      end
-    end  
-  
-    local randomSetKey = unselectedSets[math.random(#unselectedSets)]
-    selectEncounterSet(randomSetKey)
-  end
+        for k, v in pairs(encounterSets) do
+            if (not v.selected) then
+                table.insert(unselectedSets, k)
+            end
+        end
+
+        local randomSetKey = unselectedSets[math.random(#unselectedSets)]
+        selectEncounterSet(randomSetKey)
+    end
 end
 
 function addHoodEncounterSet()
-  math.randomseed(os.time())
-  local unusedSets = {}
+    math.randomseed(os.time())
+    local unusedSets = {}
 
-  for k, v in pairs(currentScenario.hoodEncounterSets) do
-    if(not v.used) then
-      table.insert(unusedSets, k)
+    for k, v in pairs(currentScenario.hoodEncounterSets) do
+        if (not v.used) then
+            table.insert(unusedSets, k)
+        end
     end
-  end
 
-  if(#unusedSets == 0) then
-    Global.call("displayMessage", {message = "All modular encounter sets have been used.", messageType = Global.getVar("MESSAGE_TYPE_INFO")})
-    return 0
-  end
+    if (#unusedSets == 0) then
+        Global.call("displayMessage", {
+            message = "All modular encounter sets have been used.",
+            messageType = Global.getVar("MESSAGE_TYPE_INFO")
+        })
+        return 0
+    end
 
-  local encounterSetKey = unusedSets[math.random(#unusedSets)]
+    local encounterSetKey = unusedSets[math.random(#unusedSets)]
 
-  currentScenario.hoodEncounterSets[encounterSetKey].used = true
+    currentScenario.hoodEncounterSets[encounterSetKey].used = true
 
-  saveData()
+    saveData()
 
-  local encounterSetManager = getObjectFromGUID(Global.getVar("GUID_MODULAR_SET_MANAGER"))
-  encounterSetManager.call("addEncounterSetToDeck", {setKey = encounterSetKey})
+    local encounterSetManager = getObjectFromGUID(Global.getVar("GUID_MODULAR_SET_MANAGER"))
+    encounterSetManager.call("addEncounterSetToDeck", {
+        setKey = encounterSetKey
+    })
 
-  Global.call("displayMessage", {message = "A random modular encounter set has been added to the encounter deck.", messageType = Global.getVar("MESSAGE_TYPE_INFO")})
+    Global.call("displayMessage", {
+        message = "A random modular encounter set has been added to the encounter deck.",
+        messageType = Global.getVar("MESSAGE_TYPE_INFO")
+    })
 
-  return #unusedSets - 1
+    return #unusedSets - 1
 end

@@ -1,123 +1,135 @@
-scenarios["loki"] =
-{
-    name="Loki",
-    tileImageUrl="https://steamusercontent-a.akamaihd.net/ugc/1849305905150132430/6C8FCFC49383857A4A92407CE13656C5DE148F37/",
-    villains={
-        loki={
-            name="Loki",
-            hpCounter={
-                imageUrl="https://steamusercontent-a.akamaihd.net/ugc/1849305905150132430/6C8FCFC49383857A4A92407CE13656C5DE148F37/",
-                primaryButtonLabel="NEXT!",
-                secondaryButton={
-                    label="SWAP",
-                    clickFunction="lokiSwapVillain",
+scenarios["loki"] = {
+    name = "Loki",
+    tileImageUrl = "https://steamusercontent-a.akamaihd.net/ugc/1849305905150132430/6C8FCFC49383857A4A92407CE13656C5DE148F37/",
+    villains = {
+        loki = {
+            name = "Loki",
+            hpCounter = {
+                imageUrl = "https://steamusercontent-a.akamaihd.net/ugc/1849305905150132430/6C8FCFC49383857A4A92407CE13656C5DE148F37/",
+                primaryButtonLabel = "NEXT!",
+                secondaryButton = {
+                    label = "SWAP",
+                    clickFunction = "lokiSwapVillain"
                 }
             },
-            stages={
-                stage1={
-                    cardId="21160",
-                    hitPointsPerPlayer=20
+            stages = {
+                stage1 = {
+                    cardId = "21160",
+                    hitPointsPerPlayer = 20
                 },
-                stage2={
-                    cardId="21161",
-                    hitPointsPerPlayer=20
+                stage2 = {
+                    cardId = "21161",
+                    hitPointsPerPlayer = 20
                 },
-                stage3={
-                    cardId="21162",
-                    hitPointsPerPlayer=20
+                stage3 = {
+                    cardId = "21162",
+                    hitPointsPerPlayer = 20
                 },
-                stage4={
-                    cardId="21163",
-                    hitPointsPerPlayer=20
+                stage4 = {
+                    cardId = "21163",
+                    hitPointsPerPlayer = 20
                 },
-                stage5={
-                    cardId="21164",
-                    hitPointsPerPlayer=20
+                stage5 = {
+                    cardId = "21164",
+                    hitPointsPerPlayer = 20
                 }
             }
         }
     },
-    schemes={
-        main={
-            stages={
-                stage1={
-                    cardId="21165",
-                    startingThreatPerPlayer=1,
-                    targetThreatPerPlayer=12
+    schemes = {
+        main = {
+            stages = {
+                stage1 = {
+                    cardId = "21165",
+                    startingThreatPerPlayer = 1,
+                    targetThreatPerPlayer = 12
                 }
             }
         }
     },
-    cards={
-        warInAsgard={
-            cardId="21167",
-            position={7.25, 1.00, 16.75},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER")),
-            landscape=true
-        },
-        infinityGuantlet={
-            cardId="21129",
-            position={-7.25, 0.97, 22.25},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER"))
+    cards = {
+        infinityGuantlet = {
+            cardId = "21129",
+            position = {-7.25, 0.97, 22.25},
+            scale = Vector(Global.getVar("CARD_SCALE_ENCOUNTER"))
         }
     },
-    decks={
-        encounterDeck={
-            name="Loki's Encounter Deck",
-            cards={
-                ["21166"]=1,
-                ["21168"]=1,
-                ["21169"]=1,
-                ["21170"]=1,
-                ["21171"]=1,
-                ["21172"]=1,
-                ["21173"]=1,
-                ["21174"]=2,
-                ["21175"]=2,
-                ["21176"]=3
+    decks = {
+        encounterDeck = {
+            name = "Loki's Encounter Deck",
+            cards = {
+                ["21166"] = 1,
+                ["21167"] = 1,
+                ["21168"] = 1,
+                ["21169"] = 1,
+                ["21170"] = 1,
+                ["21171"] = 1,
+                ["21172"] = 1,
+                ["21173"] = 1,
+                ["21174"] = 2,
+                ["21175"] = 2,
+                ["21176"] = 3
             }
         },
-        infinityStones={
-            name="Infinity Stones",
-            position={-15.25, 1, 30.25},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER")),
-            cards={
-                ["21130"]=1,
-                ["21131"]=1,
-                ["21132"]=1,
-                ["21133"]=1,
-                ["21134"]=1,
-                ["21135"]=1
+        infinityStones = {
+            name = "Infinity Stones",
+            position = {-15.25, 1, 30.25},
+            scale = Vector(Global.getVar("CARD_SCALE_ENCOUNTER")),
+            cards = {
+                ["21130"] = 1,
+                ["21131"] = 1,
+                ["21132"] = 1,
+                ["21133"] = 1,
+                ["21134"] = 1,
+                ["21135"] = 1
             }
         }
     },
-    text={
-        infinityStones={
-            position={-15.25, 1, 36},
-            text="Infinity\nStones",
-            fontSize=60
+    text = {
+        infinityStones = {
+            position = {-15.25, 1, 36},
+            text = "Infinity\nStones",
+            fontSize = 60
         }
     },
-    modularSets={
-        infinityGauntlet="required",
-        enchantress="recommended",
-        frostGiants="recommended"
+    modularSets = {
+        infinityGauntlet = "required",
+        enchantress = "recommended",
+        frostGiants = "recommended"
     }
 }
 
 function prepareScenario_loki()
-  removeModularSet({modularSetKey = "infinityGauntlet"})
+    removeModularSet({
+        modularSetKey = "infinityGauntlet"
+    })
 
-  local villain = currentScenario.villains.loki
-  local villainStages = {}
+    local villain = currentScenario.villains.loki
+    local villainStages = {}
 
-  for key, stage in pairs(villain.stages) do
-      table.insert(villainStages, key)
-  end
+    for key, stage in pairs(villain.stages) do
+        table.insert(villainStages, key)
+    end
 
-  villainStages = Global.call("shuffleTable", {table = villainStages})
+    villainStages = Global.call("shuffleTable", {
+        table = villainStages
+    })
 
-  currentScenario.lokiQueue = villainStages
+    currentScenario.lokiQueue = villainStages
+end
+
+function setUpSchemeStage_loki_main(params)
+    local stage = params.stage
+    local stageNumber = string.sub(stage.key, -1)
+    local warInAsgardCardId = "21167"
+
+    if (stageNumber == "1") then
+        Global.call("moveCardFromEncounterDeckById", {
+            cardId = warInAsgardCardId,
+            searchInDiscard = true,
+            zoneIndex = "sideScheme"
+        })
+    end
 end
 
 function getNextVillainStage_loki(params)
@@ -132,56 +144,68 @@ function getNextVillainStage_loki(params)
 end
 
 function placeVillainStage_loki(params)
-  local heroCount = params.heroCount
-  local villain = currentScenario.villains.loki
-  local stage = params.stage
-  
-  local villainPosition = villain.deckPosition or defaults.villainDeck.position
-  local villainRotation = villain.deckRotation or defaults.villainDeck.rotation
-  local villainScale = villain.deckScale or defaults.villainDeck.scale
+    local heroCount = params.heroCount
+    local villain = currentScenario.villains.loki
+    local stage = params.stage
 
-  Global.call("moveCardFromPosition", {origin = villainPosition, zoneIndex = "victoryDisplay"})
+    local villainPosition = villain.deckPosition or defaults.villainDeck.position
+    local villainRotation = villain.deckRotation or defaults.villainDeck.rotation
+    local villainScale = villain.deckScale or defaults.villainDeck.scale
 
-  Global.call("spawnCard", {
-    cardId = stage.cardId,
-    position = villainPosition,
-    scale = villainScale,
-    name = villain.name,
-    flipped = false,
-    locked = true,
-    tags = {"group-scenario"}
-  })
-  
-  local hitPoints = (stage.hitPoints or 0) + ((stage.hitPointsPerPlayer or 0) * heroCount)
-  local villainHpCounter = getObjectFromGUID(villain.hpCounter.guid)
+    Global.call("moveCardFromPosition", {
+        origin = villainPosition,
+        zoneIndex = "victoryDisplay"
+    })
 
-    Wait.frames(
-        function()
-            villainHpCounter.call("setValue", {value = hitPoints}) 
-          
-            villainHpCounter.call("setPrimaryButtonOptions", {label = "Next!"})
-            villainHpCounter.call("setSecondaryButtonOptions", {label = "Swap!", clickFunction = "lokiSwapVillain"})
+    Global.call("spawnCard", {
+        cardId = stage.cardId,
+        position = villainPosition,
+        scale = villainScale,
+        name = villain.name,
+        flipped = false,
+        locked = true,
+        tags = {"group-scenario"}
+    })
 
-            if(stage.showAdvanceButton) then
-                villainHpCounter.call("showPrimaryButton")
-                villainHpCounter.call("showSecondaryButton")
-            else
-                villainHpCounter.call("hidePrimaryButton")
-                villainHpCounter.call("hideSecondaryButton")
-            end
-        end,
-        20
-    )
+    local hitPoints = (stage.hitPoints or 0) + ((stage.hitPointsPerPlayer or 0) * heroCount)
+    local villainHpCounter = getObjectFromGUID(villain.hpCounter.guid)
+
+    Wait.frames(function()
+        villainHpCounter.call("setValue", {
+            value = hitPoints
+        })
+
+        villainHpCounter.call("setPrimaryButtonOptions", {
+            label = "Next!"
+        })
+        villainHpCounter.call("setSecondaryButtonOptions", {
+            label = "Swap!",
+            clickFunction = "lokiSwapVillain"
+        })
+
+        if (stage.showAdvanceButton) then
+            villainHpCounter.call("showPrimaryButton")
+            villainHpCounter.call("showSecondaryButton")
+        else
+            villainHpCounter.call("hidePrimaryButton")
+            villainHpCounter.call("hideSecondaryButton")
+        end
+    end, 20)
 end
 
 function lokiSwapVillain(params)
-    if(#currentScenario.lokiQueue  == 0) then
-        Global.call("displayMessage", {message = "No more Lokis!", messageType = Global.getVar("MESSAGE_TYPE_INFO")})
+    if (#currentScenario.lokiQueue == 0) then
+        Global.call("displayMessage", {
+            message = "No more Lokis!",
+            messageType = Global.getVar("MESSAGE_TYPE_INFO")
+        })
         return
     end
     local villain = currentScenario.villains.loki
 
-    currentScenario.lokiQueue = Global.call("shuffleTable", {table = currentScenario.lokiQueue})
+    currentScenario.lokiQueue = Global.call("shuffleTable", {
+        table = currentScenario.lokiQueue
+    })
 
     local currentStage = currentScenario.currentLokiStage
     local swappedStage = currentScenario.lokiQueue[1]
@@ -193,14 +217,16 @@ function lokiSwapVillain(params)
     local villainPosition = villain.deckPosition or defaults.villainDeck.position
     local villainScale = villain.deckScale or defaults.villainDeck.scale
 
-    Global.call("deleteCardAtPosition", {position = villainPosition})
-  
+    Global.call("deleteCardAtPosition", {
+        position = villainPosition
+    })
+
     Global.call("spawnCard", {
-        cardId = stage.cardId, 
-        position = villainPosition, 
-        scale = villainScale, 
-        name = villain.name, 
-        flipped = false, 
+        cardId = stage.cardId,
+        position = villainPosition,
+        scale = villainScale,
+        name = villain.name,
+        flipped = false,
         locked = true,
         tags = {"group-scenario"}
     })

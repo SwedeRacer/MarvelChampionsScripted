@@ -1,85 +1,94 @@
-scenarios["magneto"] =
-{
-    name="Magneto",
-    tileImageUrl="https://steamusercontent-a.akamaihd.net/ugc/2292958473524122289/1137A4FF6D928E4227CED8F42EE9449720D521B8/",
-    villains={
-        magneto={
-            name="Magneto",
-            hpCounter={
-                imageUrl="https://steamusercontent-a.akamaihd.net/ugc/2292958473524122289/1137A4FF6D928E4227CED8F42EE9449720D521B8/",
+scenarios["magneto"] = {
+    name = "Magneto",
+    tileImageUrl = "https://steamusercontent-a.akamaihd.net/ugc/2292958473524122289/1137A4FF6D928E4227CED8F42EE9449720D521B8/",
+    villains = {
+        magneto = {
+            name = "Magneto",
+            hpCounter = {
+                imageUrl = "https://steamusercontent-a.akamaihd.net/ugc/2292958473524122289/1137A4FF6D928E4227CED8F42EE9449720D521B8/"
             },
-            stages={
-                stage1={
-                    cardId="32138",
-                    hitPointsPerPlayer=18
+            stages = {
+                stage1 = {
+                    cardId = "32138",
+                    hitPointsPerPlayer = 18
                 },
-                stage2={
-                    cardId="32139",
-                    hitPointsPerPlayer=20
+                stage2 = {
+                    cardId = "32139",
+                    hitPointsPerPlayer = 20
                 },
-                stage3={
-                    cardId="32140",
-                    hitPointsPerPlayer=22
+                stage3 = {
+                    cardId = "32140",
+                    hitPointsPerPlayer = 22
                 }
             }
         }
     },
-    schemes={
-        main={
-            stages={
-                stage1={
-                    cardId="32141",
-                    startingThreatPerPlayer=1,
-                    targetThreatPerPlayer=5
+    schemes = {
+        main = {
+            stages = {
+                stage1 = {
+                    cardId = "32141",
+                    startingThreatPerPlayer = 1,
+                    targetThreatPerPlayer = 5
                 },
-                stage2={
-                    cardId="32142",
-                    startingThreatPerPlayer=1,
-                    targetThreatPerPlayer=6
+                stage2 = {
+                    cardId = "32142",
+                    startingThreatPerPlayer = 1,
+                    targetThreatPerPlayer = 6
                 },
-                stage3={
-                    cardId="32143",
-                    startingThreatPerPlayer=1,
-                    targetThreatPerPlayer=7
+                stage3 = {
+                    cardId = "32143",
+                    startingThreatPerPlayer = 1,
+                    targetThreatPerPlayer = 7
                 }
             }
         }
     },
-    cards={
-        boardingParty={
-            cardId="32144",
-            position={7.25, 1.00, 16.75},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER")),
-            landscape=true
-        },
-        orbitalDecay={
-            cardId="32145",
-            position={-15.25, 1.25, 30.25},
-            scale=Vector(Global.getVar("CARD_SCALE_ENCOUNTER")),
-            landscape=true
-        }
-    },
-    decks={
-        encounterDeck={
-            name="Magneto's Encounter Deck",
-            cards={
-                ["32146"]=4,
-                ["32147"]=1,
-                ["32148"]=1,
-                ["32149"]=1,
-                ["32150"]=2,
-                ["32151"]=2,
-                ["32152"]=2,
-                ["32153"]=2,
-                ["32154"]=2,
-                ["32155"]=2,
-                ["32156"]=1,
-                ["32157"]=1,
-                ["32158"]=1
+    decks = {
+        encounterDeck = {
+            name = "Magneto's Encounter Deck",
+            cards = {
+                ["32144"] = 1,
+                ["32145"] = 1,
+                ["32146"] = 4,
+                ["32147"] = 1,
+                ["32148"] = 1,
+                ["32149"] = 1,
+                ["32150"] = 2,
+                ["32151"] = 2,
+                ["32152"] = 2,
+                ["32153"] = 2,
+                ["32154"] = 2,
+                ["32155"] = 2,
+                ["32156"] = 1,
+                ["32157"] = 1,
+                ["32158"] = 1
             }
         }
     },
-    modularSets={
-        acolytes="recommended"
+    modularSets = {
+        acolytes = "recommended"
     }
 }
+
+function setUpSchemeStage_magneto_main(params)
+    local stage = params.stage
+    local stageNumber = string.sub(stage.key, -1)
+    local boardingPartyCardId = "32144"
+    local orbitalDecayCardId = "32145"
+
+    if (stageNumber == "1") then
+        Global.call("moveCardFromEncounterDeckById", {
+            cardId = boardingPartyCardId,
+            searchInDiscard = true,
+            zoneIndex = "sideScheme"
+        })
+
+        Global.call("moveCardFromEncounterDeckById", {
+            cardId = orbitalDecayCardId,
+            searchInDiscard = true,
+            destinationPosition = {-15.25, 1.00, 30.25},
+            destinationRotation = {0, 90, 0}
+        })
+    end
+end

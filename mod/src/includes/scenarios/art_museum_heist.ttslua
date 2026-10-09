@@ -96,6 +96,7 @@ function calculateThreatToAdd_artMuseumHeist()
         zoneIndex = "attachment"
     })
 
+    local heroCount = getHeroCount()
     local attachmentZone = getObjectFromGUID(attachmentZoneDef.guid)
     local attachments = attachmentZone.getObjects()
     local artCount = 0
@@ -113,5 +114,5 @@ function calculateThreatToAdd_artMuseumHeist()
         end
     end
 
-    return artCount + 1
+    return (artCount + 1) * heroCount
 end

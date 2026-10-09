@@ -125,8 +125,8 @@ function kingpinPlaceAllNemesisDecks()
     end
 end
 
-function fearNoEvilGetEncounterSetPanel()
-    local underlings = {{
+function fearNoEvilGetUnderlingOptions()
+    return {{
         key = "bullseye",
         name = "Bullseye"
     }, {
@@ -147,6 +147,24 @@ function fearNoEvilGetEncounterSetPanel()
         fileName = "typhoid-mary",
         label = "Typhoid\nMary"
     }}
+end
+
+function fearNoEvilInitializeRandomUnderlingExclusions()
+    if (not selectedScenario.randomUnderlingExclusions) then
+        selectedScenario.randomUnderlingExclusions = {}
+    end
+
+    for _, underling in ipairs(fearNoEvilGetUnderlingOptions()) do
+        if (selectedScenario.randomUnderlingExclusions[underling.key] == nil) then
+            selectedScenario.randomUnderlingExclusions[underling.key] = true
+        end
+    end
+
+    return selectedScenario.randomUnderlingExclusions
+end
+
+function fearNoEvilGetEncounterSetPanel()
+    local underlings = fearNoEvilGetUnderlingOptions()
 
     local guid = self.getGUID()
     local underlingButtons = {}
@@ -154,7 +172,70 @@ function fearNoEvilGetEncounterSetPanel()
     local randomButtonImageUrl =
         "https://steamusercontent-a.akamaihd.net/ugc/12635327849228453947/CB7134374683D9348843072934D55AF278B01109/"
 
-    for _, underling in pairs(underlings) do
+    if (selectedScenario.randomUnderlingSelectionOpen) then
+        fearNoEvilInitializeRandomUnderlingExclusions()
+
+        local randomUnderlingToggles = {}
+
+        for _, underling in ipairs(underlings) do
+            table.insert(randomUnderlingToggles, {
+                tag = "Toggle",
+                value = underling.name,
+                attributes = {
+                    id = "underlingRandomToggle_" .. underling.key,
+                    onValueChanged = guid .. "/fearNoEvilRandomUnderlingToggleChanged",
+                    height = "22",
+                    width = "175",
+                    fontSize = "15",
+                    textColor = "rgba(1,1,1,1)",
+                    colors = "rgba(1,1,1,1)|rgba(1,1,1,1)|rgba(1,1,1,1)|rgba(1,1,1,1)",
+                    isOn = selectedScenario.randomUnderlingExclusions[underling.key] ~= false
+                }
+            })
+        end
+
+        return {
+            tag = "Panel",
+            attributes = {
+                preferredHeight = "150",
+                flexibleHeight = "0",
+                width = "955"
+            },
+            children = {{
+                tag = "VerticalLayout",
+                attributes = {
+                    rectAlignment = "UpperLeft",
+                    childAlignment = "UpperLeft",
+                    childForceExpandHeight = "false",
+                    spacing = "10",
+                    contentSizeFitter = "vertical"
+                },
+                children = {{
+                    tag = "Text",
+                    value = "This scenario will choose a random underling villain. Uncheck any villains you want to exclude from the random selection.",
+                    attributes = {
+                        rectAlignment = "UpperLeft",
+                        alignment = "UpperLeft",
+                        color = "rgba(1,1,1,1)"
+                    }
+                }, {
+                    tag = "HorizontalLayout",
+                    attributes = {
+                        childAlignment = "MiddleLeft",
+                        childForceExpandHeight = "false",
+                        childForceExpandWidth = "false",
+                        preferredHeight = "30",
+                        width = "955",
+                        spacing = "10",
+                        contentSizeFitter = "vertical"
+                    },
+                    children = randomUnderlingToggles
+                }}
+            }}
+        }
+    end
+
+    for _, underling in ipairs(underlings) do
         local isSelected = underling.key == selectedUnderlingButtonId
         local underlingLabel = underling.label or underling.Label or underling.name
 
@@ -280,6 +361,12 @@ end
 function fearNoEvilPrepareScenario()
     local selectedVillainKey = selectedScenario.underlingKey or "random"
     local selectedVillain = fearNoEvilGetUnderling(selectedVillainKey)
+
+    if (not selectedVillain) then
+        selectedVillain = fearNoEvilGetUnderling("bullseye")
+        selectedVillainKey = "bullseye"
+    end
+
     local villainKey = selectedVillain.key
     local encounterDeck = currentScenario.decks.encounterDeck
     local villainEncounterCards = selectedVillain.encounterCards
@@ -595,17 +682,26 @@ function fearNoEvilGetUnderling(key)
     }
 
     if (key == "random") then
-        local underlingKeys = {}
+        local availableUnderlingKeys = {}
+        local randomUnderlingExclusions = fearNoEvilInitializeRandomUnderlingExclusions()
 
-        for key, underling in pairs(underlings) do
-            table.insert(underlingKeys, key)
+        for _, underling in ipairs(fearNoEvilGetUnderlingOptions()) do
+            if (randomUnderlingExclusions[underling.key] ~= false) then
+                table.insert(availableUnderlingKeys, underling.key)
+            end
         end
 
-        underlingKeys = Global.call("shuffleTable", {
-            table = underlingKeys
+        if (#availableUnderlingKeys == 0) then
+            for _, underling in ipairs(fearNoEvilGetUnderlingOptions()) do
+                table.insert(availableUnderlingKeys, underling.key)
+            end
+        end
+
+        availableUnderlingKeys = Global.call("shuffleTable", {
+            table = availableUnderlingKeys
         })
 
-        return underlings[underlingKeys[1]]
+        return underlings[availableUnderlingKeys[1]]
     end
 
     return underlings[key]
@@ -622,6 +718,20 @@ function fearNoEvilUnderlingButtonClicked(player, value, id)
 
     selectedScenario.underlingButtonId = id
     selectedScenario.underlingKey = id
+    selectedScenario.randomUnderlingSelectionOpen = false
+
+    if (id == "random") then
+        fearNoEvilInitializeRandomUnderlingExclusions()
+        selectedScenario.randomUnderlingSelectionOpen = true
+        displayScenarioDetailsUI()
+    end
+end
+
+function fearNoEvilRandomUnderlingToggleChanged(player, value, id)
+    local underlingKey = string.gsub(id, "underlingRandomToggle_", "")
+    fearNoEvilInitializeRandomUnderlingExclusions()
+    selectedScenario.randomUnderlingExclusions[underlingKey] = value == "True"
+    Global.UI.setAttribute(id, "isOn", value)
 end
 
 function fearNoEvilResetTyphoidMary()

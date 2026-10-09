@@ -6,6 +6,33 @@ import fs from "fs-extra";
 import os from "os";
 import path from "path";
 
+function getWindowsTtsHomeDirs(env: NodeJS.ProcessEnv): string[] {
+  const dirs: string[] = [];
+  const primary = steam.homeDir.win32(env);
+  if (primary) {
+    dirs.push(primary);
+  }
+  const oneDriveBase = env.OneDrive || env.OneDriveConsumer;
+  if (oneDriveBase) {
+    dirs.push(path.join(oneDriveBase, "Documents", "My Games", "Tabletop Simulator"));
+  }
+  return [...new Set(dirs.map((dir) => path.resolve(dir)))];
+}
+
+async function replaceWithSymlink(linkPath: string): Promise<void> {
+  if (!(await fs.pathExists(linkPath))) {
+    return;
+  }
+  const stats = await fs.lstat(linkPath);
+  if (stats.isSymbolicLink()) {
+    await fs.remove(linkPath);
+    return;
+  }
+  const backupPath = `${linkPath}.backup.${Date.now()}`;
+  await fs.move(linkPath, backupPath);
+  console.warn(`Moved existing non-link path to \"${backupPath}\" before creating symlink.`);
+}
+
 /**
  * Reads a `{TTS-SAVE-FILE}.json`, and replaces the contents of a directory.
  */
@@ -104,32 +131,43 @@ export async function compileSaveFile(
 
 export async function destroySymlink(homeDir?: string): Promise<void> {
   // TODO: Add non-win32 support.
-  if (!homeDir) {
-    if (os.platform() !== "win32") {
-      throw new Error(`Unsupported platform: ${os.platform()}`);
-    }
-    homeDir = steam.homeDir.win32(process.env);
+  if (os.platform() !== "win32") {
+    throw new Error(`Unsupported platform: ${os.platform()}`);
   }
-  const from = path.join(homeDir, "Saves", "TTSDevLink");
-  return fs.remove(from);
+  const homeDirs = homeDir ? [homeDir] : getWindowsTtsHomeDirs(process.env);
+  for (const dir of homeDirs) {
+    const from = path.join(dir, "Saves", "TTSDevLink");
+    if (!(await fs.pathExists(from))) {
+      continue;
+    }
+    const stats = await fs.lstat(from);
+    if (stats.isSymbolicLink()) {
+      await fs.remove(from);
+    }
+  }
 }
 
 export async function createSymlink(homeDir?: string): Promise<string> {
   // TODO: Add non-win32 support.
-  if (!homeDir) {
-    if (os.platform() !== "win32") {
-      throw new Error(`Unsupported platform: ${os.platform()}`);
-    }
-    homeDir = steam.homeDir.win32(process.env);
+  if (os.platform() !== "win32") {
+    throw new Error(`Unsupported platform: ${os.platform()}`);
   }
-  await destroySymlink(homeDir);
-  const from = path.join(homeDir, "Saves", "TTSDevLink");
-  await fs.symlink(
-    path.resolve("dist"),
-    from,
-    os.platform() === "win32" ? "junction" : "dir"
-  );
-  return from;
+  const homeDirs = homeDir ? [homeDir] : getWindowsTtsHomeDirs(process.env);
+  const target = path.resolve("dist");
+  let createdPath = "";
+  for (const dir of homeDirs) {
+    const from = path.join(dir, "Saves", "TTSDevLink");
+    await fs.mkdirp(path.dirname(from));
+    await replaceWithSymlink(from);
+    await fs.symlink(target, from, "junction");
+    if (!createdPath) {
+      createdPath = from;
+    }
+  }
+  if (!createdPath) {
+    throw new Error("Could not determine a Tabletop Simulator save path.");
+  }
+  return createdPath;
 }
 
 export async function generateFiles(): Promise<void> {

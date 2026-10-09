@@ -122,18 +122,28 @@ function removeCounterFromCard(params)
 end
 
 function calculateSideSchemeThreat(params)
+    local scenarioManager = getObjectFromGUID(Global.getVar("GUID_SCENARIO_MANAGER"))
+    local mode = scenarioManager and scenarioManager.call("getMode") or "standard"
     local cardData = params.cardData
     local heroCount = params.heroCount
     local threat = 0
+    local hinder = 0
 
     local baseThreat = cardData.baseThreat and tonumber(cardData.baseThreat) or 0
     local baseThreatIsFixed = cardData.baseThreatIsFixed == "true"
-    local hinder = cardData.hinder and tonumber(cardData.hinder) or 0
+    local standardHinder = cardData.hinder and tonumber(cardData.hinder) or 0
+    local expertHinder = cardData.hinderExpert and tonumber(cardData.hinderExpert) or 0
+
+    if (mode == "expert") then
+        hinder = expertHinder > 0 and expertHinder or standardHinder
+    else
+        hinder = standardHinder
+    end
 
     if baseThreatIsFixed then
         threat = baseThreat + (heroCount * hinder)
     else
-        threat = baseThreat * heroCount
+        threat = (baseThreat * heroCount) + (heroCount * hinder)
     end
 
     return threat
@@ -164,6 +174,9 @@ function addCountersAndTokensToCard(params)
     local longDelay = params.longDelay or false
     local delay = longDelay and 3 or 1
 
+    local scenarioManager = getObjectFromGUID(Global.getVar("GUID_SCENARIO_MANAGER"))
+    local mode = scenarioManager and scenarioManager.call("getMode") or "standard"
+
     local addCounterFunction = function()
         if (card.isDestroyed()) then
             return
@@ -186,7 +199,7 @@ function addCountersAndTokensToCard(params)
             addStandardCounterToCard(params)
             addConfiguredCounterToCard(params)
 
-            if (card.hasTag("toughness")) then
+            if (card.hasTag("toughness") or (mode == "expert" and card.hasTag("toughnessExpert"))) then
                 addStatusToMinionOrAlly({
                     card = card,
                     statusType = "tough"

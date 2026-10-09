@@ -1,76 +1,75 @@
-scenarios["thunderbolts"] =
-{
-    name="Thunderbolts",
+scenarios["thunderbolts"] = {
+    name = "Thunderbolts",
     fullyScripted = true,
     preselectModularEncounterSets = false,
-    tileImageUrl="https://steamusercontent-a.akamaihd.net/ugc/6301420264312827/19ADA7D5B629A3B8B723B1E30EA7AB112C06FA0F/",
-    villains={
-        citizenV={
-            name="Citizen V",
-            hpCounter={
-                imageUrl="https://steamusercontent-a.akamaihd.net/ugc/6301420264312827/19ADA7D5B629A3B8B723B1E30EA7AB112C06FA0F/",
+    tileImageUrl = "https://steamusercontent-a.akamaihd.net/ugc/6301420264312827/19ADA7D5B629A3B8B723B1E30EA7AB112C06FA0F/",
+    villains = {
+        citizenV = {
+            name = "Citizen V",
+            hpCounter = {
+                imageUrl = "https://steamusercontent-a.akamaihd.net/ugc/6301420264312827/19ADA7D5B629A3B8B723B1E30EA7AB112C06FA0F/"
             },
-            stages={
-                stageA={
-                    cardId="50129",
-                    hitPointsPerPlayer=12
+            stages = {
+                stageA = {
+                    cardId = "50129",
+                    hitPointsPerPlayer = 12
                 },
-                stageB={
-                    cardId="50129",
-                    hitPointsPerPlayer=16,
-                    flipCard=true
+                stageB = {
+                    cardId = "50129",
+                    hitPointsPerPlayer = 16,
+                    flipCard = true
                 }
             }
         }
     },
-    schemes={
-        main={
-            stages={
-                stage1={
-                    cardId="50130",
-                    startingThreat=0,
-                    startingThreatPerPlayer=1,
-                    targetThreatPerPlayer=11
+    schemes = {
+        main = {
+            stages = {
+                stage1 = {
+                    cardId = "50130",
+                    startingThreat = 0,
+                    startingThreatPerPlayer = 1,
+                    targetThreatPerPlayer = 11
                 }
             }
         }
     },
-    decks={
-        encounterDeck={
-            name="Citizen V's Encounter Deck",
-            cards={
-                ["50131"]=1,
-                ["50132"]=1,
-                ["50133"]=1,
-                ["50134"]=3,
-                ["50135"]=1,
-                ["50136"]=1,
-                ["50137"]=2,
-                ["50138"]=2
+    decks = {
+        encounterDeck = {
+            name = "Citizen V's Encounter Deck",
+            cards = {
+                ["50131"] = 1,
+                ["50132"] = 1,
+                ["50133"] = 1,
+                ["50134"] = 3,
+                ["50135"] = 1,
+                ["50136"] = 1,
+                ["50137"] = 2,
+                ["50138"] = 2
             }
         }
     },
-    zones={
-        sideScheme = {
-            position = {7.25, 1.00, 9.00},
-            scale = {7.00, 1.00, 20.00},
-            firstCardPosition = {7.25, 0.98, 16.75},
-            horizontalGap = 7,
-            verticalGap = 5,
-            layoutDirection = "vertical",
-            width = 1,
-            height = 4
-        }
-    },
+    -- zones = {
+    --     sideScheme = {
+    --         position = {7.25, 1.00, 9.00},
+    --         scale = {7.00, 1.00, 20.00},
+    --         firstCardPosition = {7.25, 0.98, 16.75},
+    --         horizontalGap = 7,
+    --         verticalGap = 5,
+    --         layoutDirection = "vertical",
+    --         width = 1,
+    --         height = 4
+    --     }
+    -- },
     customZones = {
         thunderboltBackup = {
-            zoneType="minion",
+            zoneType = "minion",
             tags = {"minion"},
             scale = {10, 1, 7},
-            position = {24.25, 1.00, 22.25},
+            position = {30.25, 1.00, 22.25},
             horizontalGap = 5,
             layoutDirection = "horizontal",
-            firstCardPosition = {21.75, 0.98, 22.25},
+            firstCardPosition = {27.75, 0.98, 22.25},
             width = 2,
             height = 1,
             rescaleOnEnterTo = CARD_SCALE_ENCOUNTER,
@@ -78,24 +77,24 @@ scenarios["thunderbolts"] =
             repositionCards = true,
             addCountersAndTokens = true
         }
-    },    
-    modularSets={
-        gravitationalPull="exclude",
-        hardSound="exclude",
-        paleLittleSpider="exclude",
-        powerOfTheAtom="exclude",
-        supersonic="exclude",
-        theLeaper="exclude",
-        extremeRisk="exclude",
-        growingStrong="exclude",
-        whiteout="exclude",
-        techno="exclude"
     },
-    notes={
-        minions={
-            title="Thunderbolt Minions",
-            text="The Thunderbolt Backup environment instructs you to swap minions based on how much damage they've taken, rather than how many hit points they have remaining. Therefore, the HP counters for these minions will start at zero, instead of the minion's printed HP. They are also positioned higher on the card, so that you can see the printed HP.",
-            position={0, 1, 0}
+    modularSets = {
+        gravitationalPull = "exclude",
+        hardSound = "exclude",
+        paleLittleSpider = "exclude",
+        powerOfTheAtom = "exclude",
+        supersonic = "exclude",
+        theLeaper = "exclude",
+        extremeRisk = "exclude",
+        growingStrong = "exclude",
+        whiteout = "exclude",
+        techno = "exclude"
+    },
+    notes = {
+        minions = {
+            title = "Thunderbolt Minions",
+            text = "The Thunderbolt Backup environment instructs you to swap minions based on how much damage they've taken, rather than how many hit points they have remaining. Therefore, the HP counters for these minions will start at zero, instead of the minion's printed HP. They are also positioned higher on the card, so that you can see the printed HP.",
+            position = {0, 1, 0}
         }
     }
 }
@@ -173,25 +172,25 @@ function getEncounterSetControlPanel_thunderbolts()
 
     for key, thunderbolt in pairs(selectedScenario.thunderboltEncounterSets) do
         table.insert(thunderboltToggles, {
-        tag = "Toggle",
-        value = thunderbolt.name,
-        attributes = {
-            id = thunderbolt.modularSetKey,
-            onValueChanged = guid .. "/modularEncounterSetToggleChanged",
-            height = "30",
-            width = "275",
-            fontSize = "15",
-            textColor = "rgba(1,1,1,1)",
-            colors = "rgba(1,1,1,1)|rgba(1,1,1,1)|rgba(1,1,1,1)|rgba(1,1,1,1)",
-            isOn = false
-        }
+            tag = "Toggle",
+            value = thunderbolt.name,
+            attributes = {
+                id = thunderbolt.modularSetKey,
+                onValueChanged = guid .. "/modularEncounterSetToggleChanged",
+                height = "30",
+                width = "275",
+                fontSize = "15",
+                textColor = "rgba(1,1,1,1)",
+                colors = "rgba(1,1,1,1)|rgba(1,1,1,1)|rgba(1,1,1,1)|rgba(1,1,1,1)",
+                isOn = false
+            }
         })
     end
 
     table.insert(thunderboltToggles, {
         tag = "Panel",
         attributes = {
-            id="emptyCell",
+            id = "emptyCell",
             preferredHeight = "8",
             flexibleHeight = "0"
         }
@@ -201,72 +200,64 @@ function getEncounterSetControlPanel_thunderbolts()
         tag = "Button",
         value = "Random Selection",
         attributes = {
-            id="randomSelectionButton",
-            onClick=guid .. "/thunderboltsRandomSelectionClicked",
-            height="30",
-            width="275",
-            fontSize="15",
-            textColor="rgba(1,1,1,1)",
-            color="rgba(0.2,0.2,0.2,1)"
+            id = "randomSelectionButton",
+            onClick = guid .. "/thunderboltsRandomSelectionClicked",
+            height = "30",
+            width = "275",
+            fontSize = "15",
+            textColor = "rgba(1,1,1,1)",
+            color = "rgba(0.2,0.2,0.2,1)"
         }
     })
 
     local encounterSetControlPanel = {
         tag = "Panel",
-        children = {
-            {
-                tag = "VerticalLayout",
+        children = {{
+            tag = "VerticalLayout",
+            attributes = {
+                rectAlignment = "UpperLeft",
+                childAlignment = "UpperLeft",
+                childForceExpandHeight = "false",
+                spacing = "16",
+                contentSizeFitter = "vertical"
+            },
+            children = {{
+                tag = "Text",
+                value = "Select at least " .. numberText .. " Thunderbolt modular encounter sets.",
                 attributes = {
                     rectAlignment = "UpperLeft",
-                    childAlignment = "UpperLeft",
+                    alignment = "UpperLeft",
+                    color = "rgba(1,1,1,1)"
+                }
+            }, {
+                tag = "HorizontalLayout",
+                attributes = {
+                    childAlignment = "MiddleCenter",
                     childForceExpandHeight = "false",
-                    spacing = "16",
-                    contentSizeFitter = "vertical"
+                    childForceExpandWidth = "false",
+                    spacing = "0"
                 },
-                children = {
-                    {
-                        tag = "Text",
-                        value = "Select at least " .. numberText .. " Thunderbolt modular encounter sets.",
-                        attributes = {
-                            rectAlignment = "UpperLeft",
-                            alignment = "UpperLeft",
-                            color = "rgba(1,1,1,1)"
-                        }
+                children = {{
+                    tag = "GridLayout",
+                    attributes = {
+                        width = "855",
+                        spacing = "15 5",
+                        cellSize = "275 30",
+                        startAxis = "Vertical",
+                        constraint = "FixedRowCount",
+                        constraintCount = "4"
                     },
-                    {
-                        tag = "HorizontalLayout",
-                        attributes = {
-                            childAlignment = "MiddleCenter",
-                            childForceExpandHeight = "false",
-                            childForceExpandWidth = "false",
-                            spacing = "0"
-                        },
-                        children = {
-                            {
-                                tag = "GridLayout",
-                                attributes = {
-                                    width = "855",
-                                    spacing = "15 5",
-                                    cellSize = "275 30",
-                                    startAxis = "Vertical",
-                                    constraint = "FixedRowCount",
-                                    constraintCount = "4"
-                                },
-                                children = thunderboltToggles
-                            }
-                        }
-                    },
-                    {
-                        tag = "Panel",
-                        attributes = {
-                            id="bottomSpacer",
-                            preferredHeight = "8",
-                            flexibleHeight = "0"
-                        }
-                    }
-                },
-            }
-        }
+                    children = thunderboltToggles
+                }}
+            }, {
+                tag = "Panel",
+                attributes = {
+                    id = "bottomSpacer",
+                    preferredHeight = "8",
+                    flexibleHeight = "0"
+                }
+            }}
+        }}
     }
 
     return encounterSetControlPanel
@@ -281,7 +272,9 @@ function thunderboltsRandomSelectionClicked(player, value, id)
         table.insert(thunderboltKeys, thunderbolt.modularSetKey)
     end
 
-    thunderboltKeys = Global.call("shuffleTable", {table = thunderboltKeys})
+    thunderboltKeys = Global.call("shuffleTable", {
+        table = thunderboltKeys
+    })
 
     local setsToSelect = math.min(minimumThunderboltEncounterSets, #thunderboltKeys)
     local selectedLookup = {}
@@ -290,7 +283,8 @@ function thunderboltsRandomSelectionClicked(player, value, id)
     end
 
     for key, thunderbolt in pairs(selectedScenario.thunderboltEncounterSets) do
-        modularEncounterSetToggleChanged(player, selectedLookup[thunderbolt.modularSetKey] == true and "True" or "False", thunderbolt.modularSetKey)
+        modularEncounterSetToggleChanged(player,
+            selectedLookup[thunderbolt.modularSetKey] == true and "True" or "False", thunderbolt.modularSetKey)
     end
 end
 
@@ -312,7 +306,7 @@ end
 --     if(params and params.postMessage and not modularSetsAreValid) then
 --       broadcastToAll("Please select at least " .. minimumThunderboltEncounterSets .. " Thunderbolt encounter sets.", {1,1,1})
 --     end
-  
+
 --     return modularSetsAreValid
 -- end
 
@@ -320,11 +314,12 @@ function setUpSchemeStage_thunderbolts_main(params)
     setupThunderboltMinions()
 
     Global.call("moveCardFromEncounterDeckById", {
-        cardId = "50131", 
-        searchInDiscard = true, 
-        destinationPosition = {16.75, 0.97, 22.25}, 
-        flipCard = true, 
-        locked = true})
+        cardId = "50131",
+        searchInDiscard = true,
+        destinationPosition = {22.75, 0.97, 22.25},
+        flipCard = true,
+        locked = true
+    })
 
     function placeThunderboltMinionCoroutine()
         for i = 1, 25 do
@@ -335,35 +330,43 @@ function setUpSchemeStage_thunderbolts_main(params)
         local players = heroManager.call("getPlayersInPlayerOrder")
         local encounterDeck = Global.call("getEncounterDeck")
 
-        local thunderboltsMinions={
-            gravitationalPull="50139",
-            hardSound="50143",
-            paleLittleSpider="50148",
-            powerOfTheAtom="50152",
-            supersonic="50156",
-            theLeaper="50161",
-            extremeRisk="51039",
-            growingStrong="52035",
-            whiteout="54034",
-            techno="53038"
+        local thunderboltsMinions = {
+            gravitationalPull = "50139",
+            hardSound = "50143",
+            paleLittleSpider = "50148",
+            powerOfTheAtom = "50152",
+            supersonic = "50156",
+            theLeaper = "50161",
+            extremeRisk = "51039",
+            growingStrong = "52035",
+            whiteout = "54034",
+            techno = "53038"
         }
-    
+
         local thunderboltsInDeck = {}
-    
+
         for key, minionId in pairs(thunderboltsMinions) do
-            if(Global.call("isCardInDeck", {cardId = minionId, deck=encounterDeck})) then
+            if (Global.call("isCardInDeck", {
+                cardId = minionId,
+                deck = encounterDeck
+            })) then
                 table.insert(thunderboltsInDeck, minionId)
             end
         end
-    
-        thunderboltsInDeck = Global.call("shuffleTable", {table = thunderboltsInDeck})
+
+        thunderboltsInDeck = Global.call("shuffleTable", {
+            table = thunderboltsInDeck
+        })
 
         local index = 0
 
-        for _, player in ipairs(players) do    
+        for _, player in ipairs(players) do
             index = index + 1
             local minionId = thunderboltsInDeck[index]
-            Global.call("moveCardFromEncounterDeckById", {cardId = minionId, zoneIndex="minion-" .. player.playerColor})
+            Global.call("moveCardFromEncounterDeckById", {
+                cardId = minionId,
+                zoneIndex = "minion-" .. player.playerColor
+            })
 
             for i = 1, 25 do
                 coroutine.yield(0)
@@ -375,11 +378,14 @@ function setUpSchemeStage_thunderbolts_main(params)
         end
 
         local minionId = thunderboltsInDeck[#thunderboltsInDeck]
-        Global.call("moveCardFromEncounterDeckById", {cardId = minionId, destinationPosition={21.75, 0.97, 22.25}})
-  
+        Global.call("moveCardFromEncounterDeckById", {
+            cardId = minionId,
+            destinationPosition = {21.75, 0.97, 22.25}
+        })
+
         return 1
     end
-  
+
     startLuaCoroutine(self, "placeThunderboltMinionCoroutine")
 end
 
@@ -388,9 +394,11 @@ function setupThunderboltMinions()
     local cards = encounterDeck.getObjects()
 
     for _, card in ipairs(cards) do
-        local cardData = Global.call("getCardData", {card = card})
+        local cardData = Global.call("getCardData", {
+            card = card
+        })
         local traits = cardData.traits or ""
-        if(string.find(traits, "Thunderbolt.", 1, true)) then
+        if (string.find(traits, "Thunderbolt.", 1, true)) then
             Global.call("setCardValue", {
                 cardGuid = card.guid,
                 property = "standardCounterBaseOffset",

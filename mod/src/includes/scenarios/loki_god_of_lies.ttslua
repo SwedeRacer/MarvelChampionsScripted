@@ -130,9 +130,9 @@ scenarios["lokiGodOfLies"] = {
     },
     zones = {
         environment = {
-            position = {28.25, 2.00, 29.75},
+            position = {35.25, 2.00, 29.75},
             scale = {30.00, 4.00, 7.00},
-            firstCardPosition = {15.75, 0.97, 29.75},
+            firstCardPosition = {22.75, 0.97, 29.75},
             horizontalGap = 5,
             verticalGap = 0,
             layoutDirection = "horizontal",
@@ -217,12 +217,17 @@ function lokiGodOfLiesPlaceSynergyEnvironments()
             Global.call("moveCardFromEncounterDeckById", {
                 cardId = cardId,
                 destinationPosition = tempEnvironmentPosition,
-                destinationRotation = {0,180,0}
+                destinationRotation = {0, 180, 0}
             })
 
             Wait.frames(function()
-                local environmentCard = Global.call("findCard", {cardId = cardId})
-                Global.call("moveCard", {card = environmentCard, zoneIndex = "environment"})
+                local environmentCard = Global.call("findCard", {
+                    cardId = cardId
+                })
+                Global.call("moveCard", {
+                    card = environmentCard,
+                    zoneIndex = "environment"
+                })
             end, 20)
 
             for i = 1, 25 do
@@ -368,7 +373,9 @@ function lokiGodOfLiesShatterTheIllusion()
         lokiGodOfLiesFlipGodOfLies()
     end
 
-    Global.call("dealEncounterCardsToAllPlayers", {cardsPerPlayer = 1})
+    Global.call("dealEncounterCardsToAllPlayers", {
+        cardsPerPlayer = 1
+    })
 
     Global.call("displayMessage", {
         message = "Dealing each hero a face-down encounter card.",
@@ -387,7 +394,7 @@ function lokiGodOfLiesAddSynergyToEnvironment()
     local environmentCard = Global.call("findCard", {
         cardId = stage.associatedEnvironment.cardId
     })
-    
+
     local synergyCounter = Global.call("getCounterFromCard", {
         card = environmentCard,
         counterClass = "configured"
@@ -525,7 +532,9 @@ function lokiGodOfWarPlaceDarkScepter()
     local cardAlreadyAttached = false
     local message = "Loki has the Dark Scepter!"
 
-    if (cardInPlay and Global.call("isFaceUp", {object = cardInPlay})) then
+    if (cardInPlay and Global.call("isFaceUp", {
+        object = cardInPlay
+    })) then
         cardFound = true
 
         cardAlreadyAttached = Global.call("cardIsInZone", {
@@ -533,7 +542,7 @@ function lokiGodOfWarPlaceDarkScepter()
             zoneIndex = "attachment"
         })
 
-        if(cardAlreadyAttached) then
+        if (cardAlreadyAttached) then
             message = "Loki already has the Dark Scepter, so he becomes tough!"
         else
             Global.call("moveCard", {
@@ -543,7 +552,7 @@ function lokiGodOfWarPlaceDarkScepter()
         end
     end
 
-    if(not cardFound) then
+    if (not cardFound) then
         cardFound = Global.call("moveCardFromEncounterDeckById", {
             cardId = darkScepterCardId,
             searchInDiscard = true,
@@ -559,7 +568,7 @@ function lokiGodOfWarPlaceDarkScepter()
         })
     end
 
-    if(not cardFound) then
+    if (not cardFound) then
         message = "The Dark Scepter could not be found, so Loki becomes tough!"
     end
 

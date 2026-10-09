@@ -19,7 +19,7 @@ function mapCardData(cardData)
     for k, v in pairs(cardData) do
         if (k ~= "FrontURL" and k ~= "FrontURL_mutant" and k ~= "FrontURL_shield" and k ~= "FrontURL_defender" and k ~=
             "BackURL" and k ~= "flavor" and k ~= "text" and k ~= "backText" and k ~= "steady" and k ~= "stalwart" and k ~=
-            "toughness") then
+            "toughness" and k ~= "toughnessExpert") then
             if (k == "code") then
                 card[k] = string.sub(tostring(v), 1, 5)
             else
@@ -104,6 +104,9 @@ function buildCardPool(packId)
             end
             if (cardData.toughness) then
                 table.insert(tags, "toughness")
+            end
+            if (cardData.toughnessExpert) then
+                table.insert(tags, "toughnessExpert")
             end
 
             local gmNotes = mapCardData(cardData)
